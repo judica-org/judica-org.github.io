@@ -1,0 +1,15 @@
+{{ define "main" }}
+    <div class="main">
+        <img src="{{.Site.Params.headerimage}}"/>
+            <h1 class="lead">{{.Site.Params.slogan }}</h1>
+    </div>
+        <hr/>
+    <div class="main2">
+        <div class="mission">
+            {{ range .Site.Params.missions }}
+            <h1> {{ .}} </h1>
+            {{ end }}
+                <h4><a href="/mission/">learn more ></a></h4>
+        </div>
+    </div>
+{{ end }}

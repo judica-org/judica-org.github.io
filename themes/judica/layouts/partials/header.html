@@ -1,0 +1,11 @@
+
+    <header class="nav">
+    <ul>
+        <li class="float-left"> <a href="/">{{.Site.Params.brand}}</a></li>
+    </ul>
+    <ul>
+        {{ range .Site.Menus.main }}
+        <li> <a href="{{.URL}}">{{.Name}}</a></li>
+        {{end}}
+    </ul>
+    </header>
