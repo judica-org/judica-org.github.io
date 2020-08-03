@@ -12,7 +12,7 @@ copyright = "&copy; Judica, Inc 2020 | contact@judica.org | <a class='darkmode-s
 [[menu.main]]
     identifier = "software"
     name = "software."
-    url = "/apps/"
+    url = "/software/"
     weight = -140
 [[menu.main]]
     identifier = "blog"
