@@ -2,7 +2,7 @@ baseURL = "https://judica.org/"
 languageCode = "en-us"
 title = "Judica, Inc"
 theme = "judica"
-copyright = "&copy; Judica, Inc 2020 | contact@judica.org | res judicata"
+copyright = "&copy; Judica, Inc 2020 | contact@judica.org | <a class='darkmode-switch'> dark/light theme</a>"
 
 [[menu.main]]
     identifier = "mission"

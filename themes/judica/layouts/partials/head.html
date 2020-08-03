@@ -1,9 +1,44 @@
 
+    <script>
+
+        const storage = window.localStorage;
+        const get_darkmode = () => {
+            const darkmode = storage.getItem('darkmode');
+            console.log('get-darkmode',darkmode);
+            if (darkmode === undefined || darkmode === null) {
+                return false;
+            }
+            return darkmode === "true";
+        };
+        const set_darkmode = () =>
+        {
+            if (get_darkmode()) {
+                console.log("Dark!");
+                document.body.classList.add('darkmode');
+            } else {
+
+                console.log("Light!");
+                document.body.classList.remove('darkmode');
+            }
+        };
+        window.onload = () => {
+            // not it so the first onclick is correct
+            const v = document.getElementsByClassName('darkmode-switch')[0];
+            v.onclick = (e) => {
+                console.log('clicked');
+                console.log(storage);
+                storage.setItem('darkmode', ! get_darkmode());
+                get_darkmode();
+                set_darkmode();
+            }
+            console.log(v);
+            set_darkmode();
+            
+        };
+    </script>
  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@200;500&display=swap" rel="stylesheet">
 <style>
 body {
-    background-color: black;
-    color: white;
     font-family: 'IBM Plex Mono', monospace;
     width: 100%;
     overflow-x: hidden;
@@ -44,12 +79,12 @@ padding-right: 20px;
 
 a {
     text-decoration:none;
-    color: #ffffff;
+    color: #000000;
 }
 
  a:hover {
     text-decoration: underline;
-    color: #ffffff;
+    color: #000000;
 }
 a.underlined {
 
@@ -66,7 +101,7 @@ a.underlined {
     display: flex;
 }
 hr {
- color: #ffffff;
+ color: #000000;
  width: 75%;
 
 }
@@ -83,5 +118,25 @@ hr {
     text-align: center;
 }
 .mission > * {
+}
+
+.darkmode {
+    background-color: black;
+    color: white;
+}
+
+.darkmode a {
+    text-decoration:none;
+    color: #ffffff;
+}
+
+ .darkmode a:hover {
+    text-decoration: underline;
+    color: #ffffff;
+}
+
+.darkmode hr {
+ color: #ffffff;
+
 }
 </style>
