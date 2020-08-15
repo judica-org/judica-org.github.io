@@ -1,6 +1,7 @@
 +++
 title="$50,000 Grant from 100x Group (BitMEX)"
 date=2020-07-22
+front_pic='/img/100x-Logo.svg'
 +++
 
 We're super pleased to share that 100x Group (BitMEX) has selected Judica to receive a $50,000

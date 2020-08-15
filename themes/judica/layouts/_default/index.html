@@ -7,9 +7,28 @@
     <div class="main2">
         <div class="mission">
             {{ range .Site.Params.missions }}
-            <h1> {{ .}} </h1>
+            <h1 style="margin-top: 0"> {{ .}} </h1>
             {{ end }}
                 <h4><a href="/mission/">learn more ></a></h4>
+        </div>
+
+        </div>
+        
+    </div>
+    <hr>
+    <div class="main2">
+        <h3> recent blogs </h3>
+        <div class="recent-blogs">
+        {{ range where .Pages "Section" "blog" }}
+            {{range first 3 .Pages }}
+            <div style="padding: 20px">
+                <img src="{{.Params.front_pic}}" style="width:100%"/>
+            <h4 class="nobottom"> <a class="underlined" href="{{.URL}}">{{.Title}} </a> </h4>
+            {{if .Params.Author }} <small> by {{.Params.Author}}</small> {{end}}
+            <small>on {{.Date.Format "January 2, 2006"}}</small>
+            </div>
+            {{end}}
+        {{ end }}
         </div>
     </div>
 {{ end }}

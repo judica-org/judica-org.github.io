@@ -2,6 +2,7 @@
 title=" The Urgency of Rearchitecting Bitcoin's Mempool"
 date='2020-08-01'
 author="Jeremy Rubin"
+front_pic='/img/complex-mempool-sm.png'
 +++
 
 ### *If this post excites you let's [work together](/join/). Or, if you see the value of this work and are able to dedicate financial resources, [please reach out](/join/) to support more developers working on this project.*
@@ -81,10 +82,13 @@ and cost miners money with a loss of uptime. Imagine it taking more time for a m
 should go into a block than it takes to mine the block itself! Therefore we need stricter rules in
 the mempool to prevent these blowouts.
 
+{{< figure src="/img/less-complex-mempool.png" width="100%" caption="Visualization of Mempool with 800 transactions. See [this PR](https://github.com/bitcoin/bitcoin/pull/17292#issuecomment-547592769) for more details.">}}
+
 Unfortunately, a number of algorithms in the Mempool are suboptimal, meaning where a small amount
 of operations might be sufficient, a much larger amount is done. Suboptimal often also means that
 while the overall work is similar in terms of the number of operations, the algorithm's operations
 are inefficient to run (maybe allocating too much memory or just doing something slowly).
+{{< figure src="/img/complex-mempool.png" width="100%" caption="Visualization of Mempool with 10,000 transactions. See [this PR](https://github.com/bitcoin/bitcoin/pull/17292#issuecomment-547592769) for more details. This makes it easy to see how the work becomes harder as more entries are added.">}}
 
 These algorithms performance mean that we have to determine safe limitations for what we will accept
 into the Mempool that fits within our computational budgets, and if the performance is suboptimal,

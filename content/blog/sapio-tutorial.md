@@ -1,6 +1,7 @@
 +++
 date='2020-08-02'
 title='Sapio Tutorial Sneak Peak'
+front_pic="/img/sapio-logo.png"
 +++
 
 We've been hard at work getting Sapio ready for release, but I figured it would be a good time to
