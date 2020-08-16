@@ -19,7 +19,7 @@ body {
 .nav {
     padding-left: max(70px, 12.5%);
     padding-right: max(70px, 12.5%);
-    padding-top: 10px;
+    padding-bottom: 30px;
     display: grid;
     grid-template-columns: 1fr max-content;
 }
@@ -165,6 +165,26 @@ a {
  figcaption a {
      text-decoration:underline !important;
  }
+ .blogrow {
+     display: grid;
+     grid-template-columns: 1fr 0.5fr 4fr;
+     padding-bottom: 2em;
+ }
+ .blogrow :first-child {
+ }
+ .blogrow > div {
+     padding-top: 0;
+ }
+
+
+ .joinrow {
+    display: grid;
+    grid-template-columns: 1fr 1fr minmax(350px, 1fr);
+ }
+ .joinrow > div {
+     padding-right: 2em;
+ }
+
     </style>
 
     <script>

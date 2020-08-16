@@ -8,19 +8,28 @@
         <br>
         <br>
         <div class="main">
-            <img src="{{.Params.img}}"/>
+            {{if .Params.img }} <img src="{{.Params.img}}"/> {{end}}
             <h1 class="lead">{{.Title}}</h1>
         </div>
         <hr>
         <div class="main2">
             {{ range .Pages }}
-            <h4 class="nobottom"> <a class="underlined" href="{{.URL}}">{{.Title}} </a> </h4>
-            {{if .Params.Author }} <small> by {{.Params.Author}}</small> {{end}}
-            <small>on {{.Date.Format "January 2, 2006"}}</small>
-            <div>
-                {{.Summary}}
-                <a href="{{ .RelPermalink }}" class='underlined'>read more…</a>
-            </div>
+                <div class="blogrow">
+                    <div>
+                        <h4 class="nobottom" style="visibility:hidden">.</h4>
+                        <img src="{{.Params.front_pic}}" style="width:100%"/>
+                    </div>
+                    <div></div>
+                    <div>
+                        <h4 class="nobottom"> <a class="underlined" href="{{.URL}}">{{.Title}} </a> </h4>
+                        {{if .Params.Author }} <small> by {{.Params.Author}}</small> {{end}}
+                        <small>on {{.Date.Format "January 2, 2006"}}</small>
+                        <div>
+                            {{.Summary}}
+                            <a href="{{ .RelPermalink }}" class='underlined'>read more…</a>
+                        </div>
+                    </div>
+                </div>
             {{ end }}
         </div>
         {{- partial "footer.html" . -}}

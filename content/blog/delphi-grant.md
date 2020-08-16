@@ -1,6 +1,7 @@
 +++
 title="$1,000 Grant from Delphi Digital"
 date=2020-07-06
+front_pic="/img/delphi-digital.png"
 +++
 
 On May 11th, 2020 [Delphi Digital](https://delphidigital.io), a leading cryptocurrency market

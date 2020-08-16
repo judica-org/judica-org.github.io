@@ -25,7 +25,6 @@ copyright = "&copy; Judica, Inc 2020 | contact@judica.org | <a class='darkmode-s
     url = "/join/"
     weight = -110
 [params]
-    missions = ["self-custody for all.", "vibrant bitcoin economy.", "unbreakable base layer."]
     slogan = "restore the  balance"
     brand="judica."
     headerimage="img/wizard2.gif"

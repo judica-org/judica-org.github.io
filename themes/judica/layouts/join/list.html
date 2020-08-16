@@ -4,18 +4,10 @@
     {{- partial "head.html" . -}}
     <body>
         {{- partial "header.html" . -}}
-<div class="main">
-    <img src="{{.Params.img}}"/>
-    <h1 class="lead">{{.Title}}</h1>
-</div>
-<hr/>
-        <div class="blogtext">
-            <div></div>
-            <div class="blogtext-inner">
-                {{.Content}}
-            </div>
-            <div></div>
+        <div class="main">
+            <img src="{{.Params.img}}"/>
         </div>
+        {{.Content}}
         {{- partial "footer.html" . -}}
     </body>
 </html>

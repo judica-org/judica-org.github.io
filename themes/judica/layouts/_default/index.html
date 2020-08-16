@@ -1,19 +1,11 @@
 {{ define "main" }}
     <div class="main">
-        <img src="{{.Site.Params.headerimage}}"/>
             <h1 class="lead">{{.Site.Params.slogan }}</h1>
+        <img src="{{.Site.Params.headerimage}}"/>
     </div>
-        <hr/>
     <div class="main2">
-        <div class="mission">
-            {{ range .Site.Params.missions }}
-            <h1 style="margin-top: 0"> {{ .}} </h1>
-            {{ end }}
-                <h4><a href="/about/">learn more ></a></h4>
-        </div>
-
-        </div>
-        
+        {{partial "fragments/mission.html"}}
+        <div style="width:100%;text-align: right"><h4><a href="/about/"> learn more ></a></h4></div>
     </div>
     <hr>
     <div class="main2">
@@ -21,14 +13,47 @@
         <div class="recent-blogs">
         {{ range where .Pages "Section" "blog" }}
             {{range first 3 .Pages }}
-            <div style="padding: 20px">
-                <img src="{{.Params.front_pic}}" style="width:100%"/>
-            <h4 class="nobottom"> <a class="underlined" href="{{.URL}}">{{.Title}} </a> </h4>
-            {{if .Params.Author }} <small> by {{.Params.Author}}</small> {{end}}
-            <small>on {{.Date.Format "January 2, 2006"}}</small>
+            <div style="padding: 20px; margin:auto; text-align: center">
+                <img src="{{.Params.front_pic}}" style="width:100%; max-width: 200px; margin:auto;"/>
+                <h4 class="nobottom"> <a class="underlined" href="{{.URL}}">{{.Title}} </a> </h4>
+                {{if .Params.Author }} <small> by {{.Params.Author}}</small> {{end}}
+                <small>on {{.Date.Format "January 2, 2006"}}</small>
             </div>
             {{end}}
         {{ end }}
+        </div>
+        <div style="width:100%;text-align: right"><a href="/blog/"> more posts ></a></div>
+    </div>
+    <hr>
+    <div class="main2">
+        <h1> join judica </h1>
+        <div class = 'joinrow'>
+
+            <h2 style="padding:0"> open positions </h2>
+            <h2 style="padding:0"> support </h2>
+            <h2 style="padding:0"> get our newsletter </h2>
+            <div>
+                <p>push the boundaries of what's possible in bitcoin at judica. seeking technical
+                contributors, but open to  non-technical.</p>
+
+                <h4><a href="/join/">see positions ></a></h4>
+            </div>
+
+            <div>
+                <p> we can't do it alone -- we're seeking organizations and individuals aligned with
+                our vision to support our work </p>
+                <h4><a href="/join/">become a sponsor ></a></h4>
+
+
+            </div>
+            <div>
+
+                <div style="overflow:hidden; width:350px; height:100px;">
+                    <iframe src="https://judica.substack.com/embed"  style="padding: 0; height:
+                                 130px; width: 350px; position:
+                        relative; top: -5px; left: -15px;" frameborder="0" scrolling="no"></iframe>
+                </div>
+            </div>
         </div>
     </div>
 {{ end }}
