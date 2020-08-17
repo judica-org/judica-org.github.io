@@ -4,9 +4,6 @@
     {{- partial "head.html" . -}}
     <body>
         {{- partial "header.html" . -}}
-        <div class="main">
-            <img src="{{.Params.img}}"/>
-        </div>
         {{.Content}}
         {{- partial "footer.html" . -}}
     </body>

@@ -3,6 +3,8 @@ languageCode = "en-us"
 title = "Judica, Inc"
 theme = "judica"
 copyright = "&copy; Judica, Inc 2020 | contact@judica.org | <a class='darkmode-switch'> dark/light theme</a>"
+disqusShortname = "judica-org"
+googleAnalytics= "UA-175497336-1"
 
 [[menu.main]]
     identifier = "about"

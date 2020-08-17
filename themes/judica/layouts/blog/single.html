@@ -15,6 +15,12 @@
             </div>
             <div></div>
         </div>
+        <hr>
+        <div class="blogtext">
+            <div></div>
+            {{ template "_internal/disqus.html" . }}
+            <div></div>
+        </div>
         {{- partial "footer.html" . -}}
     </body>
 </html>

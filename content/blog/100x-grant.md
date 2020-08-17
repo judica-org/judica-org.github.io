@@ -2,6 +2,7 @@
 title="$50,000 Grant from 100x Group (BitMEX)"
 date=2020-07-22
 front_pic='/img/100x-Logo.svg'
+summary="Judica to use the funds to improve the mempool."
 +++
 
 We're super pleased to share that 100x Group (BitMEX) has selected Judica to receive a $50,000

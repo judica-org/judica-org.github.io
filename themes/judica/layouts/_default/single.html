@@ -3,11 +3,14 @@
     {{- partial "head.html" . -}}
     <body>
         {{- partial "header.html" . -}}
-<div class="main">
-    <img src="{{.Params.img}}"/>
-    <h1 class="lead">{{.Title}}</h1>
-</div>
-<hr/>
+
+        <div class="main2" style='text-algin:left'>
+            <h1 class="lead">{{.Title}}.</h1>
+        </div>
+        <hr/>
+        <div class="main2">
+            <img src="{{.Params.img}}"/>
+        </div>
         <div class="blogtext">
             <div></div>
             <div class="blogtext-inner">

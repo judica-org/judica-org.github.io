@@ -1,17 +1,40 @@
 +++
 draft=false
-type='standard'
+type='about'
 +++
 
-<div style="font-size: 1.4em">
+<div class="main2">
+    <h1 class="lead">about.</h1>
+</div>
+<hr>
+<div style="width:75%; margin:auto">
+    <div style="font-size: 1.4em">
         {{< inline_partial src="fragments/mission.html" >}}
+    </div>
+
+    <div style='text-align:center'>
+        <img src= "/img/coin.gif" />
+    </div>
+
+    <p>
+    {{< inline_partial src="fragments/charter-intro.html" >}}
+    </p>
+    <div style="text-align:right"><a href="/charter/">the judica charter ></a></div>
+
+
+</div>
+<div class="main2" style="padding-top:2em">
+    judica is creating software that will have a remarkable impact on the
+    bitcoin ecosystem. we endeavor to provide these to the community openly. these applications
+    use judica's cutting edge bitcoin technologies, but we're exploring options to make them
+    available in a limited fashion without any new features added to bitcoin.
+
+    <div style="text-align:right"><a href="/charter/">software details ></a></div>
 </div>
 
-<div style='text-align:center'>
-<img src= "/img/coin.gif" />
+<hr>
+<div style="width:75%; margin:auto">
+    <div>
+        {{< inline_partial src="fragments/joinlet.html" >}}
+    </div>
 </div>
-
-
-
-
-

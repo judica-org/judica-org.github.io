@@ -2,6 +2,7 @@
 title="$10,000 Grant from ACINQ SAS"
 date=2020-06-18
 front_pic="/img/acinq-logo.svg"
+summary="ACINQ answers the call to organize an effort around improving the mempool."
 +++
 
 In April 2020, I chimed in on the mailing list to ask if there was interest in funding work to

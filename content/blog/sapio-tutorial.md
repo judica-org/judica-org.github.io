@@ -8,6 +8,7 @@ We've been hard at work getting Sapio ready for release, but I figured it would 
 share some early documentation & basic tutorial to make [Sapio](/sapio/) a little more concrete.
 
 Enjoy the sneak peak!
+<!--more-->
 
 ### Why is Sapio Different?
 Sapio helps you build payment protocol specifiers that oblivious third parties
