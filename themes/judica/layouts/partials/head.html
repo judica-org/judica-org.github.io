@@ -71,11 +71,6 @@ a {
      padding-left: 12.5%;
  }
 
- .recent-blogs {
-     display: grid;
-     width:100%;
-     grid-template-columns: 1fr 1fr 1fr;
- }
 
  .mission {
      display: grid;
@@ -160,7 +155,7 @@ a {
 
 
  figcaption {
-    font-size: 0.8em;
+     font-size: 0.8em;
 
  }
  figcaption a {
@@ -178,13 +173,45 @@ a {
  }
 
 
- .joinrow {
-    display: grid;
-    grid-template-columns: 1fr 1fr minmax(350px, 1fr);
+ @media all and (max-width:320px) {
+     .recent-blog-post {
+         padding: 20px; margin:auto; text-align: center;
+     }
  }
- .joinrow > div {
-     padding-right: 2em;
+ @media all and (min-width:321px) and (max-width:768px) {
+     .recent-blog-post {
+         padding: 20px; margin:auto; text-align: center;
+     }
+
  }
+
+ @media all and (min-width:769px) and (max-width:1024px) {
+     .recent-blog-post {
+         display: grid;
+         width:100%;
+         grid-template-columns: 1fr 1fr;
+     }
+
+ }
+ @media all and (min-width:1025px) {
+     .joinrow {
+         display: grid;
+         grid-template-columns: 1fr 1fr fit-content(330px);
+     }
+     .joinrow > div {
+         padding-right: 2em;
+     }
+
+     .recent-blogs {
+         display: grid;
+         width:100%;
+         grid-template-columns: 1fr 1fr 1fr;
+     }
+     .recent-blog-post {
+         padding: 20px; margin:auto; text-align: center;
+     }
+ }
+
 
     </style>
 

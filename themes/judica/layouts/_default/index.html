@@ -13,11 +13,13 @@
         <div class="recent-blogs">
         {{ range where .Pages "Section" "blog" }}
             {{range first 3 .Pages }}
-            <div style="padding: 20px; margin:auto; text-align: center">
+            <div style="" class="recent-blog-post">
                 <img src="{{.Params.front_pic}}" style="width:100%; max-width: 200px; margin:auto;"/>
+                <div>
                 <h4 class="nobottom"> <a class="underlined" href="{{.URL}}">{{.Title}} </a> </h4>
                 {{if .Params.Author }} <small> by {{.Params.Author}}</small> {{end}}
                 <small>on {{.Date.Format "January 2, 2006"}}</small>
+                </div>
             </div>
             {{end}}
         {{ end }}
