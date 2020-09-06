@@ -5,6 +5,8 @@ author="Jeremy Rubin"
 front_pic='/img/complex-mempool-sm.png'
 summary="""A deep dive into understanding some of the architectural challenges in Bitcoin's mempool
 and where future research may make improvements."""
+images=['/img/complex-mempool-sm.png']
+description="Learn about the challenges facing the mempool and plans to make it better"
 +++
 
 ### *If this post excites you let's [work together](/join/). Or, if you see the value of this work and are able to dedicate financial resources, [please reach out](/join/) to support more developers working on this project.*

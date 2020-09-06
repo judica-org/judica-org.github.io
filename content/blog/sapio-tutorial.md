@@ -2,6 +2,8 @@
 date='2020-08-02'
 title='Sapio Tutorial Sneak Peak'
 front_pic="/img/sapio-logo.png"
+images=['img/sapio-logo.png']
+description="Learn how to use Sapio to make smart contracts on Bitcoin"
 +++
 
 We've been hard at work getting Sapio ready for release, but I figured it would be a good time to
