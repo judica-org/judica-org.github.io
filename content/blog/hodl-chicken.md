@@ -6,11 +6,11 @@ summary="An on chain game of chance."
 author="Pyskell and Jeremy Rubin"
 +++
 
-Hello! I'm really excited to have <a
-href="https://twitter.com/pyskell">@pyskell</a> -- making the first guest post on the Judica
-blog! The post below is a description of Pyskell's efforts to make a new game for Bitcoin, a sort of
-"proof of strong hands" called HodlChicken. The blog will describe how the contract is written
-and show how the Sapio + Tux ecosystem works together to produce compelling Bitcoin Applications.
+Hello! I'm really excited to have [@pyskell](https://twitter.com/pyskell) making the first guest post
+on the Judica blog! The post below is a description of Pyskell's efforts to make a new game for
+Bitcoin, a sort of "proof of strong hands" called HodlChicken. The blog will describe how the
+contract is written and show how the Sapio + Tux ecosystem works together to produce compelling
+Bitcoin Applications.
 
 Let's hand it off to Pyskell to tell you more about what he built.
 
@@ -144,6 +144,8 @@ a much easier time doing so than if I gave you a plain Bitcoin Script.
 I'll leave it up to Jeremy to explain how the Tux browser works to inspect smart contracts.
 
 -----------
+
+Thanks Pyskell, awesome idea!
 
 Now, how do we set up and use the HodlChicken contract?
 
