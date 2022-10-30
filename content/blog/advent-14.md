@@ -6,6 +6,7 @@ title: Payment Channels in a CTV+Sapio World
 subtitle: "Day 14: Rubin's Bitcoin Advent Calendar"
 date: 2021-12-11
 hashtags: [Bitcoin, AdventCalendar, Covenants, Sapio]
+front_pic: "/public/img/bitcoin/advent/holidaycard.png"
 ---
 
 _This post is syndicated from [rubin.io](https://rubin.io/advent21)._

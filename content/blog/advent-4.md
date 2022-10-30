@@ -4,8 +4,9 @@ disqusId: cf54ae0f8fb6360507bbcfa099d6290926c6c381
 layout: post
 title: "Pillars of Bitcoin: Decentralization"
 subtitle: "Day 4: Rubin's Bitcoin Advent Calendar"
-date: 2021-12-1
+date: 2021-12-01
 hashtags: [Bitcoin, AdventCalendar]
+front_pic: "/public/img/bitcoin/advent/holidaycard.png"
 ---
 
 _This post is syndicated from [rubin.io](https://rubin.io/advent21)._

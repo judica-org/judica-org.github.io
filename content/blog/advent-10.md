@@ -4,8 +4,9 @@ disqusId: e3bb2e52c0ac3f4015a500a55718c65aafb5ba70
 layout: post
 title:  Building Vaults on Bitcoin
 subtitle: "Day 10: Rubin's Bitcoin Advent Calendar"
-date: 2021-12-7
+date: 2021-12-07
 hashtags: [Bitcoin, AdventCalendar, Covenants, Sapio]
+front_pic: "/public/img/bitcoin/advent/holidaycard.png"
 ---
 
 _This post is syndicated from [rubin.io](https://rubin.io/advent21)._

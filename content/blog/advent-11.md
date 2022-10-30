@@ -4,8 +4,9 @@ disqusId: 0679855d27a924b5f1b46ae7a2d9f2b35f200be0
 layout: post
 title: Inheritence Schemes for Bitcoin
 subtitle: "Day 11: Rubin's Bitcoin Advent Calendar"
-date: 2021-12-8
+date: 2021-12-08
 hashtags: [Bitcoin, AdventCalendar, Covenants, Sapio]
+front_pic: "/public/img/bitcoin/advent/holidaycard.png"
 ---
 
 _This post is syndicated from [rubin.io](https://rubin.io/advent21)._

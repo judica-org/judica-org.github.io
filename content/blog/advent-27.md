@@ -6,6 +6,7 @@ title:  RoadMap or Load o' Crap?
 subtitle: "Day 27: Rubin's Bitcoin Advent Calendar"
 date: 2021-12-24
 hashtags: [Bitcoin, AdventCalendar, Covenants, Sapio]
+front_pic: "/public/img/bitcoin/advent/holidaycard.png"
 ---
 
 _This post is syndicated from [rubin.io](https://rubin.io/advent21)._

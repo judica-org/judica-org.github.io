@@ -4,8 +4,9 @@ disqusId: 3e165cfe4960dd76446ebc7e4b501b19b0eb1314
 layout: post
 title: "What's Smart about Smart Contracts: Bitcoin Maxi Edition"
 subtitle: "Day 6: Rubin's Bitcoin Advent Calendar"
-date: 2021-12-3
+date: 2021-12-03
 hashtags: [Bitcoin, AdventCalendar]
+front_pic: "/public/img/bitcoin/advent/holidaycard.png"
 ---
 
 _This post is syndicated from [rubin.io](https://rubin.io/advent21)._

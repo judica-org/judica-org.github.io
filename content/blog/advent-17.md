@@ -6,6 +6,7 @@ title:  A Defense of Having Fun (and maybe staying poor)
 subtitle: "Day 17: Rubin's Bitcoin Advent Calendar"
 date: 2021-12-14
 hashtags: [Bitcoin, AdventCalendar, Covenants, Sapio]
+front_pic: "/public/img/bitcoin/advent/holidaycard.png"
 ---
 
 

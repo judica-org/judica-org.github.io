@@ -4,8 +4,9 @@ disqusId: 9f7ea509d6b2d725a327dac86ca78b9fe0610a77
 layout: post
 title:  Contracting Primitives and Upgrades to Bitcoin
 subtitle: "Day 8: Rubin's Bitcoin Advent Calendar"
-date: 2021-12-5
+date: 2021-12-05
 hashtags: [Bitcoin, AdventCalendar, Covenants, Upgrade, BIP119]
+front_pic: "/public/img/bitcoin/advent/holidaycard.png"
 ---
 
 _This post is syndicated from [rubin.io](https://rubin.io/advent21)._

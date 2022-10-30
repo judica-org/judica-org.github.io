@@ -4,8 +4,9 @@ disqusId: 1a8814e4c48f0f2328736e13dce7aeead5aedd2d
 layout: post
 title:  Congestion Control
 subtitle: "Day 12: Rubin's Bitcoin Advent Calendar"
-date: 2021-12-9
+date: 2021-12-09
 hashtags: [Bitcoin, AdventCalendar, Covenants, Sapio]
+front_pic: "/public/img/bitcoin/advent/holidaycard.png"
 ---
 
 

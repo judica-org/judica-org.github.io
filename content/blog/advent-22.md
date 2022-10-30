@@ -6,6 +6,7 @@ title: "NFTs Part Two: Auctions, Royalties, Mints, Generative, Game Items"
 subtitle: "Day 22: Rubin's Bitcoin Advent Calendar"
 date: 2021-12-19
 hashtags: [Bitcoin, AdventCalendar, Covenants, Sapio]
+front_pic: "/public/img/bitcoin/advent/holidaycard.png"
 ---
 
 _This post is syndicated from [rubin.io](https://rubin.io/advent21)._

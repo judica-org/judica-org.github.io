@@ -6,6 +6,7 @@ title:  Payment Pools / Coin Pools
 subtitle: "Day 13: Rubin's Bitcoin Advent Calendar"
 date: 2021-12-10
 hashtags: [Bitcoin, AdventCalendar, Covenants, Sapio]
+front_pic: "/public/img/bitcoin/advent/holidaycard.png"
 ---
 
 

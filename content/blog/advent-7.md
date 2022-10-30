@@ -4,8 +4,9 @@ disqusId: 341f24e8b710d25d116102e53312f93d084d90c2
 layout: post
 title: "Review of Smart Contract Concepts for Bitcoin"
 subtitle: "Day 7: Rubin's Bitcoin Advent Calendar"
-date: 2021-12-4
+date: 2021-12-04
 hashtags: [Bitcoin, AdventCalendar]
+front_pic: "/public/img/bitcoin/advent/holidaycard.png"
 ---
 
 _This post is syndicated from [rubin.io](https://rubin.io/advent21)._

@@ -4,8 +4,9 @@ disqusId: 3e165cfe4960dd76446ebc7e4b501b19b0eb1314
 layout: post
 title: "Pillars of Bitcoin: Privacy"
 subtitle: "Day 5: Rubin's Bitcoin Advent Calendar"
-date: 2021-12-2
+date: 2021-12-02
 hashtags: [Bitcoin, AdventCalendar]
+front_pic: "/public/img/bitcoin/advent/holidaycard.png"
 ---
 
 _This post is syndicated from [rubin.io](https://rubin.io/advent21)._

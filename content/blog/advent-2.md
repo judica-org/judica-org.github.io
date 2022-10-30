@@ -6,6 +6,7 @@ title: "Pillars of Bitcoin: Scalability"
 subtitle: "Day 2: Rubin's Bitcoin Advent Calendar"
 date: 2021-11-29
 hashtags: [Bitcoin, AdventCalendar]
+front_pic: "/public/img/bitcoin/advent/holidaycard.png"
 ---
 
 _This post is syndicated from [rubin.io](https://rubin.io/advent21)._

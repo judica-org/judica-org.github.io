@@ -4,8 +4,9 @@ disqusId: 58823d8cd92ccccad584fe5f92ae4323ecbb7f71
 layout: post
 title:  Sapio Primer
 subtitle: "Day 9: Rubin's Bitcoin Advent Calendar"
-date: 2021-12-6
+date: 2021-12-06
 hashtags: [Bitcoin, AdventCalendar, Covenants, Sapio]
+front_pic: "/public/img/bitcoin/advent/holidaycard.png"
 ---
 
 

@@ -6,6 +6,7 @@ title: Derivatives and Options For Bitcoin
 subtitle: "Day 23: Rubin's Bitcoin Advent Calendar"
 date: 2021-12-20
 hashtags: [Bitcoin, AdventCalendar, Covenants, Sapio]
+front_pic: "/public/img/bitcoin/advent/holidaycard.png"
 ---
 
 _This post is syndicated from [rubin.io](https://rubin.io/advent21)._

@@ -6,6 +6,7 @@ title:  Sapio Studio Payment Pool Walkthrough
 subtitle: "Day 18: Rubin's Bitcoin Advent Calendar"
 date: 2021-12-15
 hashtags: [Bitcoin, AdventCalendar, Covenants, Sapio]
+front_pic: "/public/img/bitcoin/advent/holidaycard.png"
 ---
 
 
