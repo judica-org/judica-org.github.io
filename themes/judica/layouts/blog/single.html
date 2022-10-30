@@ -5,7 +5,9 @@
         {{- partial "header.html" . -}}
         <div class="main2">
             <h1> {{.Title}} </h1>
+            {{if .Params.subtitle }} <div><h2 class="nobottom"> {{.Params.subtitle}} </h2></div> {{end}}
             {{if .Params.Author }} <h3> by {{.Params.Author}}</h3> {{end}}
+            <small>on {{.Date.Format "January 2, 2006"}}</small>
             <hr>
         </div>
         <div class="main2">

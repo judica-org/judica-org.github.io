@@ -2,7 +2,7 @@ baseURL = "https://judica.org/"
 languageCode = "en-us"
 title = "Judica, Inc"
 theme = "judica"
-copyright = "&copy; Judica, Inc 2020 | contact@judica.org | <a class='darkmode-switch'> dark/light theme</a>"
+copyright = "&copy; Judica, Inc 2022 | contact@judica.org | <a class='darkmode-switch'> dark/light theme</a>"
 disqusShortname = "judica-org"
 googleAnalytics= "UA-175497336-1"
 
@@ -27,7 +27,8 @@ googleAnalytics= "UA-175497336-1"
     url = "/join/"
     weight = -110
 [params]
-    slogan = "restore the  balance"
+    headtext = "built for builders"
+    slogan = "build [\"apps\",\"daos\",\"communities\",\"smart contracts\",\"defi\",\"tokens\",\"games\",\"nfts\",\"anything you want\"] on bitcoin"
     brand="judica."
     headerimage="img/wizard2.gif"
     description = "we're building cutting edge bitcoin technology at judica"
