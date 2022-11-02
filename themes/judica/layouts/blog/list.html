@@ -18,8 +18,8 @@
                     </div>
                     <div></div>
                     <div>
-                        <h4 class="nobottom"> <a class="underlined" href="{{.Permalink}}">{{.Title}} </a> </h4>
-                        {{if .Params.subtitle }} <div><small class="nobottom"> <a class="underlined" href="{{.Permalink}}">{{.Params.subtitle}} </a> </small></div> {{end}}
+                        <h4 class="nobottom"> <a class="underlined" href="{{.RelPermalink}}">{{.Title}} </a> </h4>
+                        {{if .Params.subtitle }} <div><small class="nobottom"> <a class="underlined" href="{{.RelPermalink}}">{{.Params.subtitle}} </a> </small></div> {{end}}
                         {{if .Params.Author }} <small> by {{.Params.Author}}</small> {{end}}
                         <small>on {{.Date.Format "January 2, 2006"}}</small>
                         <div>
