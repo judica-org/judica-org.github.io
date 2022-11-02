@@ -61,7 +61,7 @@
         <div style="" class="recent-blog-post">
             <img src="{{.Params.front_pic}}" style="width:100%; max-width: 200px; margin:auto;" />
             <div>
-                <h4 class="nobottom"> <a class="underlined" href="{{.Permalink}}">{{.Title}} </a> </h4>
+                <h4 class="nobottom"> <a class="underlined" href="{{.RelPermalink}}">{{.Title}} </a> </h4>
                 {{if .Params.Author }} <small> by {{.Params.Author}}</small> {{end}}
                 <small>on {{.Date.Format "January 2, 2006"}}</small>
             </div>
