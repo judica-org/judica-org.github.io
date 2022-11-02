@@ -44,6 +44,15 @@ a:hover {
 
 .mission>* {}
 
+.blogtext-inner h1,
+.blogtext-inner h2,
+.blogtext-inner h3,
+.blogtext-inner h4,
+.blogtext-inner h5,
+.blogtext-inner h6 {
+    margin-top: 50px
+}
+
 .darkmode .blogtext-inner h1,
 .darkmode .blogtext-inner h2,
 .darkmode .blogtext-inner h3,
@@ -51,7 +60,6 @@ a:hover {
 .darkmode .blogtext-inner h5,
 .darkmode .blogtext-inner h6 {
     color: white;
-    margin-top: 50px;
 }
 
 .blogtext-inner p a {
