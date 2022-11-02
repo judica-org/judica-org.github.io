@@ -2,7 +2,7 @@ baseURL = "https://judica.org/"
 languageCode = "en-us"
 title = "Judica, Inc"
 theme = "judica"
-copyright = "&copy; Judica, Inc 2022 | contact@judica.org | <a class='darkmode-switch'> dark/light theme</a>"
+copyright = "&copy; Judica, Inc 2022 | contact@judica.org | <a class='darkmode-switch'> dark/light theme</a> | <a target='_blank' href='https://discord.gg/WfBjavZpmM'>discord</a>"
 disqusShortname = "judica-org"
 googleAnalytics= "UA-175497336-1"
 
