@@ -44,17 +44,59 @@ a:hover {
 
 .mission>* {}
 
-.blogtext-inner a {
+.darkmode .blogtext-inner h1,
+.darkmode .blogtext-inner h2,
+.darkmode .blogtext-inner h3,
+.darkmode .blogtext-inner h4,
+.darkmode .blogtext-inner h5,
+.darkmode .blogtext-inner h6 {
+    color: white;
+    margin-top: 50px;
+}
+
+.blogtext-inner p a {
     text-decoration: underline;
 }
 
 .blogtext-inner p {
-    text-indent: 3em;
+    font-family: 'Raleway', sans-serif;
+    font-weight: 400;
+    line-height: 1.5em;
+    font-size: 20px;
+    margin-bottom: 1.5em;
+}
+
+.blogtext-inner li {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 400;
+    line-height: 1.5em;
+    font-size: 20px;
+    margin-left: 2em;
+    margin-bottom: 0.5em;
+}
+
+.blogtext-inner ol {
+    font-weight: bold;
+    margin: 2em 0;
+}
+
+blockquote {
+  border-left: 1px solid #ccc;
+  margin: 0.5em 1.5em;
+  padding: 0em 0.5em;
+}
+blockquote p {
+  display: inline-block;
+}
+
+.darkmode h1,
+.darkmode h2 {
+    color: white;
 }
 
 .darkmode {
     background-color: black;
-    color: white;
+    color: #ccc;
 }
 
 .darkmode a {
