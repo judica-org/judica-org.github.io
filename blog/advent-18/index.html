@@ -1,0 +1,135 @@
+<!doctype html><html><head><meta name=viewport content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@200;500&display=swap" rel=stylesheet><link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600&display=swap" rel=stylesheet><link rel=stylesheet type=text/css href=/css/style.css><script>const storage=window.localStorage,get_darkmode=()=>{const e=storage.getItem("darkmode");return e==null||e==="true"},set_darkmode=()=>{get_darkmode()?(document.body.classList.remove("lightmode"),document.body.classList.add("darkmode")):(document.body.classList.remove("darkmode"),document.body.classList.add("lightmode"))};function applyBackgroundTheme(e){var n="body { background: "+e+"; }",s=document.head||document.getElementsByTagName("head")[0],t=document.createElement("style");return s.appendChild(t),t.type="text/css",t.styleSheet?t.styleSheet.cssText=n:t.appendChild(document.createTextNode(n)),t}const style=applyBackgroundTheme(get_darkmode()?"black":"white");document.addEventListener("DOMContentLoaded",()=>{set_darkmode(),style.parentElement.removeChild(style);const e=document.getElementsByClassName("darkmode-switch")[0];e.onclick=e=>{storage.setItem("darkmode",!get_darkmode()),get_darkmode(),set_darkmode()}})</script><script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-175497336-1","auto"),ga("send","pageview"))</script><script async src=https://www.google-analytics.com/analytics.js></script><meta property="og:title" content="Sapio Studio Payment Pool Walkthrough"><meta property="og:description" content="This post is syndicated from rubin.io.
+Welcome to day 18 of my Bitcoin Advent Calendar. You can see an index of all the posts here or subscribe at judica.org/join to get new posts in your inbox
+Today&rsquo;s post will be a pretty different format that usual, it&rsquo;s basically going to be a pictorial walk through of the Sapio Studio, the frontend tool for Sapio projects. As an example, we&rsquo;ll go through a Payment Pool contract to familiarize ourselves."><meta property="og:type" content="article"><meta property="og:url" content="https://judica.org/blog/advent-18/"><meta property="og:image" content="https://judica.org/img/og-img.png"><meta property="article:section" content="blog"><meta property="article:published_time" content="2021-12-15T00:00:00+00:00"><meta property="article:modified_time" content="2021-12-15T00:00:00+00:00"><meta property="og:site_name" content="judica.org -- restore the balance"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://judica.org/img/og-img.png"><meta name=twitter:title content="Sapio Studio Payment Pool Walkthrough"><meta name=twitter:description content="This post is syndicated from rubin.io.
+Welcome to day 18 of my Bitcoin Advent Calendar. You can see an index of all the posts here or subscribe at judica.org/join to get new posts in your inbox
+Today&rsquo;s post will be a pretty different format that usual, it&rsquo;s basically going to be a pictorial walk through of the Sapio Studio, the frontend tool for Sapio projects. As an example, we&rsquo;ll go through a Payment Pool contract to familiarize ourselves."></head><body><header class=nav><ul><li class=float-left><a href=/>judica.</a></li></ul><ul><li><a href=/about/>about.</a></li><li><a href=/software/>software.</a></li><li><a href=/blog/>blog.</a></li><li><a href=/join/>join.</a></li></ul></header><div class=main2><h1>Sapio Studio Payment Pool Walkthrough</h1><div><h2 class=nobottom>Day 18: Rubin's Bitcoin Advent Calendar</h2></div><small>on December 15, 2021</small><hr></div><div class=main2><div></div><div class=blogtext-inner><p><em>This post is syndicated from <a href=https://rubin.io/advent21>rubin.io</a>.</em></p><p><em>Welcome to day 18 of my Bitcoin Advent Calendar. You can see an index of all
+the posts <a href=/advent21>here</a> or subscribe at
+<a href=https://judica.org/join>judica.org/join</a> to get new posts in your inbox</em></p><p>Today&rsquo;s post will be a pretty different format that usual, it&rsquo;s basically going
+to be a pictorial walk through of the <a href=https://github.com/sapio-lang/sapio-studio>Sapio
+Studio</a>, the frontend tool for Sapio
+projects. As an example, we&rsquo;ll go through a Payment Pool contract to familiarize
+ourselves.</p><p>I wanted to put this post here, before we get into some more applications,
+because I want you to start thinking past &ldquo;cool one-off concepts we can
+implement&rdquo; and to start thinking about reusable components we can build and ship
+into a common Bitcoin Smart Contract software (Sapio Studio or its successors).</p><p>At it&rsquo;s core, Sapio Studio is just a wallet frontend to Bitcoin Core.
+<img src=/public/img/bitcoin/advent/studio/000000.png alt></p><p>You can make a transaction, just like normal&mldr;</p><p><img src=/public/img/bitcoin/advent/studio/000001.png alt></p><p>And see it show up in the pending transactions&mldr;
+<img src=/public/img/bitcoin/advent/studio/000002.png alt></p><p>And even mine some regtest blocks.
+<img src=/public/img/bitcoin/advent/studio/000003.png alt></p><p>But where Sapio Studio is different is that there is also the ability to create
+contracts.
+<img src=/public/img/bitcoin/advent/studio/000004.png alt>
+Before we can do that, we need to load a WASM Plugin with a compiled contract.
+<img src=/public/img/bitcoin/advent/studio/000006.png alt>
+Let&rsquo;s load the Payment Pool module. You can see the code for it
+<a href=https://github.com/sapio-lang/sapio/blob/b98db9637777a808835b4593ae1063230735fc8a/plugin-example/hanukkiah/src/plugin.rs>here</a>.
+<img src=/public/img/bitcoin/advent/studio/000007.png alt>
+And now we can see we have a module!
+<img src=/public/img/bitcoin/advent/studio/000008.png alt>
+Let&rsquo;s load a few more so it doesn&rsquo;t look lonely.
+<img src=/public/img/bitcoin/advent/studio/000009.png alt>
+Now let&rsquo;s check out the Payment Pool module.
+<img src=/public/img/bitcoin/advent/studio/000010.png alt>
+Now let&rsquo;s check out another one &ndash; we can see they each have different types of
+arguments, auto-generated from the code.
+<img src=/public/img/bitcoin/advent/studio/000011.png alt></p><p>Let&rsquo;s fill out the form with 10 keys to make a Payment Pool controlled by 10
+people, and then submit it.
+<img src=/public/img/bitcoin/advent/studio/000012.png alt>
+What&rsquo;s that??? It&rsquo;s a small bug I am fixing :/. Not to worry&mldr;
+<img src=/public/img/bitcoin/advent/studio/000013.png alt>
+Just click repair layout.
+<img src=/public/img/bitcoin/advent/studio/000014.png alt>
+And the presentation resets. I&rsquo;ll fix it soon, but it can be useful if there&rsquo;s a
+glitch to reset it.</p><p>Now we can see the basic structure of the Payment Pool, and how it splits up.
+<img src=/public/img/bitcoin/advent/studio/000015.png alt>
+Let&rsquo;s get a closer look&mldr;
+<img src=/public/img/bitcoin/advent/studio/000016.png alt>
+Let&rsquo;s zoom out (not helpful!)&mldr;
+<img src=/public/img/bitcoin/advent/studio/000017.png alt>
+Let&rsquo;s zoom back in. Note how the transactions are square boxes and the outputs
+are rounded rectangles. Blue lines connect transactions to their outputs. Purple lines
+connect outputs to their (potential) spends.
+<img src=/public/img/bitcoin/advent/studio/000016.png alt>
+If we click on a transaction we can learn more about it.
+<img src=/public/img/bitcoin/advent/studio/000018.png alt>
+We even have some actions that we can take, like sending it to the network.
+<img src=/public/img/bitcoin/advent/studio/000019.png alt>
+Let&rsquo;s try it&mldr;.
+<img src=/public/img/bitcoin/advent/studio/000020.png alt>
+Oops! We need to sign it first&mldr;
+<img src=/public/img/bitcoin/advent/studio/000021.png alt>
+And then we can send it.
+<img src=/public/img/bitcoin/advent/studio/000022.png alt>
+What other buttons do we have? What&rsquo;s this do?
+<img src=/public/img/bitcoin/advent/studio/000023.png alt>
+It teleports us to the output we are creating!
+<img src=/public/img/bitcoin/advent/studio/000024.png alt>
+Notice how the output is marked &ldquo;Updatable&rdquo;, and there is also a &ldquo;DO_TX&rdquo;
+button (corresponding to the DO_TX in the Payment Pool). Let&rsquo;s click that&mldr;
+<img src=/public/img/bitcoin/advent/studio/000025.png alt>
+Ooooh. It prompts us with a form to do the transaction!
+<img src=/public/img/bitcoin/advent/studio/000026.png alt>
+Ok, let&rsquo;s fill this sucker out&mldr;
+<img src=/public/img/bitcoin/advent/studio/000027.png alt>
+Click submit, then recompile (separate actions in case we want to make multiple &ldquo;moves&rdquo; before recompiling).
+<img src=/public/img/bitcoin/advent/studio/000028.png alt>
+I really need to fix this bug&mldr;
+<img src=/public/img/bitcoin/advent/studio/000029.png alt>
+Voila!</p><p>As you can see, the original graph is intact and we&rsquo;ve augmented onto it the new state transition.
+<img src=/public/img/bitcoin/advent/studio/000030.png alt>
+The new part has our 0.1 BTC Spend + the re-creation of the Payment Pool with less funds.
+<img src=/public/img/bitcoin/advent/studio/000031.png alt>
+Ok, let&rsquo;s go nuts and do another state transition off-of the first one? This time more payouts!
+<img src=/public/img/bitcoin/advent/studio/000032.png alt>
+Submit&mldr;</p><p><img src=/public/img/bitcoin/advent/studio/000033.png alt>
+And Recompile<sup id=fnref:1><a href=#fn:1 class=footnote-ref role=doc-noteref>1</a></sup>&mldr;</p><p>Now you can see <em>two</em> state transitions! And because we used more payouts than one, we can see some congestion control<sup id=fnref:2><a href=#fn:2 class=footnote-ref role=doc-noteref>2</a></sup> at work.</p><p>It works! It all really, really works!</p><p>One more thing I <em>can&rsquo;t</em> show you with this contract is the timing simulator.</p><p>This lets you load up a contract (like our Hanukkiah below) and&mldr;
+<img src=/public/img/bitcoin/advent/studio/000042.png alt>
+Simulate the passing of time (or blocks).
+<img src=/public/img/bitcoin/advent/studio/000041.png alt>
+Pretty cool!
+<img src=/public/img/bitcoin/advent/studio/000040.png alt></p><p>There are also some settings you can configure for display settings, the node,
+and for sapio-cli. The first time you run Sapio, you&rsquo;ll need to get some of
+these things configured correctly or else it will be broken. Currently, if you
+look <a href=https://github.com/JeremyRubin/sapio-pod/blob/master/runner.sh>here</a> you
+can find a template for a script to get everything up and running for a first
+shot at it, otherwise you&rsquo;ll have to do it by hand, or just change your
+<code>preferences.json</code> to be similar to mine in the note<sup id=fnref:3><a href=#fn:3 class=footnote-ref role=doc-noteref>3</a></sup>.</p><p><img src=/public/img/bitcoin/advent/studio/000036.png alt>
+<img src=/public/img/bitcoin/advent/studio/000037.png alt>
+<img src=/public/img/bitcoin/advent/studio/000038.png alt>
+<img src=/public/img/bitcoin/advent/studio/000039.png alt></p><h3 id=before-you-ask>before you ask&mldr;</h3><h1 id=of-course-there-is-dark-mode>OF COURSE THERE IS DARK MODE</h1><p><em>configured by your local system theme preference</em>
+<img src=/public/img/bitcoin/advent/studio/dark.png alt></p><p>I hope you enjoyed this! There&rsquo;s <em>a metric fuckload</em> of work still to do to make
+Sapio Studio & Sapio anywhere near production grade, but I hope this has helped
+elucidate how powerful and cool the Sapio approach is, and has inspired you to
+build something and try it out! I&rsquo;d also be really eager for feedback on what
+features should be here/are missing.</p><p>Lastly, if you&rsquo;re just <strong>excited</strong> about this, it&rsquo;s definitely a project
+that could use more experienced react/electron/bitcoin contributors, either
+yourself or if you&rsquo;re interested in sponsoring :).</p><div class=footnotes role=doc-endnotes><hr><ol><li id=fn:1><p>it was here I noticed a small mistake that I named the updates &ldquo;First Update&rdquo; instead of &ldquo;FirstUpdate&rdquo; so I had to poke in the JSON and fix it in the interest of time&mldr; TODO for me to make invalid inputs invalid!
+<img src=/public/img/bitcoin/advent/studio/000034.png alt>
+I skipped showing you the bug this time.&#160;<a href=#fnref:1 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p></li><li id=fn:2><p>I used the wrong, wonky version of the TreePay by mistake and was too lazy to fix it, my bad :p it should look more tree-y. I&rsquo;ll fix the actual code in the repo at some point.
+<img src=/public/img/bitcoin/advent/studio/000035.png alt>&#160;<a href=#fnref:2 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p></li><li id=fn:3><p>My config file, if it helps you :)</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;sapio&#34;</span>: {
+</span></span><span style=display:flex><span>        <span style=color:#f92672>&#34;binary&#34;</span>: <span style=color:#e6db74>&#34;/Users/jr/sapio/target/release/sapio-cli&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#f92672>&#34;oracle-local-enabled&#34;</span>: <span style=color:#66d9ef>true</span>,
+</span></span><span style=display:flex><span>        <span style=color:#f92672>&#34;oracle-remote-enabled&#34;</span>: <span style=color:#66d9ef>true</span>,
+</span></span><span style=display:flex><span>        <span style=color:#f92672>&#34;oracle-remote-oracles-list&#34;</span>: [
+</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#34;0.0.0.0:8010 tpubD6NzVbkrYhZ4Y78NbTJtGWzt9a4eeoFJ1phmTVxZNSAiVkVWW5GYixSobuXTQtzFDcSWPoXhtiDUu4n6sChuNKVXZ9UL4LvxnU1WG4Y7pxV&#34;</span>
+</span></span><span style=display:flex><span>        ],
+</span></span><span style=display:flex><span>        <span style=color:#f92672>&#34;oracle-remote-threshold&#34;</span>: <span style=color:#e6db74>&#34;1&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#f92672>&#34;plugin_map&#34;</span>: [
+</span></span><span style=display:flex><span>        ],
+</span></span><span style=display:flex><span>        <span style=color:#f92672>&#34;configsource&#34;</span>: <span style=color:#e6db74>&#34;here&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#f92672>&#34;oracle-seed-file&#34;</span>: <span style=color:#e6db74>&#34;/Users/jr/sapio/SEED&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#f92672>&#34;oracle-netinterface&#34;</span>: <span style=color:#e6db74>&#34;0.0.0.0:8010&#34;</span>
+</span></span><span style=display:flex><span>    },
+</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;display&#34;</span>: {
+</span></span><span style=display:flex><span>        <span style=color:#f92672>&#34;sats-bound&#34;</span>: <span style=color:#e6db74>&#34;9999999&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#f92672>&#34;animate-flow&#34;</span>: <span style=color:#ae81ff>1594</span>,
+</span></span><span style=display:flex><span>        <span style=color:#f92672>&#34;poll-node-freq&#34;</span>: <span style=color:#ae81ff>5</span>
+</span></span><span style=display:flex><span>    },
+</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;bitcoin-config&#34;</span>: {
+</span></span><span style=display:flex><span>        <span style=color:#f92672>&#34;rpcuser&#34;</span>: <span style=color:#e6db74>&#34;jeremy&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#f92672>&#34;rpcpassword&#34;</span>: <span style=color:#e6db74>&#34;hunter2&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;rpcport&#34;</span>: <span style=color:#e6db74>&#34;18443&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#f92672>&#34;rpchost&#34;</span>: <span style=color:#e6db74>&#34;0.0.0.0&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#f92672>&#34;network&#34;</span>: <span style=color:#e6db74>&#34;regtest&#34;</span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div>&#160;<a href=#fnref:3 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></li></ol></div></div><div></div></div><hr><div class=main2><div></div><div id=disqus_thread></div><script type=application/javascript>window.disqus_config=function(){},function(){if(["localhost","127.0.0.1"].indexOf(window.location.hostname)!=-1){document.getElementById("disqus_thread").innerHTML="Disqus comments not available by default when the website is previewed locally.";return}var t=document,e=t.createElement("script");e.async=!0,e.src="//judica-org.disqus.com/embed.js",e.setAttribute("data-timestamp",+new Date),(t.head||t.body).appendChild(e)}()</script><noscript>Please enable JavaScript to view the <a href=https://disqus.com/?ref_noscript>comments powered by Disqus.</a></noscript><a href=https://disqus.com class=dsq-brlink>comments powered by <span class=logo-disqus>Disqus</span></a><div></div></div><hr><footer style=text-align:center;bottom:0;padding-bottom:10px;width:100%>&copy; Judica, Inc 2022 | contact@judica.org | <a class=darkmode-switch>dark/light theme</a></footer></body></html>

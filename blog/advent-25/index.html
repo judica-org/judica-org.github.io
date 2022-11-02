@@ -1,0 +1,300 @@
+<!doctype html><html><head><meta name=viewport content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@200;500&display=swap" rel=stylesheet><link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600&display=swap" rel=stylesheet><link rel=stylesheet type=text/css href=/css/style.css><script>const storage=window.localStorage,get_darkmode=()=>{const e=storage.getItem("darkmode");return e==null||e==="true"},set_darkmode=()=>{get_darkmode()?(document.body.classList.remove("lightmode"),document.body.classList.add("darkmode")):(document.body.classList.remove("darkmode"),document.body.classList.add("lightmode"))};function applyBackgroundTheme(e){var n="body { background: "+e+"; }",s=document.head||document.getElementsByTagName("head")[0],t=document.createElement("style");return s.appendChild(t),t.type="text/css",t.styleSheet?t.styleSheet.cssText=n:t.appendChild(document.createTextNode(n)),t}const style=applyBackgroundTheme(get_darkmode()?"black":"white");document.addEventListener("DOMContentLoaded",()=>{set_darkmode(),style.parentElement.removeChild(style);const e=document.getElementsByClassName("darkmode-switch")[0];e.onclick=e=>{storage.setItem("darkmode",!get_darkmode()),get_darkmode(),set_darkmode()}})</script><script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-175497336-1","auto"),ga("send","pageview"))</script><script async src=https://www.google-analytics.com/analytics.js></script><meta property="og:title" content="Decentralized Autonomous Organizations (DAOs) Will Save Bitcoin"><meta property="og:description" content="This post is syndicated from rubin.io.
+Welcome to day 25 of my Bitcoin Advent Calendar. You can see an index of all the posts here or subscribe at judica.org/join to get new posts in your inbox
+The title of this article is a joke. Gotcha!
+Decentralized Autonomous Organization is pretty much what&rsquo;s called an orphan initialism. So while DAO doesn&rsquo;t really mean anything is decentralized, autonomous, or an organization, but the term DAO has stuck around anyways."><meta property="og:type" content="article"><meta property="og:url" content="https://judica.org/blog/advent-25/"><meta property="og:image" content="https://judica.org/img/og-img.png"><meta property="article:section" content="blog"><meta property="article:published_time" content="2021-12-22T00:00:00+00:00"><meta property="article:modified_time" content="2021-12-22T00:00:00+00:00"><meta property="og:site_name" content="judica.org -- restore the balance"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://judica.org/img/og-img.png"><meta name=twitter:title content="Decentralized Autonomous Organizations (DAOs) Will Save Bitcoin"><meta name=twitter:description content="This post is syndicated from rubin.io.
+Welcome to day 25 of my Bitcoin Advent Calendar. You can see an index of all the posts here or subscribe at judica.org/join to get new posts in your inbox
+The title of this article is a joke. Gotcha!
+Decentralized Autonomous Organization is pretty much what&rsquo;s called an orphan initialism. So while DAO doesn&rsquo;t really mean anything is decentralized, autonomous, or an organization, but the term DAO has stuck around anyways."></head><body><header class=nav><ul><li class=float-left><a href=/>judica.</a></li></ul><ul><li><a href=/about/>about.</a></li><li><a href=/software/>software.</a></li><li><a href=/blog/>blog.</a></li><li><a href=/join/>join.</a></li></ul></header><div class=main2><h1>Decentralized Autonomous Organizations (DAOs) Will Save Bitcoin</h1><div><h2 class=nobottom>Day 25: Rubin's Bitcoin Advent Calendar</h2></div><small>on December 22, 2021</small><hr></div><div class=main2><div></div><div class=blogtext-inner><p><em>This post is syndicated from <a href=https://rubin.io/advent21>rubin.io</a>.</em></p><p><em>Welcome to day 25 of my Bitcoin Advent Calendar. You can see an index of all
+the posts <a href=/advent21>here</a> or subscribe at
+<a href=https://judica.org/join>judica.org/join</a> to get new posts in your inbox</em></p><p>The title of this article is a joke. Gotcha!</p><p><img src=/public/img/bitcoin/advent/dao/bart.png alt="Bart Simpson writing &amp;ldquo;DAOs are just fancy multisigs&amp;rdquo;."></p><p>Decentralized Autonomous Organization is pretty much what&rsquo;s called an <em><a href=http://itre.cis.upenn.edu/~myl/languagelog/archives/003555.html>orphan
+initialism</a></em>.
+So while DAO doesn&rsquo;t really mean anything is decentralized, autonomous, or an
+organization, but the term DAO has stuck around anyways. Even moreso than NFT!
+More or less, DAOs are just fancy multisigs. But they&rsquo;ve been used for all sorts
+of things, ranging from attempting to buy the US Constitution as a group,
+investing in startups, buying Ross Ulbricht&rsquo;s NFTs, or maybe even buying my
+undies.</p><p><img src=/public/img/bitcoin/advent/dao/nytimes.jpeg alt="yes this is a joke"></p><p>This post has some required reading. You have to have read through at least up
+to <a href=/bitcoin/2021/12/10/advent-13/>payment pools</a> in the advent calendar, but
+ideally you&rsquo;d have read all the posts&mldr;</p><p>So how will fancy-multisigs save Bitcoin? In this post we&rsquo;ll work through an
+example of building a DAO to fund Bitcoin Core Developers, like a Bitcoin native
+Gitcoin competitor.</p><h1 id=what-do-we-want-from-our-dao>What do we want from our DAO:</h1><p>The DAO will serve three functions:</p><ol><li>To Add members who pay in</li><li>To make Payments if a Majority of the payers by value vote</li><li>To mint commemorative NFTs</li></ol><h2 id=majority-rules>Majority rules</h2><p>DAOs are little democracies, and as such we need a voting scheme to do rule
+changes whereby a threshold (e.g., 51%) decides what happens next. We have two
+options, we can either count individuals as equal, or we can weight by amount of
+funds contributed. We can do any threshold we like, it&rsquo;s just &ldquo;this many people
+could steal the whole pot&rdquo;.</p><p>For this post, we&rsquo;ll do the weighted by funds contributed because that feels
+closer to what&rsquo;s happening in Ethereum land. Unfortunately a couple components
+around generated arbitrary weighted signatures<sup id=fnref:1><a href=#fn:1 class=footnote-ref role=doc-noteref>1</a></sup> just &ldquo;aren&rsquo;t quite there&rdquo; or have
+messy tradeoffs so we won&rsquo;t consider those &ndash; yet. Instead we&rsquo;ll just make a silly
+limit: we will allow at most 24 participants<sup id=fnref:2><a href=#fn:2 class=footnote-ref role=doc-noteref>2</a></sup>.</p><h2 id=implementing-a-dao>Implementing a DAO</h2><p>First let&rsquo;s define the basics. A DAO should have Members who each are ID&rsquo;d by a
+key and have an amount of votes.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#75715e>#[derive(Deserialize, JsonSchema, Serialize, Clone)]</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>Member</span> {
+</span></span><span style=display:flex><span>    relative_votes: <span style=color:#66d9ef>u64</span>,
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#[derive(Deserialize, JsonSchema, Clone)]</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>Dao</span> {
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # Pool Members
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// map of all initial balances as PK to BTC
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    members: <span style=color:#a6e22e>BTreeMap</span><span style=color:#f92672>&lt;</span>PublicKey, Member<span style=color:#f92672>&gt;</span>,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// The current sequence number (for authenticating state updates)
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    sequence: <span style=color:#66d9ef>u64</span>,
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>impl</span> Contract <span style=color:#66d9ef>for</span> Dao {
+</span></span><span style=display:flex><span>    declare<span style=color:#f92672>!</span> {updatable<span style=color:#f92672>&lt;</span>Proposal<span style=color:#f92672>&gt;</span>, Self::hold_vote}
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Members can hold a vote on a proposal of some kind. Let&rsquo;s do proposals
+that can make payments, mint NFTs, or add some noobs:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#e6db74>/// New Update message for generating a transaction from.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#75715e>#[derive(Deserialize, JsonSchema, Serialize)]</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>enum</span> <span style=color:#a6e22e>Proposal</span> {
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # Payments
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// A mapping of public key in members to signed list of payouts with a fee rate.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    Payments {
+</span></span><span style=display:flex><span>        payments: <span style=color:#a6e22e>BTreeMap</span><span style=color:#f92672>&lt;</span>PublicKey, AmountU64<span style=color:#f92672>&gt;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// Some purpose for this proposal, as a String.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        reason: String,
+</span></span><span style=display:flex><span>    },
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # Mint
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// Make some NFTs
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    Mint {
+</span></span><span style=display:flex><span>        minting_module: <span style=color:#a6e22e>SapioHostAPI</span><span style=color:#f92672>&lt;</span>Mint_NFT_Trait_Version_0_1_0<span style=color:#f92672>&gt;</span>,
+</span></span><span style=display:flex><span>        mint_data: <span style=color:#a6e22e>Mint_NFT_Trait_Version_0_1_0</span>,
+</span></span><span style=display:flex><span>    },
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # Add People
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    Add {
+</span></span><span style=display:flex><span>        noobs: <span style=color:#a6e22e>BTreeMap</span><span style=color:#f92672>&lt;</span>PublicKey, Member<span style=color:#f92672>&gt;</span>,
+</span></span><span style=display:flex><span>    },
+</span></span><span style=display:flex><span>    None,
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span><span style=color:#e6db74>/// required...
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#66d9ef>impl</span> Default <span style=color:#66d9ef>for</span> Proposal {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>default</span>() -&gt; <span style=color:#a6e22e>Self</span> {
+</span></span><span style=display:flex><span>        Proposal::None
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span><span style=color:#66d9ef>impl</span> StatefulArgumentsTrait <span style=color:#66d9ef>for</span> Proposal {}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#e6db74>/// helper for rust type system issue
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>default_coerce</span>(k: <span style=color:#f92672>&lt;</span>Dao <span style=color:#66d9ef>as</span> Contract<span style=color:#f92672>&gt;</span>::StatefulArguments) -&gt; Result<span style=color:#f92672>&lt;</span>Proposal, CompilationError<span style=color:#f92672>&gt;</span> {
+</span></span><span style=display:flex><span>    Ok(k)
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Now we can implement the main logic of the DAO. We want it to compute keys for
+the majority to rule, and we want it to allow a majority to vote on a Proposal.
+Note how when we make a payment, unlike in the Payment Pool, we decrease all
+member&rsquo;s proportional ownership in the pool<sup id=fnref:3><a href=#fn:3 class=footnote-ref role=doc-noteref>3</a></sup>, so that new owners are not
+disadvantaged. But we could change that, to time-weight how long members have
+been part of the DAO as well, or give people &lsquo;special voting weight&rsquo;
+disconnected from money added. It&rsquo;s really up to whatever you want&mldr;</p><p>We&rsquo;ll implement the logic for each type of proposal (minting, adding, or paying).</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#66d9ef>impl</span> Dao {
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// Sum Up all the balances
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>total</span>(<span style=color:#f92672>&amp;</span>self) -&gt; <span style=color:#a6e22e>Amount</span> {
+</span></span><span style=display:flex><span>        Amount::from_sat(self.members.iter().map(<span style=color:#f92672>|</span>e<span style=color:#f92672>|</span> e.<span style=color:#ae81ff>1.</span>relative_votes).sum::<span style=color:#f92672>&lt;</span><span style=color:#66d9ef>u64</span><span style=color:#f92672>&gt;</span>())
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// all signed the transaction!
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#75715e>#[guard]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>majority_rules</span>(self, _ctx: <span style=color:#a6e22e>Context</span>) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> ppl <span style=color:#f92672>=</span> self
+</span></span><span style=display:flex><span>            .members
+</span></span><span style=display:flex><span>            .iter()
+</span></span><span style=display:flex><span>            .map(<span style=color:#f92672>|</span>(m, d)<span style=color:#f92672>|</span> (m.clone(), d.relative_votes))
+</span></span><span style=display:flex><span>            .collect();
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// TODO: we should probably make guards return Result...
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        key_groups_to_clause(
+</span></span><span style=display:flex><span>            <span style=color:#f92672>&amp;</span>compute_key_groups(self.total().as_sat() <span style=color:#f92672>/</span> <span style=color:#ae81ff>2</span>, ppl).expect(<span style=color:#e6db74>&#34;Well Formed&#34;</span>),
+</span></span><span style=display:flex><span>        )
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// This Function will create a proposed transaction that is safe to sign
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// given a list of data from participants.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#75715e>#[continuation(
+</span></span></span><span style=display:flex><span><span style=color:#75715e>        web_api,
+</span></span></span><span style=display:flex><span><span style=color:#75715e>        guarded_by = </span><span style=color:#e6db74>&#34;[Self::majority_rules]&#34;</span><span style=color:#75715e>,
+</span></span></span><span style=display:flex><span><span style=color:#75715e>        coerce_args = </span><span style=color:#e6db74>&#34;default_coerce&#34;</span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    )]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>hold_vote</span>(self, ctx: <span style=color:#a6e22e>Context</span>, update: <span style=color:#a6e22e>Proposal</span>) {
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// don&#39;t allow empty updates.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#66d9ef>match</span> update {
+</span></span><span style=display:flex><span>            Proposal::None <span style=color:#f92672>=&gt;</span> empty(),
+</span></span><span style=display:flex><span>            Proposal::Mint {
+</span></span><span style=display:flex><span>                minting_module,
+</span></span><span style=display:flex><span>                mint_data,
+</span></span><span style=display:flex><span>            } <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>                <span style=color:#66d9ef>let</span> key <span style=color:#f92672>=</span> minting_module.key;
+</span></span><span style=display:flex><span>                <span style=color:#75715e>// let&#39;s now compile a new &#39;mint&#39; of the NFT
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>                <span style=color:#66d9ef>let</span> new_nft_contract <span style=color:#f92672>=</span> Ok(CreateArgs {
+</span></span><span style=display:flex><span>                    context: <span style=color:#a6e22e>ContextualArguments</span> {
+</span></span><span style=display:flex><span>                        amount: <span style=color:#a6e22e>ctx</span>.funds(),
+</span></span><span style=display:flex><span>                        network: <span style=color:#a6e22e>ctx</span>.network,
+</span></span><span style=display:flex><span>                        effects: Default::default(),
+</span></span><span style=display:flex><span>                    },
+</span></span><span style=display:flex><span>                    arguments: <span style=color:#a6e22e>mint_impl</span>::Versions::Mint_NFT_Trait_Version_0_1_0(mint_data),
+</span></span><span style=display:flex><span>                })
+</span></span><span style=display:flex><span>                .and_then(serde_json::to_value)
+</span></span><span style=display:flex><span>                .map(<span style=color:#f92672>|</span>args<span style=color:#f92672>|</span> create_contract_by_key(<span style=color:#f92672>&amp;</span>key, args, Amount::from_sat(<span style=color:#ae81ff>0</span>)))
+</span></span><span style=display:flex><span>                .map_err(<span style=color:#f92672>|</span>_<span style=color:#f92672>|</span> CompilationError::TerminateCompilation)<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>                .ok_or(CompilationError::TerminateCompilation)<span style=color:#f92672>?</span>;
+</span></span><span style=display:flex><span>                <span style=color:#66d9ef>let</span> f <span style=color:#f92672>=</span> ctx.funds();
+</span></span><span style=display:flex><span>                ctx.template()
+</span></span><span style=display:flex><span>                    .add_output(f, self, None)<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>                    .add_output(Amount::from_sat(<span style=color:#ae81ff>0</span>), <span style=color:#f92672>&amp;</span>new_nft_contract, None)<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>                    .into()
+</span></span><span style=display:flex><span>            }
+</span></span><span style=display:flex><span>            Proposal::Add { <span style=color:#66d9ef>mut</span> noobs } <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>                <span style=color:#66d9ef>let</span> adding <span style=color:#f92672>=</span> Amount::from_sat(noobs.values().map(<span style=color:#f92672>|</span>m<span style=color:#f92672>|</span> m.relative_votes).sum());
+</span></span><span style=display:flex><span>                <span style=color:#66d9ef>let</span> <span style=color:#66d9ef>mut</span> new <span style=color:#f92672>=</span> self.clone();
+</span></span><span style=display:flex><span>                noobs.iter_mut().for_each(<span style=color:#f92672>|</span>(pk, m)<span style=color:#f92672>|</span> {
+</span></span><span style=display:flex><span>                    new.members
+</span></span><span style=display:flex><span>                        .entry(<span style=color:#f92672>*</span>pk)
+</span></span><span style=display:flex><span>                        .and_modify(<span style=color:#f92672>|</span>e<span style=color:#f92672>|</span> e.relative_votes <span style=color:#f92672>+=</span> m.relative_votes)
+</span></span><span style=display:flex><span>                        .or_insert(m.clone());
+</span></span><span style=display:flex><span>                });
+</span></span><span style=display:flex><span>                <span style=color:#66d9ef>let</span> f <span style=color:#f92672>=</span> ctx.funds();
+</span></span><span style=display:flex><span>                ctx.template()
+</span></span><span style=display:flex><span>                    .add_sequence()
+</span></span><span style=display:flex><span>                    .add_amount(adding)
+</span></span><span style=display:flex><span>                    .add_output(f, self, None)<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>                    .add_output(Amount::from_sat(<span style=color:#ae81ff>0</span>), <span style=color:#f92672>&amp;</span>new, None)<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>                    .into()
+</span></span><span style=display:flex><span>            }
+</span></span><span style=display:flex><span>            Proposal::Payments { payments } <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>                <span style=color:#66d9ef>if</span> payments.is_empty() {
+</span></span><span style=display:flex><span>                    <span style=color:#66d9ef>return</span> empty();
+</span></span><span style=display:flex><span>                }
+</span></span><span style=display:flex><span>                <span style=color:#75715e>// collect members with updated balances here
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>                <span style=color:#66d9ef>let</span> spent <span style=color:#f92672>=</span> payments
+</span></span><span style=display:flex><span>                    .values()
+</span></span><span style=display:flex><span>                    .cloned()
+</span></span><span style=display:flex><span>                    .map(Amount::from)
+</span></span><span style=display:flex><span>                    .fold(Amount::from_sat(<span style=color:#ae81ff>0</span>), <span style=color:#f92672>|</span>a, b<span style=color:#f92672>|</span> a <span style=color:#f92672>+</span> b.into());
+</span></span><span style=display:flex><span>                <span style=color:#66d9ef>let</span> balance <span style=color:#f92672>=</span> <span style=color:#ae81ff>1.0</span> <span style=color:#f92672>-</span> (spent.as_btc() <span style=color:#f92672>/</span> self.total().as_btc());
+</span></span><span style=display:flex><span>                <span style=color:#66d9ef>let</span> <span style=color:#66d9ef>mut</span> new_members <span style=color:#f92672>=</span> self.members.clone();
+</span></span><span style=display:flex><span>                new_members.values_mut().for_each(<span style=color:#f92672>|</span>m<span style=color:#f92672>|</span> {
+</span></span><span style=display:flex><span>                    m.relative_votes <span style=color:#f92672>=</span> (m.relative_votes <span style=color:#66d9ef>as</span> <span style=color:#66d9ef>f64</span> <span style=color:#f92672>*</span> balance).round() <span style=color:#66d9ef>as</span> <span style=color:#66d9ef>u64</span>;
+</span></span><span style=display:flex><span>                });
+</span></span><span style=display:flex><span>                <span style=color:#75715e>// for each payment...
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>                <span style=color:#75715e>// Send any leftover funds to a new pool
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>                <span style=color:#66d9ef>let</span> change <span style=color:#f92672>=</span> Dao {
+</span></span><span style=display:flex><span>                    members: <span style=color:#a6e22e>new_members</span>,
+</span></span><span style=display:flex><span>                    sequence: <span style=color:#a6e22e>self</span>.sequence <span style=color:#f92672>+</span> <span style=color:#ae81ff>1</span>,
+</span></span><span style=display:flex><span>                };
+</span></span><span style=display:flex><span>                <span style=color:#66d9ef>let</span> <span style=color:#66d9ef>mut</span> tmpl <span style=color:#f92672>=</span> ctx.template().add_output(change.total(), <span style=color:#f92672>&amp;</span>change, None)<span style=color:#f92672>?</span>;
+</span></span><span style=display:flex><span>                <span style=color:#75715e>// optional: we could commit to the reason somewhere in metadata 
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>                <span style=color:#75715e>// e.g. a tapleaf branch... we don&#39;t do this here because meh.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>                <span style=color:#66d9ef>for</span> (key, amount) <span style=color:#66d9ef>in</span> payments {
+</span></span><span style=display:flex><span>                    tmpl <span style=color:#f92672>=</span> tmpl.add_output(amount.try_into()<span style=color:#f92672>?</span>, <span style=color:#f92672>&amp;</span>key, None)<span style=color:#f92672>?</span>;
+</span></span><span style=display:flex><span>                }
+</span></span><span style=display:flex><span>                tmpl.into()
+</span></span><span style=display:flex><span>            }
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>REGISTER<span style=color:#f92672>!</span>[Dao, <span style=color:#e6db74>&#34;logo.png&#34;</span>];
+</span></span></code></pre></div><p>Lastly, we need some super special sneaky algorithm fun to implement signing authorities
+based on majority value. As noted, special uses of FROST could replace this, or future
+research on better weighted key protocols.</p><p>For now, we limit ourselves to 25 keys so that compilation isn&rsquo;t too slow. We can afford
+having hundreds of thousands or millions of groups because of Taproot :).</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>key_groups_to_clause</span><span style=color:#f92672>&lt;</span>T<span style=color:#f92672>&gt;</span>(v: <span style=color:#66d9ef>&amp;</span>(Vec<span style=color:#f92672>&lt;</span>(PublicKey, T)<span style=color:#f92672>&gt;</span>, Vec<span style=color:#f92672>&lt;</span><span style=color:#66d9ef>u32</span><span style=color:#f92672>&gt;</span>)) -&gt; <span style=color:#a6e22e>Clause</span> {
+</span></span><span style=display:flex><span>    Clause::Threshold(
+</span></span><span style=display:flex><span>        <span style=color:#ae81ff>1</span>,
+</span></span><span style=display:flex><span>        v.<span style=color:#ae81ff>1.</span>iter()
+</span></span><span style=display:flex><span>            .map(<span style=color:#f92672>|</span>m<span style=color:#f92672>|</span> {
+</span></span><span style=display:flex><span>                Clause::And(
+</span></span><span style=display:flex><span>                    v.<span style=color:#ae81ff>0.</span>iter()
+</span></span><span style=display:flex><span>                        .enumerate()
+</span></span><span style=display:flex><span>                        .filter_map(<span style=color:#f92672>|</span>(i, (k, _))<span style=color:#f92672>|</span> {
+</span></span><span style=display:flex><span>                            <span style=color:#66d9ef>if</span> m <span style=color:#f92672>&amp;</span> (<span style=color:#ae81ff>1</span> <span style=color:#f92672>&lt;&lt;</span> i) <span style=color:#f92672>!=</span> <span style=color:#ae81ff>0</span> {
+</span></span><span style=display:flex><span>                                Some(k.clone())
+</span></span><span style=display:flex><span>                            } <span style=color:#66d9ef>else</span> {
+</span></span><span style=display:flex><span>                                None
+</span></span><span style=display:flex><span>                            }
+</span></span><span style=display:flex><span>                        })
+</span></span><span style=display:flex><span>                        .map(Clause::Key)
+</span></span><span style=display:flex><span>                        .collect(),
+</span></span><span style=display:flex><span>                )
+</span></span><span style=display:flex><span>            })
+</span></span><span style=display:flex><span>            .collect(),
+</span></span><span style=display:flex><span>    )
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span><span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>compute_key_groups</span>(
+</span></span><span style=display:flex><span>    threshold: <span style=color:#66d9ef>u64</span>,
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>mut</span> el: Vec<span style=color:#f92672>&lt;</span>(PublicKey, <span style=color:#66d9ef>u64</span>)<span style=color:#f92672>&gt;</span>,
+</span></span><span style=display:flex><span>) -&gt; Result<span style=color:#f92672>&lt;</span>(Vec<span style=color:#f92672>&lt;</span>(PublicKey, <span style=color:#66d9ef>u64</span>)<span style=color:#f92672>&gt;</span>, Vec<span style=color:#f92672>&lt;</span><span style=color:#66d9ef>u32</span><span style=color:#f92672>&gt;</span>), CompilationError<span style=color:#f92672>&gt;</span> {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> el.len() <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>25</span> <span style=color:#f92672>||</span> el.is_empty() {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> Err(CompilationError::TerminateCompilation);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// sort for stable ordering
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    el.sort();
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// The bitmasks for which keys to participate
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#66d9ef>let</span> <span style=color:#66d9ef>mut</span> sets: Vec<span style=color:#f92672>&lt;</span><span style=color:#66d9ef>u32</span><span style=color:#f92672>&gt;</span> <span style=color:#f92672>=</span> vec![];
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// BEGIN ALGORITHM:
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#75715e>// if we see a bit set out of range, we can stop.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#66d9ef>let</span> fail_if_set <span style=color:#f92672>=</span> ((<span style=color:#f92672>!</span><span style=color:#ae81ff>0</span>) <span style=color:#f92672>&gt;&gt;</span> el.len()) <span style=color:#f92672>&lt;&lt;</span> el.len();
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// we know that 0 elements is invalid, we need up to el.len()
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#66d9ef>for</span> i <span style=color:#66d9ef>in</span> <span style=color:#ae81ff>1</span><span style=color:#66d9ef>u32</span><span style=color:#f92672>..=</span>el.len() <span style=color:#66d9ef>as</span> <span style=color:#66d9ef>u32</span> {
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// get the first member of our permutation
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#66d9ef>let</span> <span style=color:#66d9ef>mut</span> ct <span style=color:#f92672>=</span> element_0(i);
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// if any bits are set in the failure zone stop
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#66d9ef>while</span> ct <span style=color:#f92672>&amp;</span> fail_if_set <span style=color:#f92672>==</span> <span style=color:#ae81ff>0</span> {
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// compute the sum of the elements in this mask
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#66d9ef>let</span> sum: <span style=color:#66d9ef>u64</span> <span style=color:#f92672>=</span> (<span style=color:#ae81ff>0</span><span style=color:#f92672>..</span>el.len())
+</span></span><span style=display:flex><span>                .map(<span style=color:#f92672>|</span>i<span style=color:#f92672>|</span> <span style=color:#66d9ef>if</span> ct <span style=color:#f92672>&amp;</span> (<span style=color:#ae81ff>1</span> <span style=color:#f92672>&lt;&lt;</span> i) <span style=color:#f92672>!=</span> <span style=color:#ae81ff>0</span> { el[i].<span style=color:#ae81ff>1</span> } <span style=color:#66d9ef>else</span> { <span style=color:#ae81ff>0</span> })
+</span></span><span style=display:flex><span>                .sum::<span style=color:#f92672>&lt;</span><span style=color:#66d9ef>u64</span><span style=color:#f92672>&gt;</span>();
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// this set is a candidate!
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#66d9ef>if</span> sum <span style=color:#f92672>&gt;=</span> threshold {
+</span></span><span style=display:flex><span>                <span style=color:#75715e>// subtract the smallest value (this is why we sorted) -- if it
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>                <span style=color:#75715e>// fails it is not a minimal set because there exists a passing
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>                <span style=color:#75715e>// set without this element.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>                <span style=color:#75715e>// note: trailing zeros is guaranteed to be in bounds
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>                <span style=color:#66d9ef>if</span> sum <span style=color:#f92672>-</span> el[ct.trailing_zeros() <span style=color:#66d9ef>as</span> <span style=color:#66d9ef>usize</span>].<span style=color:#ae81ff>1</span> <span style=color:#f92672>&lt;</span> threshold {
+</span></span><span style=display:flex><span>                    <span style=color:#75715e>// it did fail, so save it
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>                    sets.push(ct);
+</span></span><span style=display:flex><span>                }
+</span></span><span style=display:flex><span>            }
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// get the next ct
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            ct <span style=color:#f92672>=</span> next_perm(ct);
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    Ok((el, sets))
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#e6db74>/// Adapted from https://www.alexbowe.com/popcount-permutations/
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>///
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>/// Compute the lexicographically next bit permutation
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>/// Taken from http://graphics.stanford.edu/~seander/bithacks.html
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>next_perm</span>(v: <span style=color:#66d9ef>u32</span>) -&gt; <span style=color:#66d9ef>u32</span> {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>let</span> t: <span style=color:#66d9ef>u32</span> <span style=color:#f92672>=</span> v <span style=color:#f92672>|</span> (v <span style=color:#f92672>-</span> <span style=color:#ae81ff>1</span>); <span style=color:#75715e>// t gets v&#39;s least significant 0 bits set to 1
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>                              <span style=color:#75715e>// Next set to 1 the most significant bit to change,
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>                              <span style=color:#75715e>// set to 0 the least significant ones, and add the necessary 1 bits.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#66d9ef>let</span> w: <span style=color:#66d9ef>u32</span> <span style=color:#f92672>=</span> (t <span style=color:#f92672>+</span> <span style=color:#ae81ff>1</span>) <span style=color:#f92672>|</span> (((<span style=color:#f92672>!</span>t <span style=color:#f92672>&amp;</span> (<span style=color:#f92672>!</span>t).wrapping_neg()) <span style=color:#f92672>-</span> <span style=color:#ae81ff>1</span>) <span style=color:#f92672>&gt;&gt;</span> (v.trailing_zeros() <span style=color:#f92672>+</span> <span style=color:#ae81ff>1</span>));
+</span></span><span style=display:flex><span>    w
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span><span style=color:#e6db74>///    Generates first permutation with a given amount of set bits, which is
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>///    used to generate the rest.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>element_0</span>(c: <span style=color:#66d9ef>u32</span>) -&gt; <span style=color:#66d9ef>u32</span> {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> (<span style=color:#ae81ff>1</span> <span style=color:#f92672>&lt;&lt;</span> c) <span style=color:#f92672>-</span> <span style=color:#ae81ff>1</span>;
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>All done! Not too bad huh? I think you&rsquo;re really getting the hang of this thing!</p><h1 id=using-a-dao>Using a DAO</h1><p>Now that we have this DAO we can get together a group of people and share a UTXO.</p><p>With that shared balance, we can get everyone in some kind of chat room and &lsquo;govern&rsquo;
+what proposals folks want to vote on.</p><p>In particular, I would be very excited to see DAOs emerge for funding Bitcoin
+Developers. This type of structure can potentially help folks communally
+allocate capital. Often times the biggest barrier is finding deals that make
+sense, and DAOs would enable you to share with a group of friends and they could
+make decisions for you.</p><p>It would even be possible to create DAOs on behalf of third parties and fund
+them. For example, let&rsquo;s say I get PKs for 10 devs I like and put a 10 BTC into
+it and set the shares up so that there is a &rsquo;leader&rsquo; with 30%, and the rest
+split 70% of voting shares. The leader could just steal the money with another
+21%, but would they? I hope not! Instead, they can vote on good things as
+intended. It&rsquo;d also be possible for the DAO creator to embed an &lsquo;oversight
+comittee&rsquo; that can yank the funds if not being used.</p><p>Minting NFTs is kind of a cool feature since anyone can see they came from the
+DAO if they track the DAO&rsquo;s state updates (conceivably these get published for
+auditing). NFTs could be issued as medals of honor for devs who follow their
+grants. Or, if you really like NFTs, they could be used to issue software
+licenses in exchange for contributing funds to the DAO operators.</p><h1 id=does-this-need-ctv>Does this need CTV?</h1><p>Nope. Just a fancy multisig, right?</p><p>Where CTV is useful is if we want to vote on proposals to put things into CTV
+contracts, like subscriptions to developer grants, opening channels, etc.
+Imagine the developer gets a contract where they get paid out every week, but
+there is a auditing comittee that can be used to terminate the subscription and
+return funds to the DAO if misbehavior is detected.</p><p>While you don&rsquo;t need CTV in the DAO backbone, it would help open up new use
+cases.</p><p>It would also be possible to add some &rsquo;liveness&rsquo; smooth degradations of the DAO,
+whereby half the majority (e.g., if majority is 50%, 25%) could vote that the
+DAO is dead, and after a period of time for the majority recovery, distribute
+the funds on a pre-comitted schedule.</p><p>We don&rsquo;t show that here, but it wouldn&rsquo;t be too hard now would it?</p><h1 id=generalizing>Generalizing</h1><p>One could go ahead and implement a DAO trait that all DAOs could share and build
+a common UX for managing DAOs with a wide variety of custom logic&mldr;</p><p>It&rsquo;d also be possible to have a DAO backbone which is a single UTXO, and have
+other UTXOs &lsquo;owned&rsquo; by the DAO that can get merged in later as a proposal. This
+way contributions to the DAO don&rsquo;t always require a state update from the DAO
+itself.</p><p>For future work :)</p><div class=footnotes role=doc-endnotes><hr><ol><li id=fn:1><p>FROST allows n-M threshold Schnorr signatures, which can turn into a weighted solution by making M the total value and each party have W amount of keys for their contribution. But this scales poorly because you need to exchange keys and signatures linear in the Amount, which is up to a 51-bit number.&#160;<a href=#fnref:1 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p></li><li id=fn:2><p>We are going to brute force all the N-N key combinations, so we pick a low number like 24 and things stay &lsquo;small&rsquo; enough.&#160;<a href=#fnref:2 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p></li><li id=fn:3><p>please please if you&rsquo;re implementing this for real use rational types not floats.&#160;<a href=#fnref:3 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p></li></ol></div></div><div></div></div><hr><div class=main2><div></div><div id=disqus_thread></div><script type=application/javascript>window.disqus_config=function(){},function(){if(["localhost","127.0.0.1"].indexOf(window.location.hostname)!=-1){document.getElementById("disqus_thread").innerHTML="Disqus comments not available by default when the website is previewed locally.";return}var t=document,e=t.createElement("script");e.async=!0,e.src="//judica-org.disqus.com/embed.js",e.setAttribute("data-timestamp",+new Date),(t.head||t.body).appendChild(e)}()</script><noscript>Please enable JavaScript to view the <a href=https://disqus.com/?ref_noscript>comments powered by Disqus.</a></noscript><a href=https://disqus.com class=dsq-brlink>comments powered by <span class=logo-disqus>Disqus</span></a><div></div></div><hr><footer style=text-align:center;bottom:0;padding-bottom:10px;width:100%>&copy; Judica, Inc 2022 | contact@judica.org | <a class=darkmode-switch>dark/light theme</a></footer></body></html>

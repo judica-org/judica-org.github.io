@@ -1,0 +1,150 @@
+<!doctype html><html><head><meta name=viewport content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@200;500&display=swap" rel=stylesheet><link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600&display=swap" rel=stylesheet><link rel=stylesheet type=text/css href=/css/style.css><script>const storage=window.localStorage,get_darkmode=()=>{const e=storage.getItem("darkmode");return e==null||e==="true"},set_darkmode=()=>{get_darkmode()?(document.body.classList.remove("lightmode"),document.body.classList.add("darkmode")):(document.body.classList.remove("darkmode"),document.body.classList.add("lightmode"))};function applyBackgroundTheme(e){var n="body { background: "+e+"; }",s=document.head||document.getElementsByTagName("head")[0],t=document.createElement("style");return s.appendChild(t),t.type="text/css",t.styleSheet?t.styleSheet.cssText=n:t.appendChild(document.createTextNode(n)),t}const style=applyBackgroundTheme(get_darkmode()?"black":"white");document.addEventListener("DOMContentLoaded",()=>{set_darkmode(),style.parentElement.removeChild(style);const e=document.getElementsByClassName("darkmode-switch")[0];e.onclick=e=>{storage.setItem("darkmode",!get_darkmode()),get_darkmode(),set_darkmode()}})</script><script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-175497336-1","auto"),ga("send","pageview"))</script><script async src=https://www.google-analytics.com/analytics.js></script><meta property="og:title" content="From the Sapio Zoo: HODL Chicken + Tux Preview"><meta property="og:description" content="An on chain game of chance."><meta property="og:type" content="article"><meta property="og:url" content="https://judica.org/blog/hodl-chicken/"><meta property="og:image" content="https://judica.org/img/og-img.png"><meta property="article:section" content="blog"><meta property="article:published_time" content="2020-09-06T00:00:00+00:00"><meta property="article:modified_time" content="2020-09-06T00:00:00+00:00"><meta property="og:site_name" content="judica.org -- restore the balance"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://judica.org/img/og-img.png"><meta name=twitter:title content="From the Sapio Zoo: HODL Chicken + Tux Preview"><meta name=twitter:description content="An on chain game of chance."></head><body><header class=nav><ul><li class=float-left><a href=/>judica.</a></li></ul><ul><li><a href=/about/>about.</a></li><li><a href=/software/>software.</a></li><li><a href=/blog/>blog.</a></li><li><a href=/join/>join.</a></li></ul></header><div class=main2><h1>From the Sapio Zoo: HODL Chicken + Tux Preview</h1><h3>by Pyskell and Jeremy Rubin</h3><small>on September 6, 2020</small><hr></div><div class=main2><div></div><div class=blogtext-inner><p>Hello! I&rsquo;m really excited to have <a href=https://twitter.com/pyskell>@pyskell</a> making the first guest post
+on the Judica blog! The post below is a description of Pyskell&rsquo;s efforts to make a new game for
+Bitcoin, a sort of &ldquo;proof of strong hands&rdquo; called HodlChicken. The blog will describe how the
+contract is written and show how the Sapio + Tux ecosystem works together to produce compelling
+Bitcoin Applications.</p><p>Let&rsquo;s hand it off to Pyskell to tell you more about what he built.</p><hr><p>A few weeks ago I got access to the Sapio language developer preview, and I had a little fun
+designing a smart contract enabling people to play something like Chicken.</p><p>If you&rsquo;re not familiar, Chicken is a dangerous game where two drivers drive their cars directly at
+each other. Three things can happen: either neither driver gets out of the way, and they crash; one
+driver yields the right of way (the chicken), or both players yield.</p><p>We can make a version of this for Bitcoin using Sapio. We want the following outcomes:</p><ol><li>Alice waits, Bob waits: coins remain locked</li><li>Alice yields, Bob waits: Bob gets a prize that Alice pays for</li><li>Alice waits, Bob yields: Alice gets a prize that Bob pays for</li><li>Alice yields, Bob yields: Not Allowed, we&rsquo;re playing the extreme version of Chicken here</li></ol><p>To do this, I created the below contract:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-forth data-lang=forth><span style=display:flex><span><span style=color:#a6e22e>OP_IF</span> <span style=color:#a6e22e>&lt;bob_chicken_tx_h&gt;</span> <span style=color:#a6e22e>OP_CHECKTEMPLATEVERIFY</span> <span style=color:#a6e22e>OP_DROP</span> <span style=color:#a6e22e>&lt;bob_key&gt;</span> <span style=color:#a6e22e>OP_ELSE</span> <span style=color:#a6e22e>&lt;alice_chicken_tx_h&gt;</span> <span style=color:#a6e22e>OP_CHECKTEMPLATEVERIFY</span> <span style=color:#a6e22e>OP_DROP</span> <span style=color:#a6e22e>&lt;alice_key&gt;</span> <span style=color:#a6e22e>OP_ENDIF,</span> <span style=color:#a6e22e>OP_CHECKSIG</span>
+</span></span></code></pre></div><p>Can you read this? Maybe! But can you properly derive what the transaction hashes should be? Of course not. I can&rsquo;t either. That&rsquo;s why I wrote it in Sapio.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#75715e># code is Copyright (c) 2020 Pyskell &amp; Judica, Inc.</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Available under BSD-new license</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>@contract</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>HodlChicken</span>:
+</span></span><span style=display:flex><span>    alice_contract: Callable[[Amount], Contract]
+</span></span><span style=display:flex><span>    bob_contract: Callable[[Amount], Contract]
+</span></span><span style=display:flex><span>    alice_key: PubKey
+</span></span><span style=display:flex><span>    bob_key: PubKey
+</span></span><span style=display:flex><span>    alice_deposit: Amount
+</span></span><span style=display:flex><span>    bob_deposit: Amount
+</span></span><span style=display:flex><span>    winner_gets: Amount
+</span></span><span style=display:flex><span>    chicken_gets: Amount
+</span></span></code></pre></div><p>This first section lays out parameters necessary to construct our contract.</p><p>The winner_gets and chicken_gets determine the amounts of the prize.</p><p>The alice_deposit and bob_deposit parameters aren&rsquo;t required to make the contract, and could be
+forged, but are used to ensure some invariants in the contract later on.</p><p>The alice_key and bob_key are used to determine which party capitulates by signing a transaction.</p><p>Lastly, and most importantly, the functions alice_contract and bob_contract return a contract
+instance depending on how much value is paid. This allows a recipient to have a generic receiving
+function that creates different types of keys (e.g., composable smart contracts or plain addresses)
+depending on how much value is sent. So for example Alice could receive her winnings out to a bech32 Lightning channel
+while Bob, who likes paying unnecessary fees, can choose a P2SH address.</p><p>The next section adds the chicken logic for Alice:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#a6e22e>@HodlChicken</span><span style=color:#f92672>.</span>let
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>alice_is_a_chicken</span>(self) <span style=color:#f92672>-&gt;</span> Clause:
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> SignedBy(self<span style=color:#f92672>.</span>alice_key)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>@alice_is_a_chicken</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>@HodlChicken</span><span style=color:#f92672>.</span>then
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>alice_redeem</span>(self) <span style=color:#f92672>-&gt;</span> TransactionTemplate:
+</span></span><span style=display:flex><span>    tx <span style=color:#f92672>=</span> TransactionTemplate()
+</span></span><span style=display:flex><span>    tx<span style=color:#f92672>.</span>add_output(self<span style=color:#f92672>.</span>winner_gets, self<span style=color:#f92672>.</span>bob_contract(self<span style=color:#f92672>.</span>winner_gets))
+</span></span><span style=display:flex><span>    tx<span style=color:#f92672>.</span>add_output(self<span style=color:#f92672>.</span>chicken_gets, self<span style=color:#f92672>.</span>alice_contract(self<span style=color:#f92672>.</span>chicken_gets))
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> tx
+</span></span></code></pre></div><p>The let binding allows us to declare a reusable restriction that we can apply to
+as a decorator to our <code>alice_redeem</code> function.</p><p>The &rsquo;then&rsquo; binding ensures that the <code>TransactionTemplate</code> returned can be used if the
+alice_is_a_chicken condition is met.</p><p>The <code>TransactionTemplate</code> we return pays the winner amount to Bob (because Alice capitulated), and the
+chicken amount to Alice.</p><p>Next, we add the same logic for Bob.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>@HodlChicken</span><span style=color:#f92672>.</span>let
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>bob_is_a_chicken</span>(self):
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> SignedBy(self<span style=color:#f92672>.</span>bob_key)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>@bob_is_a_chicken</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>@HodlChicken</span><span style=color:#f92672>.</span>then
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>bob_redeem</span>(self) <span style=color:#f92672>-&gt;</span> TransactionTemplate:
+</span></span><span style=display:flex><span>    tx <span style=color:#f92672>=</span> TransactionTemplate()
+</span></span><span style=display:flex><span>    tx<span style=color:#f92672>.</span>add_output(self<span style=color:#f92672>.</span>winner_gets, self<span style=color:#f92672>.</span>alice_contract(self<span style=color:#f92672>.</span>winner_gets))
+</span></span><span style=display:flex><span>    tx<span style=color:#f92672>.</span>add_output(self<span style=color:#f92672>.</span>chicken_gets, self<span style=color:#f92672>.</span>bob_contract(self<span style=color:#f92672>.</span>chicken_gets))
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> tx
+</span></span></code></pre></div><p>Lastly, we add some requirements. Requirements are essentially assertions about the correctness of
+the parameters passed to the HodlChicken contract.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>@HodlChicken</span><span style=color:#f92672>.</span>require
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>amounts_sum_correctly</span>(self) <span style=color:#f92672>-&gt;</span> bool:
+</span></span><span style=display:flex><span>    <span style=color:#75715e># Make sure all sats will be spent when the game completes</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> (
+</span></span><span style=display:flex><span>        self<span style=color:#f92672>.</span>alice_deposit <span style=color:#f92672>+</span> self<span style=color:#f92672>.</span>bob_deposit
+</span></span><span style=display:flex><span>    ) <span style=color:#f92672>==</span> self<span style=color:#f92672>.</span>winner_gets <span style=color:#f92672>+</span> self<span style=color:#f92672>.</span>chicken_gets
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>@HodlChicken</span><span style=color:#f92672>.</span>require
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>equal_amounts</span>(self) <span style=color:#f92672>-&gt;</span> bool:
+</span></span><span style=display:flex><span>    <span style=color:#75715e># Both participants should commit the same amount</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> self<span style=color:#f92672>.</span>alice_deposit <span style=color:#f92672>==</span> self<span style=color:#f92672>.</span>bob_deposit
+</span></span></code></pre></div><p>And there you have it, a fun little Bitcoin game in a short bit of Sapio.
+Any programmer can read this code, understand what it&rsquo;s doing, and expand on it.
+For example I bet you could easily add a <code>draw</code> function where both participants
+can agree to exit the game without losing any of their deposit. You&rsquo;d at least have
+a much easier time doing so than if I gave you a plain Bitcoin Script.</p><p>I&rsquo;ll leave it up to Jeremy to explain how the Tux browser works to inspect smart contracts.</p><hr><p>Thanks Pyskell, awesome idea!</p><p>Now, how do we set up and use the HodlChicken contract?</p><p>Well, we can use it in a lot of ways! For this part let&rsquo;s set it up with a simple PayToSegwitAddress
+receiver and normal PubKeys.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>alice_script <span style=color:#f92672>=</span> script_to_p2wsh(CScript([<span style=color:#e6db74>b</span><span style=color:#e6db74>&#34;Alice&#39;s Key Goes Here!&#34;</span>]))
+</span></span><span style=display:flex><span>bob_script <span style=color:#f92672>=</span> script_to_p2wsh(CScript([<span style=color:#e6db74>b</span><span style=color:#e6db74>&#34;Bob&#39;s Key Goes Here!&#34;</span>]))
+</span></span><span style=display:flex><span>alice_key <span style=color:#f92672>=</span> random_k()
+</span></span><span style=display:flex><span>bob_key <span style=color:#f92672>=</span> random_k()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>hodl_chicken <span style=color:#f92672>=</span> HodlChicken<span style=color:#f92672>.</span>create(
+</span></span><span style=display:flex><span>    alice_contract<span style=color:#f92672>=</span><span style=color:#66d9ef>lambda</span> x: PayToSegwitAddress<span style=color:#f92672>.</span>create(
+</span></span><span style=display:flex><span>        amount<span style=color:#f92672>=</span>AmountRange<span style=color:#f92672>.</span>of(x), address<span style=color:#f92672>=</span>alice_script
+</span></span><span style=display:flex><span>    ),
+</span></span><span style=display:flex><span>    bob_contract<span style=color:#f92672>=</span><span style=color:#66d9ef>lambda</span> x: PayToSegwitAddress<span style=color:#f92672>.</span>create(
+</span></span><span style=display:flex><span>        amount<span style=color:#f92672>=</span>AmountRange<span style=color:#f92672>.</span>of(x), address<span style=color:#f92672>=</span>bob_script
+</span></span><span style=display:flex><span>    ),
+</span></span><span style=display:flex><span>    alice_key<span style=color:#f92672>=</span>alice_key,
+</span></span><span style=display:flex><span>    bob_key<span style=color:#f92672>=</span>bob_key,
+</span></span><span style=display:flex><span>    alice_deposit<span style=color:#f92672>=</span>Sats(<span style=color:#ae81ff>100_000_000</span>),
+</span></span><span style=display:flex><span>    bob_deposit<span style=color:#f92672>=</span>Sats(<span style=color:#ae81ff>100_000_000</span>),
+</span></span><span style=display:flex><span>    winner_gets<span style=color:#f92672>=</span>Sats(<span style=color:#ae81ff>150_000_000</span>),
+</span></span><span style=display:flex><span>    chicken_gets<span style=color:#f92672>=</span>Sats(<span style=color:#ae81ff>50_000_000</span>),
+</span></span><span style=display:flex><span>)
+</span></span></code></pre></div><p>Now we can derive an address for the <code>hodl_chicken</code> contract instance, and pay to it.
+Suppose we&rsquo;ve done that and created a COutPoint X. All we need to do is:</p><pre tabindex=0><code>hodl_chicken.bind(X)
+</code></pre><p>This will automatically generate a list of transactions and ABI data.</p><p>We can also add a single line of code to the server which allows HodlChicken be imported into the
+<a href=https://github.com/sapio-lang/tux>Tux</a> tool automatically by websocket. Though in the future
+this will be configurable without editing Tux.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>CompilerWebSocket<span style=color:#f92672>.</span>add_contract(<span style=color:#e6db74>&#34;Chicken&#34;</span>, HodlChicken)
+</span></span></code></pre></div><p>Now, without writing any new code, we have the ability to create a new instance of the contract via webform:</p><figure><img src=/img/chickens/tux3.png alt="Webform showing HodlChicken Contract Creation." width=100%><figcaption><p>Webform showing HodlChicken Contract Creation.</p></figcaption></figure><p>Let&rsquo;s check out our newly created contract:</p><figure><img src=/img/chickens/tux1.png alt="Freshly created HodlChicken Contract." width=100%><figcaption><p>Freshly created HodlChicken Contract.</p></figcaption></figure><p>We can use Tux to check out and inspect the transactions and outputs in our contract.<figure><img src=/img/chickens/tux2.png alt="Inspecting HodlChicken" width=100%><figcaption><p>Inspecting HodlChicken</p></figcaption></figure></p><p>When we&rsquo;re satisfied, we can use the Tux create button to connect to our node and fund a raw
+transaction to create our contract, and link the children to the parent.<figure><img src=/img/chickens/tux4.png alt="Paying To a HodlChicken Contract." width=100%><figcaption><p>Paying To a HodlChicken Contract.</p></figcaption></figure></p><p>The Load/Save windows can be used to dump a JSON object that can be passed around for future Tux
+sessions or for compatibility with other tools.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json><span style=display:flex><span>{
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;program&#34;</span>: [
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;hex&#34;</span>: <span style=color:#e6db74>&#34;0200000001174c0cee8f1c8a1dd743d663defb4c9670c7c21af17f1e2c5f93e7171ee0ac0a0000000000000000000280d1f00800000000220020108abc959debbf561218facf9ce66cecb11c526eafc4e4031e4fc68de4c8955780f0fa0 2000000002200205688d4a74bf4b739e69c34a4fde6733831d739714acc42aac756e9a371e72f6f00000000&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;label&#34;</span>: <span style=color:#e6db74>&#34;150cc0b95f23d17c&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;color&#34;</span>: <span style=color:#e6db74>&#34;green&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;utxo_metadata&#34;</span>: [
+</span></span><span style=display:flex><span>        {
+</span></span><span style=display:flex><span>          <span style=color:#f92672>&#34;color&#34;</span>: <span style=color:#e6db74>&#34;grey&#34;</span>,
+</span></span><span style=display:flex><span>          <span style=color:#f92672>&#34;label&#34;</span>: <span style=color:#e6db74>&#34;Segwit Address&#34;</span>
+</span></span><span style=display:flex><span>        },
+</span></span><span style=display:flex><span>        {
+</span></span><span style=display:flex><span>          <span style=color:#f92672>&#34;color&#34;</span>: <span style=color:#e6db74>&#34;grey&#34;</span>,
+</span></span><span style=display:flex><span>          <span style=color:#f92672>&#34;label&#34;</span>: <span style=color:#e6db74>&#34;Segwit Address&#34;</span>
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>      ]
+</span></span><span style=display:flex><span>    },
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;hex&#34;</span>: <span style=color:#e6db74>&#34;0200000001174c0cee8f1c8a1dd743d663defb4c9670c7c21af17f1e2c5f93e7171ee0ac0a0000000000000000000280d1f008000000002200205688d4a74bf4b739e69c34a4fde6733831d739714acc42aac756e9a371e72f6f80f0fa0 200000000220020108abc959debbf561218facf9ce66cecb11c526eafc4e4031e4fc68de4c8955700000000&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;label&#34;</span>: <span style=color:#e6db74>&#34;cee1b11a58baf2bb&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;color&#34;</span>: <span style=color:#e6db74>&#34;green&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;utxo_metadata&#34;</span>: [
+</span></span><span style=display:flex><span>        {
+</span></span><span style=display:flex><span>          <span style=color:#f92672>&#34;color&#34;</span>: <span style=color:#e6db74>&#34;grey&#34;</span>,
+</span></span><span style=display:flex><span>          <span style=color:#f92672>&#34;label&#34;</span>: <span style=color:#e6db74>&#34;Segwit Address&#34;</span>
+</span></span><span style=display:flex><span>        },
+</span></span><span style=display:flex><span>        {
+</span></span><span style=display:flex><span>          <span style=color:#f92672>&#34;color&#34;</span>: <span style=color:#e6db74>&#34;grey&#34;</span>,
+</span></span><span style=display:flex><span>          <span style=color:#f92672>&#34;label&#34;</span>: <span style=color:#e6db74>&#34;Segwit Address&#34;</span>
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>      ]
+</span></span><span style=display:flex><span>    },
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;hex&#34;</span>: <span style=color:#e6db74>&#34;01000000018e87e856904dac9bb5cf3f70a1d500cef506e544519a68b2fd0d46022e9de6a70000000000feffffff0200c2eb0b000000002200206320cc4055e9b2de0c5459e5eb25c2c010a2633fc32ec9aa97254e8931249cf40c241a1 e01000000160014e1d1aaf05e4531a70becab819f9ce5729c265ea900000000&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;label&#34;</span>: <span style=color:#e6db74>&#34;0aace01e17e7935f&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;color&#34;</span>: <span style=color:#e6db74>&#34;white&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;utxo_metadata&#34;</span>: [
+</span></span><span style=display:flex><span>        {
+</span></span><span style=display:flex><span>          <span style=color:#f92672>&#34;color&#34;</span>: <span style=color:#e6db74>&#34;white&#34;</span>,
+</span></span><span style=display:flex><span>          <span style=color:#f92672>&#34;label&#34;</span>: <span style=color:#e6db74>&#34;Missing&#34;</span>
+</span></span><span style=display:flex><span>        },
+</span></span><span style=display:flex><span>        {
+</span></span><span style=display:flex><span>          <span style=color:#f92672>&#34;color&#34;</span>: <span style=color:#e6db74>&#34;white&#34;</span>,
+</span></span><span style=display:flex><span>          <span style=color:#f92672>&#34;label&#34;</span>: <span style=color:#e6db74>&#34;72ae200f3fc43178&#34;</span>
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>      ]
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  ]
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>There&rsquo;s still a lot of work to do to make everything seamless and perfect, but this shows the
+direction that things are headed! If you&rsquo;re excited and want to work with Judica on Sapio, Tux,
+and whatever else we dream up, <a href=/join/>drop us a line!</a></p></div><div></div></div><hr><div class=main2><div></div><div id=disqus_thread></div><script type=application/javascript>window.disqus_config=function(){},function(){if(["localhost","127.0.0.1"].indexOf(window.location.hostname)!=-1){document.getElementById("disqus_thread").innerHTML="Disqus comments not available by default when the website is previewed locally.";return}var t=document,e=t.createElement("script");e.async=!0,e.src="//judica-org.disqus.com/embed.js",e.setAttribute("data-timestamp",+new Date),(t.head||t.body).appendChild(e)}()</script><noscript>Please enable JavaScript to view the <a href=https://disqus.com/?ref_noscript>comments powered by Disqus.</a></noscript><a href=https://disqus.com class=dsq-brlink>comments powered by <span class=logo-disqus>Disqus</span></a><div></div></div><hr><footer style=text-align:center;bottom:0;padding-bottom:10px;width:100%>&copy; Judica, Inc 2022 | contact@judica.org | <a class=darkmode-switch>dark/light theme</a></footer></body></html>

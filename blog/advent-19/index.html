@@ -1,0 +1,372 @@
+<!doctype html><html><head><meta name=viewport content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@200;500&display=swap" rel=stylesheet><link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600&display=swap" rel=stylesheet><link rel=stylesheet type=text/css href=/css/style.css><script>const storage=window.localStorage,get_darkmode=()=>{const e=storage.getItem("darkmode");return e==null||e==="true"},set_darkmode=()=>{get_darkmode()?(document.body.classList.remove("lightmode"),document.body.classList.add("darkmode")):(document.body.classList.remove("darkmode"),document.body.classList.add("lightmode"))};function applyBackgroundTheme(e){var n="body { background: "+e+"; }",s=document.head||document.getElementsByTagName("head")[0],t=document.createElement("style");return s.appendChild(t),t.type="text/css",t.styleSheet?t.styleSheet.cssText=n:t.appendChild(document.createTextNode(n)),t}const style=applyBackgroundTheme(get_darkmode()?"black":"white");document.addEventListener("DOMContentLoaded",()=>{set_darkmode(),style.parentElement.removeChild(style);const e=document.getElementsByClassName("darkmode-switch")[0];e.onclick=e=>{storage.setItem("darkmode",!get_darkmode()),get_darkmode(),set_darkmode()}})</script><script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-175497336-1","auto"),ga("send","pageview"))</script><script async src=https://www.google-analytics.com/analytics.js></script><meta property="og:title" content="Part One: Implementing NFTs in Sapio"><meta property="og:description" content="This post is syndicated from rubin.io.
+Welcome to day 19 of my Bitcoin Advent Calendar. You can see an index of all the posts here or subscribe at judica.org/join to get new posts in your inbox
+For today&rsquo;s post we&rsquo;re going to build out some Sapio NFT protocols that are client-side verifiable. Today we&rsquo;ll focus on code, tomorrow we&rsquo;ll do more discussion and showing how they work. I was sick last night (minor burrito oriented food poisoning suspected) and so I got behind, hence this post being up late."><meta property="og:type" content="article"><meta property="og:url" content="https://judica.org/blog/advent-19/"><meta property="og:image" content="https://judica.org/img/og-img.png"><meta property="article:section" content="blog"><meta property="article:published_time" content="2021-12-16T00:00:00+00:00"><meta property="article:modified_time" content="2021-12-16T00:00:00+00:00"><meta property="og:site_name" content="judica.org -- restore the balance"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://judica.org/img/og-img.png"><meta name=twitter:title content="Part One: Implementing NFTs in Sapio"><meta name=twitter:description content="This post is syndicated from rubin.io.
+Welcome to day 19 of my Bitcoin Advent Calendar. You can see an index of all the posts here or subscribe at judica.org/join to get new posts in your inbox
+For today&rsquo;s post we&rsquo;re going to build out some Sapio NFT protocols that are client-side verifiable. Today we&rsquo;ll focus on code, tomorrow we&rsquo;ll do more discussion and showing how they work. I was sick last night (minor burrito oriented food poisoning suspected) and so I got behind, hence this post being up late."></head><body><header class=nav><ul><li class=float-left><a href=/>judica.</a></li></ul><ul><li><a href=/about/>about.</a></li><li><a href=/software/>software.</a></li><li><a href=/blog/>blog.</a></li><li><a href=/join/>join.</a></li></ul></header><div class=main2><h1>Part One: Implementing NFTs in Sapio</h1><div><h2 class=nobottom>Day 19: Rubin's Bitcoin Advent Calendar</h2></div><small>on December 16, 2021</small><hr></div><div class=main2><div></div><div class=blogtext-inner><p><em>This post is syndicated from <a href=https://rubin.io/advent21>rubin.io</a>.</em></p><p><em>Welcome to day 19 of my Bitcoin Advent Calendar. You can see an index of all
+the posts <a href=/advent21>here</a> or subscribe at
+<a href=https://judica.org/join>judica.org/join</a> to get new posts in your inbox</em></p><p>For today&rsquo;s post we&rsquo;re going to build out some Sapio NFT protocols that are
+client-side verifiable. Today we&rsquo;ll focus on code, tomorrow we&rsquo;ll do more
+discussion and showing how they work. I was sick last night (minor burrito
+oriented food poisoning suspected) and so I got behind, hence this post being up
+late.</p><p>As usual, the disclaimer that as I&rsquo;ve been behind&mldr; so we&rsquo;re less focused today
+on correctness and more focused on giving you the shape of the idea. In other
+words, I&rsquo;m almost positive it won&rsquo;t work properly, but it <em>can</em> compile! And the
+general flow looks correct.</p><p>There&rsquo;s also a couple new concepts I want to adopt as I&rsquo;ve been working on this,
+so those are things that will have to happen as I refine this idea to be
+production grade.</p><p>Before we start, let&rsquo;s get an eagle-eye view of the &lsquo;system&rsquo; we&rsquo;re going to be
+building, because it represents multiple modules and logical components.</p><p>By the end, we&rsquo;ll have 5 separate things:</p><ol><li>An Abstract NFT Interface</li><li>An Abstract Sellable Interface</li><li>An Abstract Sale Interface</li><li>A Concrete Sellable NFT (Simple NFT)</li><li>A Concrete Sale Interface (Simple NFT Sale)</li></ol><p><img src=/public/img/bitcoin/advent/nft-diagram.jpg alt></p><p>In words:</p><p>Simple NFT implements both <code>NFT</code> and <code>Sellable</code>, and has a <code>sell</code> function that
+can be called with any Sale module.</p><p>Simple NFT Sale implements <code>Sale</code>, and can be used with the <code>sell</code> of anything
+that implements <code>Sellable</code> and <code>NFT</code>.</p><p>We can make other implementations of <code>Sale</code> and <code>NFT</code> and they should be
+compatible.</p><h2 id=hows-it-going-to-work>How&rsquo;s it going to &lsquo;work&rsquo;?</h2><p>Essentially how this is going to work do is</p><ol><li>An artist mint an NFT.</li><li>The artist can sell it to anyone whose bids the artist accepts</li></ol><p>Normally, in Ethereum NFTs, you could do something for step 2:</p><ul><li>The artist signs &ldquo;anyone can buy at this price&rdquo;</li></ul><p>with Bitcoin NFTs, it&rsquo;s a little different. The artist has to run a server that
+accepts bids above the owner&rsquo;s current price threshold and returns signed
+under-funded transaction that would pay the owner the asking price.
+Alternatively, the bidder can send an open-bid that the owner can fill
+immediately.</p><p>Because Sapio is super-duper cool, we can make abstract interfaces for this
+stuff so that NFTs can have lots of neat features like enforcing royalties,
+dutch auction prices, batch minting, generative art minting, and more. We&rsquo;ll see
+a bit more tomorrow.</p><p>Client validation is central to this story. A lot of the rules are <em>not</em>
+enforced by the Bitcoin blockchain. They are, however, enforced by requiring
+that the &lsquo;auditor&rsquo; be able to re-reach the same identical contract state by
+re-compiling the entire contract from the start. I.e., as long as you generate
+all your state transitions through Sapio, you can verify that an NFT is
+&lsquo;authentic&rsquo;. Of course, anyone can &lsquo;burn&rsquo; an NFT if they want by sending e.g.
+to an unknown key. Client side validation just posits that sending to an
+unknown key is &lsquo;on the same level&rsquo; of error as corrupting an NFT by doing state
+transitions without having the corresponding &lsquo;witness&rsquo; of sapio effects to
+generate the transfer.</p><p>Please re-read this section after you get throught the code (I&rsquo;ll remind you).</p><h1 id=declaring-an-nft-minting-interface>Declaring an NFT Minting Interface</h1><p>First we are going to declare the basic information for a NFT.</p><p>Every NFT should have a owner (PublicKey) and a locator (some url, IPFS hash,
+etc).</p><p>NFTs also should track which Sapio module was used to mint them, to ensure
+compatibility going forward. If it&rsquo;s not known, modules can try to fill it in
+and guess (e.g., a good gues is &ldquo;this module&rdquo;).</p><p>Let&rsquo;s put that to code:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#e6db74>/// # Trait for a Mintable NFT
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#75715e>#[derive(Serialize, JsonSchema, Deserialize, Clone)]</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>pub</span> <span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>Mint_NFT_Trait_Version_0_1_0</span> {
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # Initial Owner
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// The key that will own this NFT
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#66d9ef>pub</span> owner: <span style=color:#a6e22e>bitcoin</span>::PublicKey,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # Locator
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// A piece of information that will instruct us where the NFT can be
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// downloaded -- e.g. an IPFs Hash
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#66d9ef>pub</span> locator: String,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # Minting Module
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// If a specific sub-module is to be used / known -- when in doubt, should
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// be None.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#66d9ef>pub</span> minting_module: Option<span style=color:#f92672>&lt;</span>SapioHostAPI<span style=color:#f92672>&lt;</span>Mint_NFT_Trait_Version_0_1_0<span style=color:#f92672>&gt;&gt;</span>,
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#e6db74>/// Boilerplate for the Mint trait
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#66d9ef>pub</span> <span style=color:#66d9ef>mod</span> mint_impl {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>use</span> <span style=color:#66d9ef>super</span>::<span style=color:#f92672>*</span>;
+</span></span><span style=display:flex><span>    <span style=color:#75715e>#[derive(Serialize, Deserialize, JsonSchema)]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>pub</span> <span style=color:#66d9ef>enum</span> <span style=color:#a6e22e>Versions</span> {
+</span></span><span style=display:flex><span>        Mint_NFT_Trait_Version_0_1_0(Mint_NFT_Trait_Version_0_1_0),
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// we must provide an example!
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#66d9ef>impl</span> SapioJSONTrait <span style=color:#66d9ef>for</span> Mint_NFT_Trait_Version_0_1_0 {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>get_example_for_api_checking</span>() -&gt; <span style=color:#a6e22e>Value</span> {
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>let</span> key <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;02996fe4ed5943b281ca8cac92b2d0761f36cc735820579da355b737fb94b828fa&#34;</span>;
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>let</span> ipfs_hash <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;bafkreig7r2tdlwqxzlwnd7aqhkkvzjqv53oyrkfnhksijkvmc6k57uqk6a&#34;</span>;
+</span></span><span style=display:flex><span>            serde_json::to_value(mint_impl::Versions::Mint_NFT_Trait_Version_0_1_0(
+</span></span><span style=display:flex><span>                Mint_NFT_Trait_Version_0_1_0 {
+</span></span><span style=display:flex><span>                    owner: <span style=color:#a6e22e>bitcoin</span>::PublicKey::from_str(key).unwrap(),
+</span></span><span style=display:flex><span>                    locator: <span style=color:#a6e22e>ipfs_hash</span>.into(),
+</span></span><span style=display:flex><span>                    minting_module: None,
+</span></span><span style=display:flex><span>                },
+</span></span><span style=display:flex><span>            ))
+</span></span><span style=display:flex><span>            .unwrap()
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Shaweeeeet! We have an NFT Minting Interface!</p><p>But you can&rsquo;t actually use it to Mint yet, since we lack an Implementation.</p><p>Before we implement it&mldr;</p><h1 id=what-are-nfts-good-for-selling-sales-interface>What are NFTs Good For? Selling! (Sales Interface)</h1><p>If you have an NFT, you probably will want to sell it in the future. Let&rsquo;s
+declare a sales interface.</p><p>To sell an NFT we need to know:</p><ol><li>Who currently owns it</li><li>Who is buying it</li><li>What they are paying for it</li><li>Maybe some extra stuff</li></ol><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#e6db74>/// # NFT Sale Trait
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>/// A trait for coordinating a sale of an NFT
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#75715e>#[derive(Serialize, JsonSchema, Deserialize, Clone)]</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>pub</span> <span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>NFT_Sale_Trait_Version_0_1_0</span> {
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # Owner
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// The key that will own this NFT
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#66d9ef>pub</span> sell_to: <span style=color:#a6e22e>bitcoin</span>::PublicKey,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # Price
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// The price in Sats
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#66d9ef>pub</span> price: <span style=color:#a6e22e>AmountU64</span>,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # NFT
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// The NFT&#39;s Current Info
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#66d9ef>pub</span> data: <span style=color:#a6e22e>Mint_NFT_Trait_Version_0_1_0</span>,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # Extra Information
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// Extra information required by this contract, if any.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// Must be Optional for consumer or typechecking will fail.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// Usually None unless you know better!
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#66d9ef>pub</span> extra: Option<span style=color:#f92672>&lt;</span>Value<span style=color:#f92672>&gt;</span>,
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#e6db74>/// Boilerplate for the Sale trait
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#66d9ef>pub</span> <span style=color:#66d9ef>mod</span> sale_impl {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>use</span> <span style=color:#66d9ef>super</span>::<span style=color:#f92672>*</span>;
+</span></span><span style=display:flex><span>    <span style=color:#75715e>#[derive(Serialize, Deserialize, JsonSchema)]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>pub</span> <span style=color:#66d9ef>enum</span> <span style=color:#a6e22e>Versions</span> {
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>/// # Batching Trait API
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>        NFT_Sale_Trait_Version_0_1_0(NFT_Sale_Trait_Version_0_1_0),
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>impl</span> SapioJSONTrait <span style=color:#66d9ef>for</span> NFT_Sale_Trait_Version_0_1_0 {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>get_example_for_api_checking</span>() -&gt; <span style=color:#a6e22e>Value</span> {
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>let</span> key <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;02996fe4ed5943b281ca8cac92b2d0761f36cc735820579da355b737fb94b828fa&#34;</span>;
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>let</span> ipfs_hash <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;bafkreig7r2tdlwqxzlwnd7aqhkkvzjqv53oyrkfnhksijkvmc6k57uqk6a&#34;</span>;
+</span></span><span style=display:flex><span>            serde_json::to_value(sale_impl::Versions::NFT_Sale_Trait_Version_0_1_0(
+</span></span><span style=display:flex><span>                NFT_Sale_Trait_Version_0_1_0 {
+</span></span><span style=display:flex><span>                    sell_to: <span style=color:#a6e22e>bitcoin</span>::PublicKey::from_str(key).unwrap(),
+</span></span><span style=display:flex><span>                    price: <span style=color:#a6e22e>Amount</span>::from_sat(<span style=color:#ae81ff>0</span>).into(),
+</span></span><span style=display:flex><span>                    data: <span style=color:#a6e22e>Mint_NFT_Trait_Version_0_1_0</span> {
+</span></span><span style=display:flex><span>                        owner: <span style=color:#a6e22e>bitcoin</span>::PublicKey::from_str(key).unwrap(),
+</span></span><span style=display:flex><span>                        locator: <span style=color:#a6e22e>ipfs_hash</span>.into(),
+</span></span><span style=display:flex><span>                        minting_module: None,
+</span></span><span style=display:flex><span>                    },
+</span></span><span style=display:flex><span>                    extra: None,
+</span></span><span style=display:flex><span>                },
+</span></span><span style=display:flex><span>            ))
+</span></span><span style=display:flex><span>            .unwrap()
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>That&rsquo;s the interface for the contract that <em>sells</em> the NFTs. We also need an
+interface for NFTs that want to initiate a sale.</p><p>To do that, we need to know:</p><ol><li>What kind of sale we are doing</li><li>The data for that sale</li></ol><p>This is really just expressing that we need to bind a NFT Sale Implementation to
+our contract. We can express the sale interface as follows.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#e6db74>/// # Sellable NFT Function
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>/// If a NFT should be sellable, it should have this trait implemented.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#66d9ef>pub</span> <span style=color:#66d9ef>trait</span> SellableNFT: <span style=color:#a6e22e>Contract</span> {
+</span></span><span style=display:flex><span>    decl_continuation<span style=color:#f92672>!</span> {<span style=color:#f92672>&lt;</span>web<span style=color:#f92672>=</span>{}<span style=color:#f92672>&gt;</span> sell<span style=color:#f92672>&lt;</span>Sell<span style=color:#f92672>&gt;</span>}
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span><span style=color:#e6db74>/// # Sell Instructions
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#75715e>#[derive(Serialize, Deserialize, JsonSchema)]</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>pub</span> <span style=color:#66d9ef>enum</span> <span style=color:#a6e22e>Sell</span> {
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # Hold
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// Don&#39;t transfer this NFT
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    Hold,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # MakeSale
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// Transfer this NFT
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    MakeSale {
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>/// # Which Sale Contract to use?
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>        <span style=color:#e6db74>/// Specify a hash/name for a contract to generate the sale with.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>        which_sale: <span style=color:#a6e22e>SapioHostAPI</span><span style=color:#f92672>&lt;</span>NFT_Sale_Trait_Version_0_1_0<span style=color:#f92672>&gt;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>/// # The information needed to create the sale
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>        sale_info: <span style=color:#a6e22e>NFT_Sale_Trait_Version_0_1_0</span>,
+</span></span><span style=display:flex><span>    },
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span><span style=color:#66d9ef>impl</span> Default <span style=color:#66d9ef>for</span> Sell {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>default</span>() -&gt; <span style=color:#a6e22e>Sell</span> {
+</span></span><span style=display:flex><span>        Sell::Hold
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span><span style=color:#66d9ef>impl</span> StatefulArgumentsTrait <span style=color:#66d9ef>for</span> Sell {}
+</span></span></code></pre></div><h1 id=getting-concrete-making-an-nft>Getting Concrete: Making an NFT</h1><p>Let&rsquo;s create a really simple NFT now that implements these interfaces.</p><p>There&rsquo;s a bit of boilerplate, so we&rsquo;ll go section-by-section.</p><p>First, let&rsquo;s declare the SimpleNFT</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#e6db74>/// # SimpleNFT
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>/// A really simple NFT... not much too it!
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#75715e>#[derive(JsonSchema, Serialize, Deserialize)]</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>pub</span> <span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>SimpleNFT</span> {
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// The minting data, and nothing else.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    data: <span style=color:#a6e22e>Mint_NFT_Trait_Version_0_1_0</span>,
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#e6db74>/// # The SimpleNFT Contract
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#66d9ef>impl</span> Contract <span style=color:#66d9ef>for</span> SimpleNFT {
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// NFTs... only good for selling?
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    declare<span style=color:#f92672>!</span> {updatable<span style=color:#f92672>&lt;</span>Sell<span style=color:#f92672>&gt;</span>, Self::sell}
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// embeds metadata
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    declare<span style=color:#f92672>!</span> {then, Self::metadata_txns}
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>First, let&rsquo;s implement the logic for selling the NFT&mldr; You remember our old
+friend the Sales interface?</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#66d9ef>impl</span> SimpleNFT {
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # signed
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// Get the current owners signature.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#75715e>#[guard]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>signed</span>(self, ctx: <span style=color:#a6e22e>Context</span>) {
+</span></span><span style=display:flex><span>        Clause::Key(self.data.owner.clone())
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span><span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>default_coerce</span>(k: <span style=color:#f92672>&lt;</span>SimpleNFT <span style=color:#66d9ef>as</span> Contract<span style=color:#f92672>&gt;</span>::StatefulArguments) -&gt; Result<span style=color:#f92672>&lt;</span>Sell, CompilationError<span style=color:#f92672>&gt;</span> {
+</span></span><span style=display:flex><span>    Ok(k)
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>impl</span> SellableNFT <span style=color:#66d9ef>for</span> SimpleNFT {
+</span></span><span style=display:flex><span>    <span style=color:#75715e>#[continuation(guarded_by = </span><span style=color:#e6db74>&#34;[Self::signed]&#34;</span><span style=color:#75715e>, web_api, coerce_args = </span><span style=color:#e6db74>&#34;default_coerce&#34;</span><span style=color:#75715e>)]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>sell</span>(self, ctx: <span style=color:#a6e22e>Context</span>, sale: <span style=color:#a6e22e>Sell</span>) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> <span style=color:#66d9ef>let</span> Sell::MakeSale {
+</span></span><span style=display:flex><span>            sale_info,
+</span></span><span style=display:flex><span>            which_sale,
+</span></span><span style=display:flex><span>        } <span style=color:#f92672>=</span> sale
+</span></span><span style=display:flex><span>        {
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// if we&#39;re selling...
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#66d9ef>if</span> sale_info.data.owner <span style=color:#f92672>!=</span> self.data.owner {
+</span></span><span style=display:flex><span>                <span style=color:#75715e>// Hmmm... metadata mismatch! the current owner does not
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>                <span style=color:#75715e>// matched the sale&#39;s claimed owner.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>                <span style=color:#66d9ef>return</span> Err(CompilationError::TerminateCompilation);
+</span></span><span style=display:flex><span>            }
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// create a contract from the sale API passed in
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#66d9ef>let</span> compiled <span style=color:#f92672>=</span> Ok(CreateArgs {
+</span></span><span style=display:flex><span>                context: <span style=color:#a6e22e>ContextualArguments</span> {
+</span></span><span style=display:flex><span>                    amount: <span style=color:#a6e22e>ctx</span>.funds(),
+</span></span><span style=display:flex><span>                    network: <span style=color:#a6e22e>ctx</span>.network,
+</span></span><span style=display:flex><span>                    effects: <span style=color:#a6e22e>unsafe</span> { ctx.get_effects_internal() }.as_ref().clone(),
+</span></span><span style=display:flex><span>                },
+</span></span><span style=display:flex><span>                arguments: <span style=color:#a6e22e>sale_impl</span>::Versions::NFT_Sale_Trait_Version_0_1_0(sale_info.clone()),
+</span></span><span style=display:flex><span>            })
+</span></span><span style=display:flex><span>            .map(serde_json::to_value)
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// use the sale API we passed in
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            .map(<span style=color:#f92672>|</span>args<span style=color:#f92672>|</span> create_contract_by_key(<span style=color:#f92672>&amp;</span>which_sale.key, args, Amount::from_sat(<span style=color:#ae81ff>0</span>)))
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// handle errors...
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            .map_err(<span style=color:#f92672>|</span>_<span style=color:#f92672>|</span> CompilationError::TerminateCompilation)<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>            .ok_or(CompilationError::TerminateCompilation)<span style=color:#f92672>?</span>;
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// send to this sale!
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#66d9ef>let</span> <span style=color:#66d9ef>mut</span> builder <span style=color:#f92672>=</span> ctx.template();
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// todo: we need to cut-through the compiled contract address, but this
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#75715e>// upgrade to Sapio semantics will come Soon™.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            builder <span style=color:#f92672>=</span> builder.add_output(compiled.amount_range.max(), <span style=color:#f92672>&amp;</span>compiled, None)<span style=color:#f92672>?</span>;
+</span></span><span style=display:flex><span>            builder.into()
+</span></span><span style=display:flex><span>        } <span style=color:#66d9ef>else</span> {
+</span></span><span style=display:flex><span>            <span style=color:#e6db74>/// Don&#39;t do anything if we&#39;re holding!
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>            empty()
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Next, let&rsquo;s implement the metadata logic. There are a million ways to do metadata,
+so feel free to &lsquo;skip&rsquo; this section and just let your mind wander on interesting
+things you could do here&mldr;</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#66d9ef>impl</span> SimpleNFT {
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # unspendable
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// what? This is just a sneaky way of making a provably unspendable branch
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// (since the preimage of [0u8; 32] hash can never be found). We use that to
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// help us embed metadata inside of our contract...
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#75715e>#[guard]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>unspendable</span>(self, ctx: <span style=color:#a6e22e>Context</span>) {
+</span></span><span style=display:flex><span>        Clause::Sha256(sha256::Hash::from_inner([<span style=color:#ae81ff>0</span><span style=color:#66d9ef>u8</span>; <span style=color:#ae81ff>32</span>]))
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # Metadata TXNs
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// This metadata TXN is provably unspendable because it is guarded
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// by `Self::unspendable`. Neat!
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// Here, we simple embed a OP_RETURN.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// But you could imagine tracking (&amp; client side validating)
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// an entire tree of transactions based on state transitions with these
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// transactions... in a future post, we&#39;ll see more!
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#75715e>#[then(guarded_by = </span><span style=color:#e6db74>&#34;[Self::unspendable]&#34;</span><span style=color:#75715e>)]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>metadata_txns</span>(self, ctx: <span style=color:#a6e22e>Context</span>) {
+</span></span><span style=display:flex><span>        ctx.template()
+</span></span><span style=display:flex><span>            .add_output(
+</span></span><span style=display:flex><span>                Amount::ZERO,
+</span></span><span style=display:flex><span>                <span style=color:#f92672>&amp;</span>Compiled::from_op_return(
+</span></span><span style=display:flex><span>                    <span style=color:#f92672>&amp;</span>sha256::Hash::hash(<span style=color:#f92672>&amp;</span>self.data.locator.as_bytes()).as_inner()[<span style=color:#f92672>..</span>],
+</span></span><span style=display:flex><span>                )<span style=color:#f92672>?</span>,
+</span></span><span style=display:flex><span>                None,
+</span></span><span style=display:flex><span>            )<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// note: what if we also comitted to the hash of the wasm module
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#75715e>// compiling this contract?
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            .into()
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Lastly, some icky boilerplate stuff:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#75715e>#[derive(Serialize, Deserialize, JsonSchema)]</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>enum</span> <span style=color:#a6e22e>Versions</span> {
+</span></span><span style=display:flex><span>    Mint_NFT_Trait_Version_0_1_0(Mint_NFT_Trait_Version_0_1_0),
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>impl</span> TryFrom<span style=color:#f92672>&lt;</span>Versions<span style=color:#f92672>&gt;</span> <span style=color:#66d9ef>for</span> SimpleNFT {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>type</span> <span style=color:#a6e22e>Error</span> <span style=color:#f92672>=</span> CompilationError;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>try_from</span>(v: <span style=color:#a6e22e>Versions</span>) -&gt; Result<span style=color:#f92672>&lt;</span>Self, Self::Error<span style=color:#f92672>&gt;</span> {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> Versions::Mint_NFT_Trait_Version_0_1_0(<span style=color:#66d9ef>mut</span> data) <span style=color:#f92672>=</span> v;
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> this <span style=color:#f92672>=</span> LookupFrom::This
+</span></span><span style=display:flex><span>            .try_into()
+</span></span><span style=display:flex><span>            .map_err(<span style=color:#f92672>|</span>_<span style=color:#f92672>|</span> CompilationError::TerminateCompilation)<span style=color:#f92672>?</span>;
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>match</span> data.minting_module {
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// if no module is provided, it must be this module!
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            None <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>                data.minting_module <span style=color:#f92672>=</span> Some(this);
+</span></span><span style=display:flex><span>                Ok(SimpleNFT { data })
+</span></span><span style=display:flex><span>            }
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// if a module is provided, we have no idea what to do...
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#75715e>// unless the module is this module itself!
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            Some(<span style=color:#66d9ef>ref</span> module) <span style=color:#66d9ef>if</span> module.key <span style=color:#f92672>==</span> this.key <span style=color:#f92672>=&gt;</span> Ok(SimpleNFT { data }),
+</span></span><span style=display:flex><span>            _ <span style=color:#f92672>=&gt;</span> Err(CompilationError::TerminateCompilation),
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>REGISTER<span style=color:#f92672>!</span>[[SimpleNFT, Versions], <span style=color:#e6db74>&#34;logo.png&#34;</span>];
+</span></span></code></pre></div><p>Right on! Now we have made a NFT Implementation. We can Mint one, but wait.</p><p>How do we sell it?</p><h1 id=we-need-a-nft-sale-implementation>We need a NFT Sale Implementation</h1><p>So let&rsquo;s do it. In today&rsquo;s post, we&rsquo;ll implement the most boring lame ass Sale&mldr;</p><p>Tomorrow we&rsquo;ll do more fun stuff, I swear.</p><p>First, let&rsquo;s get our boring declarations out of the way:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#e6db74>/// # Simple NFT Sale
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>/// A Sale which simply transfers the NFT for a fixed price.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#75715e>#[derive(JsonSchema, Serialize, Deserialize)]</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>pub</span> <span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>SimpleNFTSale</span>(NFT_Sale_Trait_Version_0_1_0);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#e6db74>/// # Versions Trait Wrapper
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#75715e>#[derive(Serialize, Deserialize, JsonSchema)]</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>enum</span> <span style=color:#a6e22e>Versions</span> {
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # Batching Trait API
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    NFT_Sale_Trait_Version_0_1_0(NFT_Sale_Trait_Version_0_1_0),
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span><span style=color:#66d9ef>impl</span> Contract <span style=color:#66d9ef>for</span> SimpleNFTSale {
+</span></span><span style=display:flex><span>    declare<span style=color:#f92672>!</span> {updatable<span style=color:#f92672>&lt;</span>()<span style=color:#f92672>&gt;</span>, Self::transfer}
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span><span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>default_coerce</span><span style=color:#f92672>&lt;</span>T<span style=color:#f92672>&gt;</span>(_: <span style=color:#a6e22e>T</span>) -&gt; Result<span style=color:#f92672>&lt;</span>(), CompilationError<span style=color:#f92672>&gt;</span> {
+</span></span><span style=display:flex><span>    Ok(())
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span><span style=color:#66d9ef>impl</span> From<span style=color:#f92672>&lt;</span>Versions<span style=color:#f92672>&gt;</span> <span style=color:#66d9ef>for</span> SimpleNFTSale {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>from</span>(v: <span style=color:#a6e22e>Versions</span>) -&gt; <span style=color:#a6e22e>SimpleNFTSale</span> {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> Versions::NFT_Sale_Trait_Version_0_1_0(x) <span style=color:#f92672>=</span> v;
+</span></span><span style=display:flex><span>        SimpleNFTSale(x)
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>REGISTER<span style=color:#f92672>!</span>[[SimpleNFTSale, Versions], <span style=color:#e6db74>&#34;logo.png&#34;</span>];
+</span></span></code></pre></div><p>Now, onto the logic of a sale!</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>impl</span> SimpleNFTSale {
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # signed
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// sales must be signed by the current owner
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#75715e>#[guard]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>signed</span>(self, ctx: <span style=color:#a6e22e>Context</span>) {
+</span></span><span style=display:flex><span>        Clause::Key(self.<span style=color:#ae81ff>0.</span>data.owner.clone())
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # transfer
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// transfer exchanges the NFT for cold hard Bitcoinz
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#75715e>#[continuation(guarded_by = </span><span style=color:#e6db74>&#34;[Self::signed]&#34;</span><span style=color:#75715e>, web_api, coerce_args = </span><span style=color:#e6db74>&#34;default_coerce&#34;</span><span style=color:#75715e>)]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>transfer</span>(self, ctx: <span style=color:#a6e22e>Context</span>, u: ()) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> amt <span style=color:#f92672>=</span> ctx.funds();
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// first, let&#39;s get the module that should be used to &#39;re-mint&#39; this NFT
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#75715e>// to the new owner
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#66d9ef>let</span> key <span style=color:#f92672>=</span> self
+</span></span><span style=display:flex><span>            .<span style=color:#ae81ff>0</span>
+</span></span><span style=display:flex><span>            .data
+</span></span><span style=display:flex><span>            .minting_module
+</span></span><span style=display:flex><span>            .clone()
+</span></span><span style=display:flex><span>            .ok_or(CompilationError::TerminateCompilation)<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>            .key;
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// let&#39;s make a copy of the old nft metadata..
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#66d9ef>let</span> <span style=color:#66d9ef>mut</span> mint_data <span style=color:#f92672>=</span> self.<span style=color:#ae81ff>0.</span>data.clone();
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// and change the owner to the buyer
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        mint_data.owner <span style=color:#f92672>=</span> self.<span style=color:#ae81ff>0.</span>sell_to;
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// let&#39;s now compile a new &#39;mint&#39; of the NFT
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#66d9ef>let</span> new_nft_contract <span style=color:#f92672>=</span> Ok(CreateArgs {
+</span></span><span style=display:flex><span>            context: <span style=color:#a6e22e>ContextualArguments</span> {
+</span></span><span style=display:flex><span>                amount: <span style=color:#a6e22e>ctx</span>.funds(),
+</span></span><span style=display:flex><span>                network: <span style=color:#a6e22e>ctx</span>.network,
+</span></span><span style=display:flex><span>                effects: <span style=color:#a6e22e>unsafe</span> { ctx.get_effects_internal() }.as_ref().clone(),
+</span></span><span style=display:flex><span>            },
+</span></span><span style=display:flex><span>            arguments: <span style=color:#a6e22e>mint_impl</span>::Versions::Mint_NFT_Trait_Version_0_1_0(mint_data),
+</span></span><span style=display:flex><span>        })
+</span></span><span style=display:flex><span>        .and_then(serde_json::to_value)
+</span></span><span style=display:flex><span>        .map(<span style=color:#f92672>|</span>args<span style=color:#f92672>|</span> create_contract_by_key(<span style=color:#f92672>&amp;</span>key, args, Amount::from_sat(<span style=color:#ae81ff>0</span>)))
+</span></span><span style=display:flex><span>        .map_err(<span style=color:#f92672>|</span>_<span style=color:#f92672>|</span> CompilationError::TerminateCompilation)<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>        .ok_or(CompilationError::TerminateCompilation)<span style=color:#f92672>?</span>;
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// Now for the magic:
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#75715e>// This is a transaction that creates at output 0 the new nft for the
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#75715e>// person, and must add another input that pays sufficiently to pay the
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#75715e>// prior owner an amount.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// todo: we also could use cut-through here once implemented
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#75715e>// todo: change seem problematic here? with a bit of work, we could handle it
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#75715e>// cleanly if the buyer identifys an output they are spending before requesting
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#75715e>// a purchase.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        ctx.template()
+</span></span><span style=display:flex><span>            .add_output(amt, <span style=color:#f92672>&amp;</span>new_nft_contract, None)<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>            .add_amount(self.<span style=color:#ae81ff>0.</span>price.into())
+</span></span><span style=display:flex><span>            .add_sequence()
+</span></span><span style=display:flex><span>            .add_output(self.<span style=color:#ae81ff>0.</span>price.into(), <span style=color:#f92672>&amp;</span>self.<span style=color:#ae81ff>0.</span>data.owner, None)<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// note: what would happen if we had another output that 
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#75715e>// had a percentage-of-sale royalty to some creator&#39;s key?
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            .into()
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>And that&rsquo;s it! Makes sense, right? I hope&mldr;</p><h2 id=but-if-not>But if not</h2><p>Re read the part before the code again! Maybe it will be more clear now :)</p></div><div></div></div><hr><div class=main2><div></div><div id=disqus_thread></div><script type=application/javascript>window.disqus_config=function(){},function(){if(["localhost","127.0.0.1"].indexOf(window.location.hostname)!=-1){document.getElementById("disqus_thread").innerHTML="Disqus comments not available by default when the website is previewed locally.";return}var t=document,e=t.createElement("script");e.async=!0,e.src="//judica-org.disqus.com/embed.js",e.setAttribute("data-timestamp",+new Date),(t.head||t.body).appendChild(e)}()</script><noscript>Please enable JavaScript to view the <a href=https://disqus.com/?ref_noscript>comments powered by Disqus.</a></noscript><a href=https://disqus.com class=dsq-brlink>comments powered by <span class=logo-disqus>Disqus</span></a><div></div></div><hr><footer style=text-align:center;bottom:0;padding-bottom:10px;width:100%>&copy; Judica, Inc 2022 | contact@judica.org | <a class=darkmode-switch>dark/light theme</a></footer></body></html>

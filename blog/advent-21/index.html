@@ -1,0 +1,150 @@
+<!doctype html><html><head><meta name=viewport content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@200;500&display=swap" rel=stylesheet><link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600&display=swap" rel=stylesheet><link rel=stylesheet type=text/css href=/css/style.css><script>const storage=window.localStorage,get_darkmode=()=>{const e=storage.getItem("darkmode");return e==null||e==="true"},set_darkmode=()=>{get_darkmode()?(document.body.classList.remove("lightmode"),document.body.classList.add("darkmode")):(document.body.classList.remove("darkmode"),document.body.classList.add("lightmode"))};function applyBackgroundTheme(e){var n="body { background: "+e+"; }",s=document.head||document.getElementsByTagName("head")[0],t=document.createElement("style");return s.appendChild(t),t.type="text/css",t.styleSheet?t.styleSheet.cssText=n:t.appendChild(document.createTextNode(n)),t}const style=applyBackgroundTheme(get_darkmode()?"black":"white");document.addEventListener("DOMContentLoaded",()=>{set_darkmode(),style.parentElement.removeChild(style);const e=document.getElementsByClassName("darkmode-switch")[0];e.onclick=e=>{storage.setItem("darkmode",!get_darkmode()),get_darkmode(),set_darkmode()}})</script><script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-175497336-1","auto"),ga("send","pageview"))</script><script async src=https://www.google-analytics.com/analytics.js></script><meta property="og:title" content="Packaging Sapio Applications"><meta property="og:description" content="This post is syndicated from rubin.io.
+Welcome to day 21 of my Bitcoin Advent Calendar. You can see an index of all the posts here or subscribe at judica.org/join to get new posts in your inbox
+Today&rsquo;s a bit of a cheat day for me &ndash; not really &ldquo;new&rdquo; content, but mostly stuff re-packaged1 from learn.sapio-lang.org.
+But it belongs in the series, and is it really plagarism if I wrote it myself?"><meta property="og:type" content="article"><meta property="og:url" content="https://judica.org/blog/advent-21/"><meta property="og:image" content="https://judica.org/img/og-img.png"><meta property="article:section" content="blog"><meta property="article:published_time" content="2021-12-18T00:00:00+00:00"><meta property="article:modified_time" content="2021-12-18T00:00:00+00:00"><meta property="og:site_name" content="judica.org -- restore the balance"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://judica.org/img/og-img.png"><meta name=twitter:title content="Packaging Sapio Applications"><meta name=twitter:description content="This post is syndicated from rubin.io.
+Welcome to day 21 of my Bitcoin Advent Calendar. You can see an index of all the posts here or subscribe at judica.org/join to get new posts in your inbox
+Today&rsquo;s a bit of a cheat day for me &ndash; not really &ldquo;new&rdquo; content, but mostly stuff re-packaged1 from learn.sapio-lang.org.
+But it belongs in the series, and is it really plagarism if I wrote it myself?"></head><body><header class=nav><ul><li class=float-left><a href=/>judica.</a></li></ul><ul><li><a href=/about/>about.</a></li><li><a href=/software/>software.</a></li><li><a href=/blog/>blog.</a></li><li><a href=/join/>join.</a></li></ul></header><div class=main2><h1>Packaging Sapio Applications</h1><div><h2 class=nobottom>Day 21: Rubin's Bitcoin Advent Calendar</h2></div><small>on December 18, 2021</small><hr></div><div class=main2><div></div><div class=blogtext-inner><p><em>This post is syndicated from <a href=https://rubin.io/advent21>rubin.io</a>.</em></p><p><em>Welcome to day 21 of my Bitcoin Advent Calendar. You can see an index of all
+the posts <a href=/advent21>here</a> or subscribe at
+<a href=https://judica.org/join>judica.org/join</a> to get new posts in your inbox</em></p><p>Today&rsquo;s a bit of a cheat day for me &ndash; not really &ldquo;new&rdquo; content, but mostly
+stuff re-packaged<sup id=fnref:1><a href=#fn:1 class=footnote-ref role=doc-noteref>1</a></sup> from <a href=https://learn.sapio-lang.org>learn.sapio-lang.org</a>.</p><p>But it belongs in the series, and is it really plagarism if I wrote it myself?</p><p>How should you release it? How should you use it?</p><p>Today&rsquo;s post covers various ways to deploy and use Sapio contracts.</p><h4 id=note-on-open-sourcing>Note on Open Sourcing:</h4><blockquote><p>In general, it is important to make the code available in an open source way,
+so others can integrate and use your contracts. Rust&rsquo;s <a href=https://crates.io>crates</a>
+system provides a natural place to publish for the time being, although
+in the future we may build a Sapio specific package manager as smart contracts
+have some unique differences.</p></blockquote><h1 id=packaging-contracts-via-wasm>Packaging Contracts via WASM</h1><p>WASM is &ldquo;WebAssembly&rdquo;, or a standard for producing bytecode objects that can
+be run on any platform. As the name suggests, it was originally designed for
+use in web browsers as a compiler target for any language to produce code to
+run safely from untrusted sources.</p><p>So what&rsquo;s it doing in Sapio?</p><p>WASM is designed to be cross platform and deterministic, which makes it a great
+target for smart contracts that we want to be able to be reproduced locally. The
+determinism also enables our update system. It also makes it <em>relatively</em> safe
+to run smart contracts provided by untrusted parties as the security of the WASM
+sandbox prevents bad code from harming or infecting our system.</p><p>Sapio Contract objects can be built into WASM binaries very easily. The code required is basically:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#e6db74>/// MyContract must support Deserialize and JsonSchema
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#75715e>#[derive(Deserialize, JsonSchema)]</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>MyContract</span>;
+</span></span><span style=display:flex><span><span style=color:#66d9ef>impl</span> Contract <span style=color:#66d9ef>for</span> MyContract{<span style=color:#960050;background-color:#1e0010>\</span><span style=color:#f92672>*..</span>.<span style=color:#f92672>*</span><span style=color:#960050;background-color:#1e0010>\</span>};
+</span></span><span style=display:flex><span><span style=color:#e6db74>/// binds to the plugin interface -- only one REGISTER macro permitted per project
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>REGISTER<span style=color:#f92672>!</span>[MyContract];
+</span></span></code></pre></div><p>See <a href=https://github.com/sapio-lang/sapio/tree/master/plugin-example>the example</a> for more details.
+The best way to make a new plugin is just to copy that directory and update the <code>Cargo.toml</code> with a new name.</p><p>These compiled objects require a special environment to be interacted with.
+That environment is provided by the Sapio CLI as a standalone binary. It is also
+possible to use the interface provided by the <code>sapio-wasm-plugin</code> crate to load
+a plugin from any rust codebase programmatically. Lastly, one could create
+similar bindings for another platform as long as a WASM interpreter is
+available.</p><h2 id=cross-module-calls-cmc>Cross Module Calls (CMC)</h2><p>The WASM Plugin Handle architecture permits one WASM plugin to call into
+another. This is incredibly powerful. What this enables one to do is to
+package Sapio contracts that are generic and can call one another either by
+hash (with effective subresource integrity) or by a nickname (providing easy
+user customizability).</p><p>For example, suppose I was writing a standard contract component <code>C</code> which I
+publish. Then later, I develop a contract <code>B</code> which is designed to work with
+<code>C</code>. Rather than having to depend on <code>C</code>&rsquo;s source code (which I may not want to
+do for various reasons &ndash; for example <code>C</code> could be a standard), I could simply
+hard code <code>C</code>&rsquo;s hash into <code>B</code> and call <code>create_contract_by_key(key: &[u8; 32], args: Value, amt: Amount)</code> to get the desired code. The plugin management system
+automatically searches for a contract plugin with that hash, and tries to call
+it with the provided JSON arguments. Using <code>create_contract(key:&str, args:Value: amt:Amount)</code>, a nickname can be provided in which case the
+appropriate plugin is resolved by the environment. Lastly, it&rsquo;s possible to use
+<code>lookup_this_module_name()</code> to resolve the currently executing modules hash for
+recursive calls. Recursive CMC calls can be helpful when you want to either
+make a contract generic, or you want a clean JSON argument interface between
+units. It&rsquo;s also possible for a contract to detect if a generic argument
+would result in a recursive CMC and cut-through it locally.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>C</span>;
+</span></span><span style=display:flex><span><span style=color:#66d9ef>const</span> DEPENDS_ON_MODULE : [<span style=color:#66d9ef>u8</span>; <span style=color:#ae81ff>32</span>] <span style=color:#f92672>=</span> [<span style=color:#ae81ff>0</span>;<span style=color:#ae81ff>32</span>];
+</span></span><span style=display:flex><span><span style=color:#66d9ef>impl</span> Contract <span style=color:#66d9ef>for</span> C {
+</span></span><span style=display:flex><span>    <span style=color:#75715e>#[then]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>demo</span>(self, ctx: <span style=color:#a6e22e>Context</span>) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> amt <span style=color:#f92672>=</span> ctx.funds()<span style=color:#f92672>/</span><span style=color:#ae81ff>2</span>;
+</span></span><span style=display:flex><span>        ctx.template()
+</span></span><span style=display:flex><span>            .add_output(amt, <span style=color:#f92672>&amp;</span>create_contract(<span style=color:#e6db74>&#34;users_cold_storage&#34;</span>, <span style=color:#75715e>/**/</span>, amt), None)<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>            .add_output(amt, <span style=color:#f92672>&amp;</span>create_contract_by_key(<span style=color:#f92672>&amp;</span>DEPENDS_ON_MODULE, <span style=color:#75715e>/**/</span>, amt), None)<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>            .add_output(amt, <span style=color:#f92672>&amp;</span>create_contract_by_key(<span style=color:#f92672>&amp;</span>lookup_this_module_name().unwrap(), <span style=color:#75715e>/**/</span>, amt), None)<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>            .into()
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h3 id=typed-calls>Typed Calls</h3><p>Using JSONSchemas, plugins have a basic type system that enables run-time
+checking for compatibility. Plugins can guarantee they implement particular
+interfaces faithfully. These interfaces currently only support protecting the
+call, but make no assurances about the returned value or potential errors from
+the callee&rsquo;s implementation of the trait.</p><p>For example, suppose I want to be able to specify a provided module must
+statisfy a calling convention for batching. I define the trait
+<code>BatchingTraitVersion0_1_1</code> as follows:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#e6db74>/// A payment to a specific address
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#75715e>#[derive(JsonSchema, Serialize, Deserialize, Clone)]</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>pub</span> <span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>Payment</span> {
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// The amount to send in sats
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#66d9ef>pub</span> amount: <span style=color:#a6e22e>AmountU64</span>,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # Address
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// The Address to send to
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#66d9ef>pub</span> address: <span style=color:#a6e22e>Address</span>,
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span><span style=color:#75715e>#[derive(Serialize, JsonSchema, Deserialize, Clone)]</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>pub</span> <span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>BatchingTraitVersion0_1_1</span> {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>pub</span> payments: Vec<span style=color:#f92672>&lt;</span>Payment<span style=color:#f92672>&gt;</span>,
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>pub</span> feerate_per_byte: <span style=color:#a6e22e>AmountU64</span>,
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>I can then turn this into a SapioJSONTrait by implementing the trait and
+providing an &ldquo;example&rdquo; function.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#66d9ef>impl</span> SapioJSONTrait <span style=color:#66d9ef>for</span> BatchingTraitVersion0_1_1 {
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// required to implement
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>get_example_for_api_checking</span>() -&gt; <span style=color:#a6e22e>Value</span> {
+</span></span><span style=display:flex><span>        <span style=color:#75715e>#[derive(Serialize)]</span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>enum</span> <span style=color:#a6e22e>Versions</span> {
+</span></span><span style=display:flex><span>            BatchingTraitVersion0_1_1(BatchingTraitVersion0_1_1),
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>        serde_json::to_value(Versions::BatchingTraitVersion0_1_1(
+</span></span><span style=display:flex><span>            BatchingTraitVersion0_1_1 {
+</span></span><span style=display:flex><span>                payments: <span style=color:#a6e22e>vec</span><span style=color:#f92672>!</span>[],
+</span></span><span style=display:flex><span>                feerate_per_byte: <span style=color:#a6e22e>Amount</span>::from_sat(<span style=color:#ae81ff>0</span>).into(),
+</span></span><span style=display:flex><span>            },
+</span></span><span style=display:flex><span>        ))
+</span></span><span style=display:flex><span>        .unwrap()
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// optionally, this method may be overridden directly for more advanced type checking.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>check_trait_implemented</span>(api: <span style=color:#66d9ef>&amp;</span><span style=color:#a6e22e>dyn</span> SapioAPIHandle) -&gt; <span style=color:#66d9ef>bool</span> {
+</span></span><span style=display:flex><span>        Self::check_trait_implemented_inner(api).is_ok()
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>If a contract module can receive the example, then it is considered to have
+implemented the API. We can implement the receivers for a module as follows:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>MockContract</span>;
+</span></span><span style=display:flex><span><span style=color:#e6db74>/// # Different Calling Conventions to create a Treepay
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#75715e>#[derive(Serialize, Deserialize, JsonSchema)]</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>enum</span> <span style=color:#a6e22e>Versions</span> {
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # Base
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    Base(MockContract),
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # Batching Trait API
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    BatchingTraitVersion0_1_1(BatchingTraitVersion0_1_1),
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span><span style=color:#66d9ef>impl</span> From<span style=color:#f92672>&lt;</span>BatchingTraitVersion0_1_1<span style=color:#f92672>&gt;</span> <span style=color:#66d9ef>for</span> MockContract {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>from</span>(args: <span style=color:#a6e22e>BatchingTraitVersion0_1_1</span>) -&gt; <span style=color:#a6e22e>Self</span> {
+</span></span><span style=display:flex><span>        MockContract
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span><span style=color:#66d9ef>impl</span> From<span style=color:#f92672>&lt;</span>Versions<span style=color:#f92672>&gt;</span> <span style=color:#66d9ef>for</span> TreePay {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>from</span>(v: <span style=color:#a6e22e>Versions</span>) -&gt; <span style=color:#a6e22e>TreePay</span> {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>match</span> v {
+</span></span><span style=display:flex><span>            Versions::Base(v) <span style=color:#f92672>=&gt;</span> v,
+</span></span><span style=display:flex><span>            Versions::BatchingTraitVersion0_1_1(v) <span style=color:#f92672>=&gt;</span> v.into(),
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>REGISTER<span style=color:#f92672>!</span>[[MockContract, Versions], <span style=color:#e6db74>&#34;logo.png&#34;</span>];
+</span></span></code></pre></div><p>Now <code>MockContract</code> can be called via the <code>BatchingTraitVersion0_1_1</code> trait
+interface.</p><p>Another module in the future need only have a field
+<code>SapioHostAPI&lt;BatchingTraitVersion0_1_1></code>. This type verifies at deserialize
+time that the provided name or hash key implements the required interface(s).</p><h3 id=future-work-on-cross-module-calls>Future Work on Cross Module Calls</h3><ul><li><strong>Gitian Packaging:</strong> Using a gitian signed packaging distribution system
+would enable a user to set up a web-of-trust setting for their sapio compiler
+and enable fetching of sub-resources by hash if they&rsquo;ve been signed by the
+appropriate parties.</li><li><strong>NameSpace Registration:</strong> A system to allow people to register names
+unambiguously would aid in ensuring no conflicts. For now, we can handle
+this using a centralized repo.</li><li><strong>Remote CMC:</strong> In some cases, we may want to make a call to a remote
+server that will call a given module for us. This might be desirable if the
+server holds sensitive material that we shouldn&rsquo;t have.</li><li><strong>Polymorphic CMC:</strong> currently, CMC&rsquo;s only return the <code>Compiled</code> type. Perhaps
+future <code>CMC</code> support can return arbitrary types, allowing other types of
+functionality to be packaged. For example, it would be great if a <code>guard</code> clause
+could be generated just from a separate WASM module.</li></ul><h1 id=what-if-i-dont-want-wasm>What if I don&rsquo;t <em>want</em> WASM?</h1><p>Well, ngmi. JK. Kinda.</p><p>You <em>do</em> really want WASM. You very much want your contracts to be
+deterministically compiled. If they are not, then a lot of things are not
+guaranteed to work correctly and you might lose funds.</p><p>We&rsquo;re very focused on run-in WASM and not focused on other things.</p><p>That said, Sapio is just a Rust library, so you can embed your contracts
+into an application directly, e.g., for an embedded signing device.</p><p>If you do this it is paramount that you carefully audit and check that you are
+able to get consistent deterministic results out, or that you do not need to be
+able to deterministically recompile (this is true in many cases!) and can save
+the compilation result.</p><p>Another technique you can use is to build a bigger application around a contract
+and then compile <em>that</em> to a WASM blob. Also works fine if you&rsquo;re careful not
+to accidentally add some entropy.</p><p>That&rsquo;s all folks. In sum: Sapio is using WASM, you can choose to not use it at
+your own peril.</p><div class=footnotes role=doc-endnotes><hr><ol><li id=fn:1><p>pun certainly intended.&#160;<a href=#fnref:1 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p></li></ol></div></div><div></div></div><hr><div class=main2><div></div><div id=disqus_thread></div><script type=application/javascript>window.disqus_config=function(){},function(){if(["localhost","127.0.0.1"].indexOf(window.location.hostname)!=-1){document.getElementById("disqus_thread").innerHTML="Disqus comments not available by default when the website is previewed locally.";return}var t=document,e=t.createElement("script");e.async=!0,e.src="//judica-org.disqus.com/embed.js",e.setAttribute("data-timestamp",+new Date),(t.head||t.body).appendChild(e)}()</script><noscript>Please enable JavaScript to view the <a href=https://disqus.com/?ref_noscript>comments powered by Disqus.</a></noscript><a href=https://disqus.com class=dsq-brlink>comments powered by <span class=logo-disqus>Disqus</span></a><div></div></div><hr><footer style=text-align:center;bottom:0;padding-bottom:10px;width:100%>&copy; Judica, Inc 2022 | contact@judica.org | <a class=darkmode-switch>dark/light theme</a></footer></body></html>

@@ -1,0 +1,88 @@
+<!doctype html><html><head><meta name=viewport content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@200;500&display=swap" rel=stylesheet><link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600&display=swap" rel=stylesheet><link rel=stylesheet type=text/css href=/css/style.css><script>const storage=window.localStorage,get_darkmode=()=>{const e=storage.getItem("darkmode");return e==null||e==="true"},set_darkmode=()=>{get_darkmode()?(document.body.classList.remove("lightmode"),document.body.classList.add("darkmode")):(document.body.classList.remove("darkmode"),document.body.classList.add("lightmode"))};function applyBackgroundTheme(e){var n="body { background: "+e+"; }",s=document.head||document.getElementsByTagName("head")[0],t=document.createElement("style");return s.appendChild(t),t.type="text/css",t.styleSheet?t.styleSheet.cssText=n:t.appendChild(document.createTextNode(n)),t}const style=applyBackgroundTheme(get_darkmode()?"black":"white");document.addEventListener("DOMContentLoaded",()=>{set_darkmode(),style.parentElement.removeChild(style);const e=document.getElementsByClassName("darkmode-switch")[0];e.onclick=e=>{storage.setItem("darkmode",!get_darkmode()),get_darkmode(),set_darkmode()}})</script><script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-175497336-1","auto"),ga("send","pageview"))</script><script async src=https://www.google-analytics.com/analytics.js></script><meta property="og:title" content="Pillars of Bitcoin: Scalability"><meta property="og:description" content="This post is syndicated from rubin.io.
+Welcome to day 2 of my Bitcoin Advent Calendar. You can see an index of all the posts here or subscribe at judica.org/join to get new posts in your inbox
+This is the first of four posts in an advent mini-series about four fundamental pillars of Bitcoin. I know, I know, a series within a series. What am I, nuts? But it&rsquo;s important that we begin our journey by setting the stage with a few big picture objectives for Bitcoin before we get into why Smart Contracts matter."><meta property="og:type" content="article"><meta property="og:url" content="https://judica.org/blog/advent-2/"><meta property="og:image" content="https://judica.org/img/og-img.png"><meta property="article:section" content="blog"><meta property="article:published_time" content="2021-11-29T00:00:00+00:00"><meta property="article:modified_time" content="2021-11-29T00:00:00+00:00"><meta property="og:site_name" content="judica.org -- restore the balance"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://judica.org/img/og-img.png"><meta name=twitter:title content="Pillars of Bitcoin: Scalability"><meta name=twitter:description content="This post is syndicated from rubin.io.
+Welcome to day 2 of my Bitcoin Advent Calendar. You can see an index of all the posts here or subscribe at judica.org/join to get new posts in your inbox
+This is the first of four posts in an advent mini-series about four fundamental pillars of Bitcoin. I know, I know, a series within a series. What am I, nuts? But it&rsquo;s important that we begin our journey by setting the stage with a few big picture objectives for Bitcoin before we get into why Smart Contracts matter."></head><body><header class=nav><ul><li class=float-left><a href=/>judica.</a></li></ul><ul><li><a href=/about/>about.</a></li><li><a href=/software/>software.</a></li><li><a href=/blog/>blog.</a></li><li><a href=/join/>join.</a></li></ul></header><div class=main2><h1>Pillars of Bitcoin: Scalability</h1><div><h2 class=nobottom>Day 2: Rubin's Bitcoin Advent Calendar</h2></div><small>on November 29, 2021</small><hr></div><div class=main2><div></div><div class=blogtext-inner><p><em>This post is syndicated from <a href=https://rubin.io/advent21>rubin.io</a>.</em></p><p><em>Welcome to day 2 of my Bitcoin Advent Calendar. You can see an index of all
+the posts <a href=/advent21>here</a> or subscribe at
+<a href=https://judica.org/join>judica.org/join</a> to get new posts in your inbox</em></p><p>This is the first of four posts in an advent mini-series about four fundamental
+pillars of Bitcoin. I know, I know, a series within a series. What am I, nuts?
+But it&rsquo;s important that we begin our journey by setting the stage with a few
+big picture objectives for Bitcoin before we get into why Smart Contracts
+matter.</p><p>After all, we&rsquo;re trying to build the hardest money possible, not Crypto
+Kitties… right?</p><p>The four pillars I&rsquo;ve chosen to focus on are Scalability, Self Custody,
+Decentralization, and Privacy. Are there other properties that are also
+important? Sure. Might there be a &ldquo;more fundamental&rdquo; name for each pillar? Ok.
+But generally I find that these 4 categories are different enough from one
+another and capture a very wide swath of what Bitcoin is and not overly
+specific or overly general. Otherwise we&rsquo;d just have one pillar for Bitcoin:
+&ldquo;To Fix This&rdquo;.</p><p>Now onto the content.</p><p>Scalability is a controversy generating issue. Throughout Bitcoin&rsquo;s history
+there have been acerbic disagreements about what sort of scale is required and
+how to accomplish it. Back then I even helped create a conference series,
+Scaling Bitcoin, where people got to present to/shout at each other in person!</p><p>But why is scalability so important? And why does it generate controversy?</p><p>Famously, certain folks have remarked that, &ldquo;you can&rsquo;t buy coffee with Bitcoin&rdquo;
+because fees would be too high. This is an issue that&rsquo;s easy to empathize with;
+if transactions cost $10 who wants to do that for a $5 coffee &ndash; No One!</p><p>The common response is that Bitcoin isn&rsquo;t for trivial purposes like buying a
+cup of coffee, it&rsquo;s The Hardest And Most Sound Money To Ever Exist And If You
+Buy Coffee With It You Are Stupid.</p><p>There&rsquo;s some truth to that. Bitcoin doesn&rsquo;t need to function to enable your
+trivial day to day purchases, it needs to exist to help you take self-sovereign
+control over your money! Forget about your coffee, stack sats, survive
+hyperinflation, avoid the pod, don&rsquo;t eat the bugs. Capiche?</p><p>So what&rsquo;s the rub? Well, if Bitcoin is to really be the vaccine against
+autocratic rulers and corrupt financial systems, it needs to protect everyone,
+not just elite sat-stackers who can afford to use it. Scalability represents
+our desire for Bitcoin to be affordable for all who could benefit from it. Many
+who live under abusive or corrupt regimes today might already be priced out.
+Imagine earning 1000 satoshis per day and spending 300 satoshis to do a
+transaction. Real bummer. And what if fees go up? There&rsquo;s also the insulting
+concept of dust in Bitcoin, 546 satoshis, currently about $0.30. Some people
+work hard just to earn that much! Where do you think people who fall on this
+low end of the economic spectrum live… in the freest of the free western
+countries? No, they&rsquo;re Congolese children mining cobalt. Maybe it&rsquo;s OK that
+they&rsquo;re priced out: Bitcoin preserves wealth (and freedom), it doesn&rsquo;t create
+it. And just having cheaper fees isn&rsquo;t going to free the child workers. But
+still, wouldn&rsquo;t you rather have Bitcoin be able to benefit anyone who might
+have the need to use it, regardless of net worth?</p><p>Good news: there are techniques that exist today for scaling access to Bitcoin.
+Bad news: they all have different tradeoffs.</p><h2 id=just-make-the-blocks-bigger-bro>Just Make the Blocks Bigger Bro</h2><p>Early on in Bitcoin&rsquo;s history a contingency of Bitcoiners
+felt strongly that Bitcoin should scale by increasing the size of Blocks to
+accommodate more transactions per second and keeping fees low. While mild block
+size increases (e.g., as done with SegWit) are probably ok, the ever-increasing
+block size would threaten Bitcoin&rsquo;s decentralization and make it harder for
+anyone to be able to run and audit the system. And if you can&rsquo;t run and audit
+Bitcoin yourself, you might as well be using the legacy financial system.</p><p>There are some efficiency improvements that can shrink transactions marginally,
+contributing to an effectively larger block. But Blockspace will always be
+scarce, no matter how space efficient transactions are.</p><h2 id=lightning-network>Lightning Network</h2><p>The Lightning Network is a very popular means of scaling bitcoin. It makes a
+second layer on top of Bitcoin where you can make cheaper and lower latency
+payments. It functions sort of like the equivalent of Venmo versus Bank Wire
+Transfers. You set up a &ldquo;payment channel&rdquo; with a counterparty, and are able to
+make many cheap payments between you and the counterparty. You can even route
+payments through friend&rsquo;s channels if you don&rsquo;t have a direct link. A few major
+downsides to this approach are as follows:</p><ol><li>That it requires an active online presence and ability to get bitcoin
+transactions confirmed (which still costs money!)</li><li>It requires some form of durable storage any time you make a transaction.</li><li>That in order to receive funds, you have to have someone loan you the
+&ldquo;potential&rdquo; capital (think credit worthiness, which requires some sort of
+reputation system and identities).</li></ol><p>In countries like El Salvador, which have begun adopting Bitcoin as legal
+tender, many users of the Lightning Network are doing so through a centralized
+service provider which doesn&rsquo;t protect users from the types of abuse possible
+in current banking paradigms. In theory, this central service provider isn&rsquo;t
+there because the El Salvador government is some kind of soon-to-be
+dictatorship, but rather because solving the problems of capital loan, regular
+online presence, and durable storage are hard problems for citizens of a poor
+country.</p><h2 id=sidechains>Sidechains</h2><p>Another popular approach is to make federated sidechains, such as
+RootStock, Liquid, Nomic, or ThorChain, etc. A Federated Sidechain is
+essentially a &ldquo;fancy multisig&rdquo;, where funds are sent into the custody of a set
+of entities (usually such that many independent entities would have to collude
+to steal funds). The federation then runs some sort of cryptocurrency backed by
+the deposits. Users are granted virtual bitcoin on the sidechain which they can
+use in accordance with the rules of the sidechain. Eventually they may request
+that whatever balance they have on the sidechain be sent out of the sidechain
+and into a normal bitcoin address of their choosing. This achieves a sort of
+scalability because the base layer does not have to validate or store any of
+the transactions occurring on the sidechain. However, the tradeoff is severe:
+the funds are completely owned by the Federation, which means that users are
+not guaranteed to be able to access their funds. It&rsquo;s basically a bank with a
+cool API.</p><p>This post doesn&rsquo;t end in a fun or upbeat way: we want everyone to be able to
+access and benefit from Bitcoin; we can&rsquo;t get everyone for access in the obvious
+way of bigger blocks or we risk unravelling Bitcoin&rsquo;s core guarantees; and the
+solutions using layers on top of bitcoin reduce some of the core properties that
+make Bitcoin valuable to society in the first place. Some of these tradeoffs may
+be acceptable in certain cases, but we must always strive to support the most
+users with the strongest Hard Money properties we can.</p><p>In future posts we&rsquo;ll see how more sophisticated smart contracts could improve
+Bitcoin&rsquo;s scalability, or at least provide a different set of tradeoffs compared
+to the solutions above.</p></div><div></div></div><hr><div class=main2><div></div><div id=disqus_thread></div><script type=application/javascript>window.disqus_config=function(){},function(){if(["localhost","127.0.0.1"].indexOf(window.location.hostname)!=-1){document.getElementById("disqus_thread").innerHTML="Disqus comments not available by default when the website is previewed locally.";return}var t=document,e=t.createElement("script");e.async=!0,e.src="//judica-org.disqus.com/embed.js",e.setAttribute("data-timestamp",+new Date),(t.head||t.body).appendChild(e)}()</script><noscript>Please enable JavaScript to view the <a href=https://disqus.com/?ref_noscript>comments powered by Disqus.</a></noscript><a href=https://disqus.com class=dsq-brlink>comments powered by <span class=logo-disqus>Disqus</span></a><div></div></div><hr><footer style=text-align:center;bottom:0;padding-bottom:10px;width:100%>&copy; Judica, Inc 2022 | contact@judica.org | <a class=darkmode-switch>dark/light theme</a></footer></body></html>

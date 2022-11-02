@@ -1,0 +1,135 @@
+<!doctype html><html><head><meta name=viewport content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@200;500&display=swap" rel=stylesheet><link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600&display=swap" rel=stylesheet><link rel=stylesheet type=text/css href=/css/style.css><script>const storage=window.localStorage,get_darkmode=()=>{const e=storage.getItem("darkmode");return e==null||e==="true"},set_darkmode=()=>{get_darkmode()?(document.body.classList.remove("lightmode"),document.body.classList.add("darkmode")):(document.body.classList.remove("darkmode"),document.body.classList.add("lightmode"))};function applyBackgroundTheme(e){var n="body { background: "+e+"; }",s=document.head||document.getElementsByTagName("head")[0],t=document.createElement("style");return s.appendChild(t),t.type="text/css",t.styleSheet?t.styleSheet.cssText=n:t.appendChild(document.createTextNode(n)),t}const style=applyBackgroundTheme(get_darkmode()?"black":"white");document.addEventListener("DOMContentLoaded",()=>{set_darkmode(),style.parentElement.removeChild(style);const e=document.getElementsByClassName("darkmode-switch")[0];e.onclick=e=>{storage.setItem("darkmode",!get_darkmode()),get_darkmode(),set_darkmode()}})</script><script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-175497336-1","auto"),ga("send","pageview"))</script><script async src=https://www.google-analytics.com/analytics.js></script><meta property="og:title" content="The History and Future of Sapio"><meta property="og:description" content="This post is syndicated from rubin.io.
+Welcome to day 26 of my Bitcoin Advent Calendar. You can see an index of all the posts here or subscribe at judica.org/join to get new posts in your inbox
+Sapio began as little more than a slide in presentations I would give on what BIP-119 could be with the support of a programming environment.
+While my conceptions of what could be built with CTV were about on-par with where they are today, the tools available were very clunky."><meta property="og:type" content="article"><meta property="og:url" content="https://judica.org/blog/advent-26/"><meta property="og:image" content="https://judica.org/img/og-img.png"><meta property="article:section" content="blog"><meta property="article:published_time" content="2021-12-23T00:00:00+00:00"><meta property="article:modified_time" content="2021-12-23T00:00:00+00:00"><meta property="og:site_name" content="judica.org -- restore the balance"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://judica.org/img/og-img.png"><meta name=twitter:title content="The History and Future of Sapio"><meta name=twitter:description content="This post is syndicated from rubin.io.
+Welcome to day 26 of my Bitcoin Advent Calendar. You can see an index of all the posts here or subscribe at judica.org/join to get new posts in your inbox
+Sapio began as little more than a slide in presentations I would give on what BIP-119 could be with the support of a programming environment.
+While my conceptions of what could be built with CTV were about on-par with where they are today, the tools available were very clunky."></head><body><header class=nav><ul><li class=float-left><a href=/>judica.</a></li></ul><ul><li><a href=/about/>about.</a></li><li><a href=/software/>software.</a></li><li><a href=/blog/>blog.</a></li><li><a href=/join/>join.</a></li></ul></header><div class=main2><h1>The History and Future of Sapio</h1><div><h2 class=nobottom>Day 26: Rubin's Bitcoin Advent Calendar</h2></div><small>on December 23, 2021</small><hr></div><div class=main2><div></div><div class=blogtext-inner><p><em>This post is syndicated from <a href=https://rubin.io/advent21>rubin.io</a>.</em></p><p><em>Welcome to day 26 of my Bitcoin Advent Calendar. You can see an index of all
+the posts <a href=/advent21>here</a> or subscribe at
+<a href=https://judica.org/join>judica.org/join</a> to get new posts in your inbox</em></p><p>Sapio began as little more than a slide in presentations I would give on what
+BIP-119 could be with the support of a programming environment.</p><p>While my conceptions of what could be built with CTV were about on-par with
+where they are today, the tools available were very clunky. You can see
+one of the original diagrams from the C++ Code below (<a href=https://github.com/JeremyRubin/bitcoin/blob/8f297449ff296533d7dd0ac44b62cb3cc33d1b83/src/wallet/rpcwallet.cpp#L1339>code here</a>).</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-c++ data-lang=c++><span style=display:flex><span><span style=color:#75715e>/*
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    *                   [      vault_to_vault n  ]
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    *                     |a                   |b
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    *                    (0)                  (1)
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    *                    /\                   /\
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    * wait + maturity   /  \                 /  \ wait + step_period    (attached)
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    * [   hot_to_hot   ]   /  [vault_to_cold]    [vault_to_vault n - 1]
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    *                     /                         |           |
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    *        [hot_to_cold]                         (0)         (1)
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    *                                               .           .
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    *                                               .           .
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    *                                                           .
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    *                                                     wait + step_period * n   (attached)
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    *                                                   [vault_to_vault 0]
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    *                                                      |
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    *                                                     (0)
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    *                                                     */</span>
+</span></span></code></pre></div><p>When I presented it on February 1st, 2020 at the CTV workshop, one of the last
+Bitcoin events before the pandemic began<sup id=fnref:1><a href=#fn:1 class=footnote-ref role=doc-noteref>1</a></sup>, I knew I had to present a more
+concrete vision on how smart contracts could be built, rather than spit-and-glue
+C++.</p><p>And so I included slide inspired by the hand rolled smart contracts I was making
+in C++ about how the technique could be generalized.</p><p><img src=/public/img/bitcoin/advent/sapio-future/sapio-idea.svg alt>
+<em>a slide at the feb. 2020 CTV workshop.</em></p><blockquote><p>This is a research project I am interested in pursuing. We have a few
+scripting languages. We have Dan here who wrote Ivy. There&rsquo;s also Balzac and
+Solidity. It&rsquo;s poorly named, but it actually has some really interesting ideas
+that aren&rsquo;t in other scripting languages for bitcoin. There&rsquo;s some notion of
+participants with private state they are storing, and has some notion of
+interactivity. I also threw up there BlueSpec which is like a VHDL competitor
+that is pretty neat. If you think about it, there&rsquo;s a software layer for
+controlling vaults but there&rsquo;s also a hardware layer- so how can we describe
+transactional hardware? You wind up with similar controls as a BlueSpec-like
+language where you are creating plumbing and a description of how things are
+moving rather than something that has imperative state.</p><p>As an example, one of the properties with OP_CHECKTEMPLATEVERIFY that is cool is
+the narrow window of a standard OP_CHECKTEMPLATEVERIFY script is that you have
+this composability property where for a given model that goes to arbitrary
+address outputs, you can just throw another one inside it. As the outputs of
+that annuinity, you can put undo send as the outputs of that annunity, and you
+can tag on more and more programs into that if you want. On this slide is a
+templately description of a language, which helps if someone else given the same
+program description can verify that the hash is the same for the given inputs.
+Instead of sending you a million branches, you can generate them yourselves.</p><p>Q: Is there code for your metascript thing?</p><p>A: No. It&rsquo;s just an idea I&rsquo;ve been toying with. I got relatively close to
+metascript just writing in C++ just writing with C++ templates. Then I got ready
+to kill myself doing that because writing templates.</p></blockquote><p>I&rsquo;d discussed similar slides at earlier events, usually included it as an
+example of something <em>someone else</em> could build while I kept pluggin&rsquo; away
+working on Bitcoin Core. Eventually I realized that me claiming that CTV could
+be used to do these things and CTV demonstrably doing these things was an
+obstacle&mldr; I needed to make the prototype.</p><p>So I set off hacking together a prototype&mldr; I spent an afternoon or two mucking
+around in C++ only to realize that wasn&rsquo;t going to happen, and then I switched
+to python. Python was a great choice, and after quite a bit of time pluggin
+away, I had something that actually worked.</p><p>There was a moment of magic where I connected it to the Sapio Studio (which
+actually existed long before Sapio as just a visualizer for a set of
+transactions) to load a contract written in python and&mldr; it worked. Really
+well. It felt incredible. I began talking more about what Sapio could do,
+thinking through some of the problems and solutions. I even gave a talk in the
+metaverse with Udi where I dropped my virtual laser pointer on the ground for a
+minute and couldn&rsquo;t pick it back up.</p><p><img src=/public/img/bitcoin/advent/sapio-future/reckless.png alt>
+<em>there were more people sitting further back I swear&mldr;</em></p><p>At a certain point I decided to start working on cleaning up Sapio by using
+Python&rsquo;s gradual typing and trying to convert to using Miniscript instead of my
+custom-made Sapio script fragment builder. I was neck deep in type refactors and
+then I had a deep realization:</p><h2 id=python-fucking-sucks>Python FUCKING SUCKS</h2><p>I was incredibly greatful for the rapid iterating that python allowed me, but I
+realized at this point that it was going to be nearly impossible to make Sapio
+actually good and not just a toy working in python. What had started as a proof
+of concept for someone to do &ldquo;for real&rdquo; had gotten good enough conceptually but
+was bursting at the seams and was not going to ever yield something production grade.</p><p>So I did a reset.</p><p>I started building Sapio in Rust, re-implementing (but much more cleanly) the
+paradigms that I had previously developed, relying on well tested and type
+rust-bitcoin libraries instead of janky test-framework python code from Bitcoin
+Core.</p><p>And one day &ndash; almost like Deja Vu &ndash; I plugged the Sapio Rust served in place
+of the Python one for the Sapio Studio and everything Just Worked™.</p><p>Since then, Sapio has only matured and gotten better and better with each
+passing month. I&rsquo;ve added tons of new features, improved the underlying
+architecture, made the ABIs more well defined, built stronger intergrations with
+the GUI, and more. Today, Sapio is actually usable on mainnet (if you&rsquo;re an
+expert at least), and I&rsquo;ve used to do congestion control payments and art
+projects.</p><p>Sapio has helped me cut through the content for this Advent Calendar like a
+swiss army knife. It&rsquo;s actually becoming a pretty decent tool!</p><h1 id=whats-next>What&rsquo;s Next</h1><p>Sapio needs to get to the next level. There are many major areas of work in the
+pipeline. You might think of this as &ldquo;Sapio is so incomplete it&rsquo;s not ready&rdquo;.
+I think of it more as Sapio is just getting started:</p><h4 id=upgrade-to-taproot>Upgrade to Taproot</h4><p>Support for Taproot in rust-bitcoin and rust-miniscript is coming! Once that
+lands, I need to rebase (and maybe upstream?) some Sapio features, and then
+update the compiler to always use Taproot outputs!</p><h4 id=improve-sapio-ctv-emulators-with-taproot-if-ctv-seems-to-be-slow>Improve Sapio CTV Emulators with Taproot (if ctv seems to be slow)</h4><p>Once taproot lands, the multi-sig federated oracle designs can be set up to do a
+MuSig Schnorr signature instead of just a bare multi-sig, allowing wider federations.</p><p>This engineering work only really matters if CTV seems unlikely, but could
+be useful to have anyways for future purposes & extensions to Sapio.</p><h4 id=build-out-some-full-featured-applications-backed-by-sapio>Build out some &ldquo;full featured&rdquo; applications backed by Sapio</h4><p>Right now Sapio works for making little Applets, but there is no &ldquo;end to end&rdquo;
+software (e.g., vaults) made in Sapio.</p><p>This requires work on both the Sapio Studio front and potentially on a website
+for things like Sapio NFTs.</p><p>This will push the boundaries on integrating Sapio into real applications.</p><p>One particular feature that would be great is &lsquo;auto-signing&rsquo; on valid state
+transitions proposed at a certain continuation point. For example, if we have an
+NFT we want to dutch auction, we should be able to have a sapio module running
+that is happy to spit out the relevant transactions with a nice API.</p><h4 id=more-advanced-programming-of-transactions>More advanced programming of transactions</h4><p>Currently the Sapio transaction builder from within Sapio branches is a bit
+limited in what it can express.</p><p>Augmenting it with the ability to more fully describe partially signed bitcoin
+transactions (PSBTs), e.g., when used in the <code>continuation</code> context would
+advance the state of the art.</p><h5 id=key-management>Key Management</h5><p>Relatedly, it would be really useful if you could tell Sapio how to access a
+signing module and have sapio use that external key to generate the appropriate
+signatures for the state transitions.</p><h4 id=better-sapio-cli--server-that-can-keep-wasm-modules-loaded-in-memory-aiding-performance>Better sapio-cli / server that can keep WASM modules loaded in memory, aiding performance</h4><p>Right now every time a module is used the entire thing has to reload which is
+super slow.</p><p>It should be possible to have a single server instances that manages a cache of
+all modules, greatly boosting performance, especially for recursive cross-module
+calling contracts.</p><h4 id=client-side-verification-caching-across-module-boundaries>Client Side Verification Caching Across Module Boundaries</h4><p>For things like NFTs that we saw, we have to always re-compile the <em>entire</em>
+history of the NFT to do state transitions. However, many of these state
+transitions are just doing the exact same thing every time, re-verifying from
+genesis. We should be able to cache the compilations at well defined boundaries.</p><h4 id=better-formal-analysis-tools--type-system-on-top-of-sapio>Better formal analysis tools / type system on top of Sapio</h4><p>Currently Sapio has the ability to define various interfaces for composing Sapio contracts cleanly.</p><p>But we don&rsquo;t have a great way of proving what we want a contract to do v.s. what it does.</p><p>This work will start as being able to express more properties about a module in
+it&rsquo;s &ldquo;manifest&rdquo;, and will culminate in being able to check the validity of compositions
+of contracts based on them.</p><p>If anyones looking to do a PhD thesis on Sapio, this is prolly it.</p><h4 id=more-module-types>More Module Types</h4><p>Right now all WASM modules are for generating a &lsquo;Compiled&rsquo; contract from a JSON.</p><p>I would love to add defined module types to cover all the standard components like:</p><ul><li>Miniscript Fragments</li><li>Then Functions</li><li>Continuation Functions</li><li>Transaction Template Generators</li><li>Trait Verifiers</li></ul><p>and more.</p><h4 id=more-emulator-types>More Emulator Types</h4><p>Sapio works <em>today</em> with CTV <code>then</code> functions because the functionality can be
+emulated by a federation of signers.</p><p>Figuring out how to cleanly extend the signing server paradigm to a number of
+different types of Covenant proposal (e.g. APO, TLUV, CAT) or other opcodes
+could add a lot of value for making Sapio the defacto platform and proving
+ground for upgrades to Bitcoin.</p><h4 id=unifying-then-and-continuation>Unifying Then and Continuation</h4><p>Then and Continuation really are the same thing conceptually, it would be</p><h4 id=standard-library-of-useful-applications--plugins>Standard Library of useful applications / Plugins</h4><p>Title says it all. There should be more off the shelf things to use!</p><h4 id=wallet-stack-for-sapio-contracts>Wallet Stack for Sapio Contracts</h4><p>The Sapio Studio is rapidly imporving as a system for engaging with Sapio
+contracts, but it&rsquo;s lacking in the management and storage of all of a user&rsquo;s
+contracts. We can, and will, do a better job with this.</p><p>This includes being able to make watchtower-like functionality for Sapio. It&rsquo;s
+coming, but will likely require a lot of new features to the language spec to
+express if this then that monitoring conditions. And with features comes
+complexity.</p><p>You can see hints to this in the slide earlier, being able to react to e.g.
+confirmation or mempool events.</p><p>This also includes dramatic improvements needed to the GUI so that users
+can understand much more deeply what contracts are doing.</p><h4 id=binary-releases>Binary Releases</h4><p>Right now Sapio is just DIY to build and run it yourself, but we really ought to
+work towards stable binary releases to quickstart users.</p><h4 id=visual-programming-for-building-sapio-contracts>Visual Programming for Building Sapio Contracts</h4><p>When composing together Sapio modules, I would <em>really</em> like for it to be kind
+of labview like interface for adding data or other modules, where you can
+&ldquo;typecheck&rdquo; that the wires (module names) are composing into slots they work.
+If that sounded like gibberish, I just mean that I want to be able to plug in a
+module hash for a NFT Sale contract into my NFT contract and have the UX give
+me real time feedback if I should be able to do that.</p><h4 id=sapio-package-manager--deterministic-builds--signers>Sapio Package Manager / Deterministic Builds / Signers</h4><p>As more modules become commonly used (e.g., like NFTs) we want to ensure all
+users can build an exact copy themselves (Deterministic Builds) or that they
+can find a build signed by a number of respected code signers (Signers). While
+we can use Cargo / crates.io for the package management of our actual rust code,
+we need something to distribute the sapio wasm blobs nicely!</p><h4 id=testing>Testing</h4><p>Writing tests for Sapio contracts is hard as heck. We need some bold ideas on
+what sorts of properties would be useful to test for. Fortunately, a lot of
+properties we care about (like not wasting money) can be checked by the sapio
+library to be safe, but we still want to be able to ensure we never lose a
+users funds out of Sapio.</p><h4 id=getting-ctv-locked-in>Getting CTV Locked in</h4><p>Duh!</p><p>If I get even a tenth of this completed 2022 will be a good year for Sapio.</p><p>But I plan to get it all done.</p><p>Perhaps with your support &ndash; if you&rsquo;re an engineer or funder interested
+in helping propel this, please reach out!</p><p>p.s. safe holiday travels!</p><div class=footnotes role=doc-endnotes><hr><ol><li id=fn:1><p>That honor I think goes to the MIT Bitcoin Expo.&#160;<a href=#fnref:1 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p></li></ol></div></div><div></div></div><hr><div class=main2><div></div><div id=disqus_thread></div><script type=application/javascript>window.disqus_config=function(){},function(){if(["localhost","127.0.0.1"].indexOf(window.location.hostname)!=-1){document.getElementById("disqus_thread").innerHTML="Disqus comments not available by default when the website is previewed locally.";return}var t=document,e=t.createElement("script");e.async=!0,e.src="//judica-org.disqus.com/embed.js",e.setAttribute("data-timestamp",+new Date),(t.head||t.body).appendChild(e)}()</script><noscript>Please enable JavaScript to view the <a href=https://disqus.com/?ref_noscript>comments powered by Disqus.</a></noscript><a href=https://disqus.com class=dsq-brlink>comments powered by <span class=logo-disqus>Disqus</span></a><div></div></div><hr><footer style=text-align:center;bottom:0;padding-bottom:10px;width:100%>&copy; Judica, Inc 2022 | contact@judica.org | <a class=darkmode-switch>dark/light theme</a></footer></body></html>

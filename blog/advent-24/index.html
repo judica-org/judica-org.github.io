@@ -1,0 +1,237 @@
+<!doctype html><html><head><meta name=viewport content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@200;500&display=swap" rel=stylesheet><link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600&display=swap" rel=stylesheet><link rel=stylesheet type=text/css href=/css/style.css><script>const storage=window.localStorage,get_darkmode=()=>{const e=storage.getItem("darkmode");return e==null||e==="true"},set_darkmode=()=>{get_darkmode()?(document.body.classList.remove("lightmode"),document.body.classList.add("darkmode")):(document.body.classList.remove("darkmode"),document.body.classList.add("lightmode"))};function applyBackgroundTheme(e){var n="body { background: "+e+"; }",s=document.head||document.getElementsByTagName("head")[0],t=document.createElement("style");return s.appendChild(t),t.type="text/css",t.styleSheet?t.styleSheet.cssText=n:t.appendChild(document.createTextNode(n)),t}const style=applyBackgroundTheme(get_darkmode()?"black":"white");document.addEventListener("DOMContentLoaded",()=>{set_darkmode(),style.parentElement.removeChild(style);const e=document.getElementsByClassName("darkmode-switch")[0];e.onclick=e=>{storage.setItem("darkmode",!get_darkmode()),get_darkmode(),set_darkmode()}})</script><script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-175497336-1","auto"),ga("send","pageview"))</script><script async src=https://www.google-analytics.com/analytics.js></script><meta property="og:title" content="POWSWAP: Oracle Free Bitcoin Hashrate Derivatives"><meta property="og:description" content="This post is syndicated from rubin.io.
+Welcome to day 24 of my Bitcoin Advent Calendar. You can see an index of all the posts here or subscribe at judica.org/join to get new posts in your inbox
+Today&rsquo;s post is near and dear to my heart &ndash; years ago I put up an interest form for powswap.com, but as I went down the rabbit hole I realized how badly I wanted generic tooling to automate the building of these which is partly what led to Sapio!"><meta property="og:type" content="article"><meta property="og:url" content="https://judica.org/blog/advent-24/"><meta property="og:image" content="https://judica.org/img/og-img.png"><meta property="article:section" content="blog"><meta property="article:published_time" content="2021-12-21T00:00:00+00:00"><meta property="article:modified_time" content="2021-12-21T00:00:00+00:00"><meta property="og:site_name" content="judica.org -- restore the balance"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://judica.org/img/og-img.png"><meta name=twitter:title content="POWSWAP: Oracle Free Bitcoin Hashrate Derivatives"><meta name=twitter:description content="This post is syndicated from rubin.io.
+Welcome to day 24 of my Bitcoin Advent Calendar. You can see an index of all the posts here or subscribe at judica.org/join to get new posts in your inbox
+Today&rsquo;s post is near and dear to my heart &ndash; years ago I put up an interest form for powswap.com, but as I went down the rabbit hole I realized how badly I wanted generic tooling to automate the building of these which is partly what led to Sapio!"></head><body><header class=nav><ul><li class=float-left><a href=/>judica.</a></li></ul><ul><li><a href=/about/>about.</a></li><li><a href=/software/>software.</a></li><li><a href=/blog/>blog.</a></li><li><a href=/join/>join.</a></li></ul></header><div class=main2><h1>POWSWAP: Oracle Free Bitcoin Hashrate Derivatives</h1><div><h2 class=nobottom>Day 24: Rubin's Bitcoin Advent Calendar</h2></div><small>on December 21, 2021</small><hr></div><div class=main2><div></div><div class=blogtext-inner><p><em>This post is syndicated from <a href=https://rubin.io/advent21>rubin.io</a>.</em></p><p><em>Welcome to day 24 of my Bitcoin Advent Calendar. You can see an index of all
+the posts <a href=/advent21>here</a> or subscribe at
+<a href=https://judica.org/join>judica.org/join</a> to get new posts in your inbox</em></p><p>Today&rsquo;s post is near and dear to my heart &ndash; years ago I put up an interest form
+for <a href=https://powswap.com>powswap.com</a>, but as I went down the rabbit hole I
+realized how badly I wanted generic tooling to automate the building of these
+which is partly what led to Sapio!</p><p>So therefore it&rsquo;s very exciting to show you the basics of powswap in Sapio. You
+can see how bad the early version was
+<a href=https://gist.github.com/JeremyRubin/8bacafdb997c588ef2a203ffeb726b83>here</a>. If
+you want to contrast life with Sapio and without.</p><h1 id=what-is-a-powswap>What is a Powswap?</h1><p>The basic idea of Powswap is super simple. It is a contract that measures a
+block surplus or deficit &ndash; a Block Delta Contract (BDC). A BDC allows
+counterparties to bet on statements like &ldquo;at the end of 6 months, we will be +/-
+1000 blocks against the current expected number of blocks&rdquo;, and program a payoff
+curve based on the binary outcome of that. The block delta should be &ndash; and this
+is a matter for the analysts to price on and model &ndash; correlated with changes in
+hashrate.</p><h3 id=who-the-f-cares>WHO THE F CARES</h3><p>Well imagine you are about to buy a new fancy mining rig to mine with. But you
+have a moment of doubt &ndash; what if everyone else is doing that right now too?</p><p>You could buy hashrate derivatives where you win money if the hashrate increases
+and lose if it stays the same.</p><p>This would de-risk your investment in mining.</p><p>You can also lever-up and increase profit if you&rsquo;re adding a lot of hashrate,
+doubling down that hashrate goes up, but let&rsquo;s not entertain the degens shall
+we.</p><h3 id=ok-ok-how-can-i-do-it>OK OK How can I do it?</h3><p>One could imagine making a BDC based on the Oracle system we saw in yesterday&rsquo;s
+post. But the magic of Powswap is that we will do this without using any oracle
+whatsoever, just measuring the blocks directly.</p><p>How do we do this?</p><p>The answer is actually really simple. Suppose Alice wants to get 1 Bitcoin if
+100 blocks are missing at the end of the week (the 28th, let&rsquo;s say expected 1000
+blocks), and Bob wants to win 1 Bitcoin if they are actually there.</p><p>All we have to do is have Alice and Bob agree to a multisig to deposit 0.5 BTC
+each to, and then pre-sign from it two transactions:</p><ol><li>If the date is the 28th at noon and the height is greater than 1000, Bob gets paid 1 BTC</li><li>If the date the date is the 28th at noon + 8 hours, Alice gets paid 1 BTC</li></ol><p>Let&rsquo;s think it through:</p><p>Suppose that Alice is right and blocks are 100 short by
+noon.</p><p>In the next 8 hours, only 48 blocks should be mined (and probably less, if the
+hashrate has actually decreased).</p><p>After that point, Alice has 8 more hours (again, probably more if hashrate
+actually decreased) to broadcast and claim her BTC.</p><p>Suppose that Bob is right and blocks reach 1000 at noon. Bob has 8 hours to
+claim the BTC before Alice can.</p><h3 id=metastability>Metastability</h3><p>Where this is a bit wonky is that the result is metastable. Let&rsquo;s assume that
+neither Alice nor Bob is right: The deficit is 50 blocks short.</p><p>At noon, Bob cannot claim. But in 8 hours he can! But also in 8 hours Alice can
+claim too.</p><p>So who wins?</p><p>The answer is either! Using a POWSWAP you either want to be really right or
+really wrong.</p><p>We&rsquo;ll see some cool results around why this might not be a huge deal later.</p><p>Let&rsquo;s flip the powswap around now, for a surplus of blocks. Bob thinks the
+blocks will be 1000, Alice thinks 1100.</p><ol><li>If the date is the 28th at noon + 8 hours, Bob gets paid 1 BTC</li><li>If the date the date is the 28th at noon and there are 1100 blocks, Alice gets paid 1 BTC</li></ol><p>Under this model if Alice is right there should be that many blocks by that
+time, and if Bob is right there should not be and a resaonable amount of time
+later Bob can claim.</p><p>It&rsquo;s a bit harder to see, but we can even implement this logic more simply as just:</p><ol><li>If we reach +1 week, give Bob 1 BTC</li><li>If we reach +1100 blocks, give Alice 1 BTC</li></ol><p>Then, if a week goes by first without seeing 1100 blocks, Bob can claim. If the
+1100 blocks show well before the week is up, then Alice can claim. If neither
+are really right then it&rsquo;s metastable and either could win.</p><h2 id=we-are-not-going-there>We are not going there!</h2><p>There are a myriad of different combinations of locktimes and heights that you
+can use to do this correctly, we won&rsquo;t focus too much on that in this post, and
+we&rsquo;ll let our contract users decide what parameters they want. Let the analysts
+figure out what the right combo of locktimes and stuff is to hedge different
+risks. They should get paid for something, right?</p><p>One of the wrinkles is that the less time you have in your contract, the more
+metastable it is. The more time you have, expecially across difficulty
+adjustments, the more the deficits can be erased.</p><h1 id=implementing-a-powswap>Implementing a Powswap</h1><h2 id=is-ctv-required>Is CTV Required?</h2><p>In the example I gave above, it is not! However, if you have CTV then one party
+can unilaterally open a hashrate derivative for other parties, and that matters
+quite a lot!</p><p>This means that when we do implement it, we will use <code>then</code> because if you
+want the pre-signature version you can use CTV Emulators.</p><p>First we&rsquo;ll start by writing some code to be able to describe the locktimes
+under which some outcome is considered &ldquo;resolved&rdquo;. We&rsquo;ll write a container type
+(the data we actually need) and then we&rsquo;ll write a verifier type that makes
+for a convenient API for human input. It&rsquo;s kind of gross, so you can skip
+the verifier type code and just imagine you put in the correct parameters.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#e6db74>/// `ContractVariant` ensures that we either set a Relative Height and Absolute
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>/// Time or a Relative Time and Absolute Height, the two valid combinations, or
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>/// just one.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>///
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>/// Note these are unlocking conditions for each participant.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>///
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>/// Validity is ensured through smart constructor
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#75715e>#[derive(JsonSchema, Deserialize, Clone, Copy)]</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#[serde(try_from = </span><span style=color:#e6db74>&#34;ValidContractVariant&#34;</span><span style=color:#75715e>)]</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>pub</span> <span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>ContractVariant</span>(Option<span style=color:#f92672>&lt;</span>AnyRelTimeLock<span style=color:#f92672>&gt;</span>, Option<span style=color:#f92672>&lt;</span>AnyAbsTimeLock<span style=color:#f92672>&gt;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#e6db74>/// In order to test for coherence here, we should convert
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>/// ValidContractVariant to ContractVariant.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>///
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>/// The coherence rules should match one ruleset of:
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>/// - a single type of TimeLock (Relative Height, Relative Time, Absolute Time,
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>///   Absolute Height)
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>/// - a mixed TimeLock of just Relative Height/Absolute Time or just Relative
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>///   Time/Absolute Height
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#75715e>#[derive(JsonSchema, Deserialize, Clone)]</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>ValidContractVariant</span>(Vec<span style=color:#f92672>&lt;</span>AnyTimeLock<span style=color:#f92672>&gt;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>impl</span> TryFrom<span style=color:#f92672>&lt;</span>ValidContractVariant<span style=color:#f92672>&gt;</span> <span style=color:#66d9ef>for</span> ContractVariant {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>type</span> <span style=color:#a6e22e>Error</span> <span style=color:#f92672>=</span> CompilationError;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>try_from</span>(vcv: <span style=color:#a6e22e>ValidContractVariant</span>) -&gt; Result<span style=color:#f92672>&lt;</span>Self, Self::Error<span style=color:#f92672>&gt;</span> {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> abs: Vec<span style=color:#f92672>&lt;</span>_<span style=color:#f92672>&gt;</span> <span style=color:#f92672>=</span> vcv
+</span></span><span style=display:flex><span>            .<span style=color:#ae81ff>0</span>
+</span></span><span style=display:flex><span>            .iter()
+</span></span><span style=display:flex><span>            .filter_map(<span style=color:#f92672>|</span>v<span style=color:#f92672>|</span> {
+</span></span><span style=display:flex><span>                <span style=color:#66d9ef>if</span> <span style=color:#66d9ef>let</span> AnyTimeLock::A(a) <span style=color:#f92672>=</span> v {
+</span></span><span style=display:flex><span>                    Some(a)
+</span></span><span style=display:flex><span>                } <span style=color:#66d9ef>else</span> {
+</span></span><span style=display:flex><span>                    None
+</span></span><span style=display:flex><span>                }
+</span></span><span style=display:flex><span>            })
+</span></span><span style=display:flex><span>            .collect();
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> rel: Vec<span style=color:#f92672>&lt;</span>_<span style=color:#f92672>&gt;</span> <span style=color:#f92672>=</span> vcv
+</span></span><span style=display:flex><span>            .<span style=color:#ae81ff>0</span>
+</span></span><span style=display:flex><span>            .iter()
+</span></span><span style=display:flex><span>            .filter_map(<span style=color:#f92672>|</span>v<span style=color:#f92672>|</span> {
+</span></span><span style=display:flex><span>                <span style=color:#66d9ef>if</span> <span style=color:#66d9ef>let</span> AnyTimeLock::R(r) <span style=color:#f92672>=</span> v {
+</span></span><span style=display:flex><span>                    Some(r)
+</span></span><span style=display:flex><span>                } <span style=color:#66d9ef>else</span> {
+</span></span><span style=display:flex><span>                    None
+</span></span><span style=display:flex><span>                }
+</span></span><span style=display:flex><span>            })
+</span></span><span style=display:flex><span>            .collect();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> all_rh <span style=color:#f92672>=</span> rel.iter().all(<span style=color:#f92672>|</span>v<span style=color:#f92672>|</span> matches!(v, AnyRelTimeLock::RH(c)));
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> all_rt <span style=color:#f92672>=</span> rel.iter().all(<span style=color:#f92672>|</span>v<span style=color:#f92672>|</span> matches!(v, AnyRelTimeLock::RT(c)));
+</span></span><span style=display:flex><span>        <span style=color:#75715e>#[derive(Debug)]</span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>LocalError</span>(<span style=color:#f92672>&amp;&#39;</span>static <span style=color:#66d9ef>str</span>);
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>impl</span> std::fmt::Display <span style=color:#66d9ef>for</span> LocalError {
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>fmt</span>(
+</span></span><span style=display:flex><span>                <span style=color:#f92672>&amp;</span>self,
+</span></span><span style=display:flex><span>                f: <span style=color:#66d9ef>&amp;</span><span style=color:#a6e22e>mut</span> std::fmt::Formatter<span style=color:#f92672>&lt;&#39;</span>_<span style=color:#f92672>&gt;</span>,
+</span></span><span style=display:flex><span>            ) -&gt; <span style=color:#a6e22e>std</span>::result::Result<span style=color:#f92672>&lt;</span>(), std::fmt::Error<span style=color:#f92672>&gt;</span> {
+</span></span><span style=display:flex><span>                self.<span style=color:#ae81ff>0.</span>fmt(f)
+</span></span><span style=display:flex><span>            }
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>impl</span> std::error::Error <span style=color:#66d9ef>for</span> LocalError {}
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> <span style=color:#f92672>!</span>(all_rh <span style=color:#f92672>||</span> all_rt) {
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>return</span> Err(CompilationError::custom(LocalError(
+</span></span><span style=display:flex><span>                <span style=color:#e6db74>&#34;Must have some timelock set!&#34;</span>,
+</span></span><span style=display:flex><span>            )));
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> all_ah <span style=color:#f92672>=</span> abs.iter().all(<span style=color:#f92672>|</span>v<span style=color:#f92672>|</span> matches!(v, AnyAbsTimeLock::AH(c)));
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> all_at <span style=color:#f92672>=</span> abs.iter().all(<span style=color:#f92672>|</span>v<span style=color:#f92672>|</span> matches!(v, AnyAbsTimeLock::AT(c)));
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> <span style=color:#f92672>!</span>(all_ah <span style=color:#f92672>||</span> all_at) {
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>return</span> Err(CompilationError::custom(LocalError(
+</span></span><span style=display:flex><span>                <span style=color:#e6db74>&#34;Incoherent Absolute Timelocks (mixed height/time)&#34;</span>,
+</span></span><span style=display:flex><span>            )));
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> relative <span style=color:#f92672>=</span> rel.iter().max_by_key(<span style=color:#f92672>|</span>v<span style=color:#f92672>|</span> AnyRelTimeLock::get(v)).cloned();
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> absolute <span style=color:#f92672>=</span> abs.iter().max_by_key(<span style=color:#f92672>|</span>v<span style=color:#f92672>|</span> AnyAbsTimeLock::get(v)).cloned();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> matches!((relative, absolute), (None, None)) {
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>return</span> Err(CompilationError::custom(LocalError(
+</span></span><span style=display:flex><span>                <span style=color:#e6db74>&#34;Must have some timelock set!&#34;</span>,
+</span></span><span style=display:flex><span>            )));
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (all_rt <span style=color:#f92672>&amp;&amp;</span> all_at) <span style=color:#f92672>||</span> (all_rh <span style=color:#f92672>&amp;&amp;</span> all_rt) {
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>return</span> Err(CompilationError::custom(LocalError(
+</span></span><span style=display:flex><span>                <span style=color:#e6db74>&#34;Must mix {Relative,Absolute} Height and Absolute time!&#34;</span>,
+</span></span><span style=display:flex><span>            )));
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>        Ok(ContractVariant(relative.cloned(), absolute.cloned()))
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span><span style=color:#66d9ef>impl</span> ContractVariant {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>get_relative</span>(<span style=color:#f92672>&amp;</span>self) -&gt; <span style=color:#a6e22e>AnyRelTimeLock</span> {
+</span></span><span style=display:flex><span>        self.<span style=color:#ae81ff>0.</span>unwrap_or(RelTime::from(<span style=color:#ae81ff>0</span>).into())
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>get_abs</span>(<span style=color:#f92672>&amp;</span>self) -&gt; <span style=color:#a6e22e>AnyAbsTimeLock</span> {
+</span></span><span style=display:flex><span>        self.<span style=color:#ae81ff>1.</span>unwrap_or(AbsHeight::try_from(<span style=color:#ae81ff>0</span>).unwrap().into())
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>With that out of the way, let&rsquo;s now define our contract data:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#e6db74>/// Instructions for a Payment from an outcome
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#75715e>#[derive(JsonSchema, Deserialize, Clone)]</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>pub</span> <span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>Pays</span> {
+</span></span><span style=display:flex><span>    sats: <span style=color:#a6e22e>AmountU64</span>,
+</span></span><span style=display:flex><span>    to: <span style=color:#a6e22e>PublicKey</span>,
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span><span style=color:#e6db74>/// A `Outcome` is a contract where
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#75715e>#[derive(JsonSchema, Deserialize, Clone)]</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>pub</span> <span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>Outcome</span> {
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # Variant
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// if the base is time or height for the relative leg.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    unlocks_if: <span style=color:#a6e22e>ContractVariant</span>,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # Outcome
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// Payments to make (should be &gt;= 1)
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    outcome: Vec<span style=color:#f92672>&lt;</span>Pays<span style=color:#f92672>&gt;</span>,
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span><span style=color:#e6db74>/// A `PowSwap` is a contract where
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#75715e>#[derive(JsonSchema, Deserialize, Clone)]</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>pub</span> <span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>PowSwap</span> {
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # Parties
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#66d9ef>pub</span> outcomes: [Outcome; <span style=color:#ae81ff>2</span>],
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # Cooperate Key
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    coop: Vec<span style=color:#f92672>&lt;</span>PublicKey<span style=color:#f92672>&gt;</span>,
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span><span style=color:#66d9ef>impl</span> Contract <span style=color:#66d9ef>for</span> PowSwap {
+</span></span><span style=display:flex><span>    declare<span style=color:#f92672>!</span> {then, Self::payoff}
+</span></span><span style=display:flex><span>    declare<span style=color:#f92672>!</span> {finish, Self::cooperate}
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>As you can see, it&rsquo;s pretty simple. We just need a set of keys to &lsquo;opt out&rsquo; of
+the on-chain execution, and a set of outcomes and their unlocking conditions.
+We can pay an arbitrary number of parties.</p><p>Now to finish, let&rsquo;s implement the logic. It&rsquo;s really simple, we just create the
+(2) transactions and assign the sequences/locktimes properly.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#66d9ef>impl</span> PowSwap {
+</span></span><span style=display:flex><span>    <span style=color:#75715e>#[guard]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>cooperate</span>(self, ctx: <span style=color:#a6e22e>Context</span>) {
+</span></span><span style=display:flex><span>        Clause::And(self.coop.iter().cloned().map(Clause::Key).collect())
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>make_payoffs</span>(<span style=color:#f92672>&amp;</span>self, ctx: <span style=color:#a6e22e>Context</span>, payments: <span style=color:#66d9ef>&amp;</span>[Pays]) -&gt; Result<span style=color:#f92672>&lt;</span>Builder, CompilationError<span style=color:#f92672>&gt;</span> {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> <span style=color:#66d9ef>mut</span> bld <span style=color:#f92672>=</span> ctx.template();
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>for</span> Pays { sats, to } <span style=color:#66d9ef>in</span> payments {
+</span></span><span style=display:flex><span>            bld <span style=color:#f92672>=</span> bld.add_output(sats.clone().into(), to, None)<span style=color:#f92672>?</span>;
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>        Ok(bld)
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    <span style=color:#75715e>#[then]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>payoff</span>(self, <span style=color:#66d9ef>mut</span> base_ctx: <span style=color:#a6e22e>Context</span>) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> <span style=color:#66d9ef>mut</span> ret: Vec<span style=color:#f92672>&lt;</span>Result<span style=color:#f92672>&lt;</span>Template, _<span style=color:#f92672>&gt;&gt;</span> <span style=color:#f92672>=</span> vec![];
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>for</span> (i, path) <span style=color:#66d9ef>in</span> self.outcomes.iter().enumerate() {
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>let</span> ctx <span style=color:#f92672>=</span> base_ctx.derive_num(i <span style=color:#66d9ef>as</span> <span style=color:#66d9ef>u64</span>)<span style=color:#f92672>?</span>;
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>let</span> v <span style=color:#f92672>=</span> self
+</span></span><span style=display:flex><span>                .make_payoffs(ctx, <span style=color:#f92672>&amp;</span>path.outcome)<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>                .set_sequence(<span style=color:#f92672>-</span><span style=color:#ae81ff>1</span>, path.unlocks_if.get_relative())<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>                .set_lock_time(path.unlocks_if.get_abs())<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>                .into();
+</span></span><span style=display:flex><span>            ret.push(Ok(v));
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>        Ok(Box::new(ret.into_iter()))
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>That wasn&rsquo;t so bad now, was it?</p><h1 id=using-powswap>Using PowSwap</h1><p>We already said we&rsquo;re not going to analyze the profit of these contracts, but I
+want to give a couple cool ways to use these.</p><h2 id=when-to-cooperate>When to Cooperate?</h2><p>One thing that I think would be important to settling a hashrate derivative would be
+to set it for, say, 6 months forecast and then try to roll the strategy at 3 months cooperatively.</p><p>This way you don&rsquo;t have trouble with metastability as you and your counterparty
+can update forecasts and re-enter the contract, or go separate ways.</p><h2 id=take-it-to-the-limit>TAKE IT TO THE LIMIT</h2><p>Well what if instead of settling on-chain, you nested these in LN channels? And
+then every microsecond you don&rsquo;t see a block being advertised and broadcast, you
+update your probabilities and try to adjust with your counterparty. It becomes
+pretty neat becuase you essentially make a hashrate perpetual where if your
+counterparty dies then you settle on-chain (if they&rsquo;re really dead, you just
+win), but you can update your forecasts on whatever frequency you want. All
+trustlessly.</p><h3 id=the-information-market-for-relaying>The Information Market for Relaying</h3><p>This opens the door for HFT-ing information about the rate of block production.
+Knowing a block is mined and getting it relayed to you before your counterparty
+gives you an edge in trading.</p><p>Maybe this pays for really really good block relaying infrastructure?</p><h2 id=galaxy-brain-me>GALAXY BRAIN ME</h2><p>Hey, it&rsquo;s me. Your old friend Decentralized Coordination Free Mining Pools. What
+if we made &ndash; using CTV &ndash; the channels/payouts by default resolve into some sort
+of hashrate future, and we had an automated hedging market maker that could incorporate
+your desired side of a trade from old hash shares into opening new positions for you every block.
+If it was in channels you could immediately turn these into hashrate perps.</p><h3 id=metastability-1>Metastability</h3><p>If you&rsquo;re a miner and you mine, say, 2 blocks a day, then you can usually expect
+to be able to settle your own metastable hashrate derivatives as long as the
+metastable window isn&rsquo;t smaller than ~12 hours. This means that while normie
+pleb users might struggle with closing their derivatives, miner-to-miner
+hashrate derivatives should be actually pretty safe if you stay in your
+bounds.</p><h2 id=gimme-all-my-options>Gimme all My Options</h2><p>This idea composes beautifully with the options we saw yesterday. What if I want
+the <em>option</em> for the next week to open up a 6 month hashrate contract with you?</p><p>Just toss it into an Expiring Under Funded Option contract and you got it. And
+because we represented these as Dutch Auctionable NFTs, you can advertise the
+position you&rsquo;re willing to open to the network and take the best offer for this
+option.</p><p>Sapio composes. Legit forreal.</p><p>DeFi is coming to Bitcoin.</p><p>And it&rsquo;s going to help with securing the base layer of Bitcoin by permitting
+trustless financialization of investments in hashrate.</p><p>Have a great day. P.s. now is a good time to join
+<a href=https://utxos.org/signals>utxos.org/signals</a> if you think CTV is a great next
+step in Bitcoin Development&rsquo;s journey.</p></div><div></div></div><hr><div class=main2><div></div><div id=disqus_thread></div><script type=application/javascript>window.disqus_config=function(){},function(){if(["localhost","127.0.0.1"].indexOf(window.location.hostname)!=-1){document.getElementById("disqus_thread").innerHTML="Disqus comments not available by default when the website is previewed locally.";return}var t=document,e=t.createElement("script");e.async=!0,e.src="//judica-org.disqus.com/embed.js",e.setAttribute("data-timestamp",+new Date),(t.head||t.body).appendChild(e)}()</script><noscript>Please enable JavaScript to view the <a href=https://disqus.com/?ref_noscript>comments powered by Disqus.</a></noscript><a href=https://disqus.com class=dsq-brlink>comments powered by <span class=logo-disqus>Disqus</span></a><div></div></div><hr><footer style=text-align:center;bottom:0;padding-bottom:10px;width:100%>&copy; Judica, Inc 2022 | contact@judica.org | <a class=darkmode-switch>dark/light theme</a></footer></body></html>

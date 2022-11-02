@@ -1,0 +1,262 @@
+<!doctype html><html><head><meta name=viewport content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@200;500&display=swap" rel=stylesheet><link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600&display=swap" rel=stylesheet><link rel=stylesheet type=text/css href=/css/style.css><script>const storage=window.localStorage,get_darkmode=()=>{const e=storage.getItem("darkmode");return e==null||e==="true"},set_darkmode=()=>{get_darkmode()?(document.body.classList.remove("lightmode"),document.body.classList.add("darkmode")):(document.body.classList.remove("darkmode"),document.body.classList.add("lightmode"))};function applyBackgroundTheme(e){var n="body { background: "+e+"; }",s=document.head||document.getElementsByTagName("head")[0],t=document.createElement("style");return s.appendChild(t),t.type="text/css",t.styleSheet?t.styleSheet.cssText=n:t.appendChild(document.createTextNode(n)),t}const style=applyBackgroundTheme(get_darkmode()?"black":"white");document.addEventListener("DOMContentLoaded",()=>{set_darkmode(),style.parentElement.removeChild(style);const e=document.getElementsByClassName("darkmode-switch")[0];e.onclick=e=>{storage.setItem("darkmode",!get_darkmode()),get_darkmode(),set_darkmode()}})</script><script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-175497336-1","auto"),ga("send","pageview"))</script><script async src=https://www.google-analytics.com/analytics.js></script><meta property="og:title" content="Inheritence Schemes for Bitcoin"><meta property="og:description" content="This post is syndicated from rubin.io.
+Welcome to day 11 of my Bitcoin Advent Calendar. You can see an index of all the posts here or subscribe at judica.org/join to get new posts in your inbox
+You are going to die. Merry Christmas! Hopefully not any time soon, but one of these days you will shuffle off this mortal coil.
+When that day comes, how will you give your loved ones your hard earned bitcoin?"><meta property="og:type" content="article"><meta property="og:url" content="https://judica.org/blog/advent-11/"><meta property="og:image" content="https://judica.org/img/og-img.png"><meta property="article:section" content="blog"><meta property="article:published_time" content="2021-12-08T00:00:00+00:00"><meta property="article:modified_time" content="2021-12-08T00:00:00+00:00"><meta property="og:site_name" content="judica.org -- restore the balance"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://judica.org/img/og-img.png"><meta name=twitter:title content="Inheritence Schemes for Bitcoin"><meta name=twitter:description content="This post is syndicated from rubin.io.
+Welcome to day 11 of my Bitcoin Advent Calendar. You can see an index of all the posts here or subscribe at judica.org/join to get new posts in your inbox
+You are going to die. Merry Christmas! Hopefully not any time soon, but one of these days you will shuffle off this mortal coil.
+When that day comes, how will you give your loved ones your hard earned bitcoin?"></head><body><header class=nav><ul><li class=float-left><a href=/>judica.</a></li></ul><ul><li><a href=/about/>about.</a></li><li><a href=/software/>software.</a></li><li><a href=/blog/>blog.</a></li><li><a href=/join/>join.</a></li></ul></header><div class=main2><h1>Inheritence Schemes for Bitcoin</h1><div><h2 class=nobottom>Day 11: Rubin's Bitcoin Advent Calendar</h2></div><small>on December 8, 2021</small><hr></div><div class=main2><div></div><div class=blogtext-inner><p><em>This post is syndicated from <a href=https://rubin.io/advent21>rubin.io</a>.</em></p><p><em>Welcome to day 11 of my Bitcoin Advent Calendar. You can see an index of all
+the posts <a href=/advent21>here</a> or subscribe at
+<a href=https://judica.org/join>judica.org/join</a> to get new posts in your inbox</em></p><h2 id=you-are-going-to-die>You are going to die.</h2><p>Merry Christmas! Hopefully not any time soon, but one of these days you will shuffle off this mortal coil.</p><p>When that day comes, how will you give your loved ones your hard earned bitcoin?</p><p>You do have a plan, right?</p><p>This post is a continuation of the last post on Vaults. Whereas Vaults focus on trying to keep your coins away from someone, Inheritance focuses on making sure someone does get your coins. Basically opposites!</p><h2 id=basic-bitcoin-plans>Basic Bitcoin Plans</h2><p>Let&rsquo;s say you&rsquo;re a smarty pants and you set the following system up:</p><pre tabindex=0><code>(2-of-3 Multisig of my keys) OR (After 1 year, 3-of-5 Multisig of my 4 family members keys and 1 lawyer to tie break)
+</code></pre><p>Under this setup, you can spend your funds secured by a multisig. You have to
+spend them once a year to keep your greedy family away, but that&rsquo;s OK.</p><p>Until one day, you perish in a boating accident (shouldn&rsquo;t have gone to that Flamin&rsquo; Hot Cheetos Yach Party in Miami).</p><p>A year goes by, no one knows where your 2-of-3 keys are, and so the family&rsquo;s
+backup keys go online.</p><p>They raid your files and find a utxoset backup with descriptors and know how to
+combine their keys (that you made for them most likely&mldr;) with offline signing
+devices to sign a PSBT, and the money comes out.</p><p>If the family can&rsquo;t agree, a Lawyer who has your will can tie break the execution.</p><p>Except wait&mldr;</p><h2 id=your-kids-are-assholes-just-like-your-spouse>Your kids are assholes, just like your spouse</h2><p>So your piece of shit husband/wife doesn&rsquo;t think the kids should get anything (RIP
+college fund), so count them out on signing the tuition payments.</p><p>Now we&rsquo;re down to your 3 kids agreeing and your 1 lawyer.</p><p>Your Lawyer thinks your spouse has a bit of a case, so the whole things in
+probate as far as they are concerned.</p><p>And the kids? Well, the kids don&rsquo;t want to go to college. You just gifted them
+42069 sats each, enough to pay for a ticket on Elon Musk&rsquo;s spaceship. So they
+get together one night, withdraw all the money, and go to Mars. Or the Casino.
+Little Jimmy has never seen so much money, so he goes to Vegas for a last huzzah
+before the Mars trip, but he blows it all. So Jimmy stays behind, satless, and
+the other kids go to mars.</p><h2 id=well-that-sucked>Well That Sucked</h2><p>And it didn&rsquo;t have to! What if you could express your last will and testament in
+Bitcoin transactions instead of in messy messy multisigs. You Can! Today! No new
+features required (although they&rsquo;d sure be nice&mldr;).</p><h1 id=building-inheritence-schemes-with-sapio>Building Inheritence Schemes with Sapio</h1><p>You can make inheritence schemes with Sapio! While it does benefit from having
+CTV enabled for various reasons, technically it can work decently without CTV by
+pre-signing transactions with a CTV emulator.</p><p>Here we&rsquo;ll develop some interesting primitives that can be used to make various
+inheritence guarantees.</p><h2 id=making-a-better-dead-man-switch>Making a better Dead Man Switch</h2><p>First off, let&rsquo;s make a better dead man switch. Recall we had to move our funds once a year because of the timelocks.</p><p>That was dumb.</p><p>Instead, let&rsquo;s make a challenge of liveness! (again, deep apologies on these
+examples, I&rsquo;m a bit behind on the series so haven&rsquo;t checked as closely as I
+would usually&mldr;)</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#e6db74>/// Opening state of a DeadManSwitch
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#75715e>#[derive(Clone)]</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>Alive</span> {
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// Key needed to claim I&#39;m dead
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    is_dead: <span style=color:#a6e22e>bitcoin</span>::PublicKey,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// If someone says i&#39;m dead but I&#39;m alive, backup wallet address
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    is_live: <span style=color:#a6e22e>bitcoin</span>::Address,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// My normal spending key (note: could be a Clause instead...)
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    key: <span style=color:#a6e22e>bitcoin</span>::PublicKey,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// How long you have to claim you&#39;re not dead
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    timeout: <span style=color:#a6e22e>RelTime</span>,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// Addresses for CPFP Anchor Outputs
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    is_dead_cpfp: <span style=color:#a6e22e>bitcoin</span>::Address,
+</span></span><span style=display:flex><span>    is_live_cpfp: <span style=color:#a6e22e>bitcoin</span>::Address,
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>impl</span> Alive {
+</span></span><span style=display:flex><span>    <span style=color:#75715e>#[guard]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>is_dead_sig</span>(self, ctx: <span style=color:#a6e22e>Context</span>) {
+</span></span><span style=display:flex><span>        Clause::Key(self.is_dead.clone())
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// only allow the is_dead key to transition to a CheckIfDead 
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#75715e>#[then(guarded_by=</span><span style=color:#e6db74>&#34;[Self::is_dead_sig]&#34;</span><span style=color:#75715e>)]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>am_i_dead</span>(self, ctx: <span style=color:#a6e22e>Context</span>) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> dust <span style=color:#f92672>=</span> Amount::from_sat(<span style=color:#ae81ff>600</span>);
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> amt <span style=color:#f92672>=</span> ctx.funds();
+</span></span><span style=display:flex><span>        ctx.template()
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// Send all but some dust to CheckIfDead
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            .add_output(amt <span style=color:#f92672>-</span> dust, <span style=color:#f92672>&amp;</span>CheckIfDead(self.clone()), None)<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// used for CPFP
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            .add_output(
+</span></span><span style=display:flex><span>                dust,
+</span></span><span style=display:flex><span>                <span style=color:#f92672>&amp;</span>Compiled::from_address(self.is_dead_cpfp.clone(), None),
+</span></span><span style=display:flex><span>                None,
+</span></span><span style=display:flex><span>            )<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>            .into()
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// Allow spending like normal
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#75715e>#[guard]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>spend</span>(self, ctx: <span style=color:#a6e22e>Context</span>) {
+</span></span><span style=display:flex><span>        Clause::Key(self.key.clone())
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>impl</span> Contract <span style=color:#66d9ef>for</span> Alive {
+</span></span><span style=display:flex><span>    declare<span style=color:#f92672>!</span> {finish, Self::spend}
+</span></span><span style=display:flex><span>    declare<span style=color:#f92672>!</span> {then, Self::am_i_dead}
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#e6db74>/// All the info we need is in Alive struct already...
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>CheckIfDead</span>(Alive);
+</span></span><span style=display:flex><span><span style=color:#66d9ef>impl</span> CheckIfDead {
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// we&#39;re dead after the timeout and is_dead key signs to take the money
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#75715e>#[guard]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>is_dead</span>(self, ctx: <span style=color:#a6e22e>Context</span>) {
+</span></span><span style=display:flex><span>        Clause::And(vec![Clause::Key(self.<span style=color:#ae81ff>0.</span>is_dead.clone()), self.<span style=color:#ae81ff>0.</span>timeout.clone().into()])
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// signature required for liveness claim
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#75715e>#[guard]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>alive_auth</span>(self, ctx: <span style=color:#a6e22e>Context</span>) {
+</span></span><span style=display:flex><span>        Clause::Key(self.key.clone())
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// um excuse me i&#39;m actually alive
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#75715e>#[then(guarded_by=</span><span style=color:#e6db74>&#34;[Self::alive_auth]&#34;</span><span style=color:#75715e>)]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>im_alive</span>(self, ctx: <span style=color:#a6e22e>Context</span>) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> dust <span style=color:#f92672>=</span> Amount::from_sat(<span style=color:#ae81ff>600</span>);
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> amt <span style=color:#f92672>=</span> ctx.funds();
+</span></span><span style=display:flex><span>        ctx.template()
+</span></span><span style=display:flex><span>            <span style=color:#e6db74>/// Send funds to the backup address!
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>            .add_output(
+</span></span><span style=display:flex><span>                amt <span style=color:#f92672>-</span> dust,
+</span></span><span style=display:flex><span>                <span style=color:#f92672>&amp;</span>Compiled::from_address(self.<span style=color:#ae81ff>0.</span>is_live.clone(), None),
+</span></span><span style=display:flex><span>                None,
+</span></span><span style=display:flex><span>            )<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>            <span style=color:#e6db74>/// Dust for CPFP-ing
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>            .add_output(
+</span></span><span style=display:flex><span>                dust,
+</span></span><span style=display:flex><span>                <span style=color:#f92672>&amp;</span>Compiled::from_address(self.<span style=color:#ae81ff>0.</span>is_live_cpfp.clone(), None),
+</span></span><span style=display:flex><span>                None,
+</span></span><span style=display:flex><span>            )<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>            .into()
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>impl</span> Contract <span style=color:#66d9ef>for</span> CheckIfDead {
+</span></span><span style=display:flex><span>    declare<span style=color:#f92672>!</span> {finish, Self::is_dead}
+</span></span><span style=display:flex><span>    declare<span style=color:#f92672>!</span> {then, Self::im_alive}
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>In this example, the funds start in a state of Alive, until a challenger calls
+<code>Alive::am_i_dead</code> or the original owner spends the coin. After the call of
+<code>Alive::am_i_dead</code>, the contract transitions to CheckIfDead state. From this state,
+the owner has <code>timeout</code> (either time or blocks) time to move the coin to their
+key, or else the claimer of the death can spend using <code>CheckIfDead::is_dead</code>.</p><p>Of course, we can clean up this contract in various ways (e.g., making the
+destination if dead generic). That could look something like this:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>Alive</span> {
+</span></span><span style=display:flex><span>    is_dead_cpfp: <span style=color:#a6e22e>bitcoin</span>::Address,
+</span></span><span style=display:flex><span>    is_live_cpfp: <span style=color:#a6e22e>bitcoin</span>::Address,
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// note that this permits composing Alive with some arbitrary function
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    is_dead: <span style=color:#66d9ef>&amp;</span><span style=color:#a6e22e>dyn</span> Fn(ctx: <span style=color:#a6e22e>Context</span>, cpfp: <span style=color:#a6e22e>bitcoin</span>::Address) -&gt; <span style=color:#a6e22e>TxTmplIt</span>,
+</span></span><span style=display:flex><span>    is_live: <span style=color:#a6e22e>bitcoin</span>::Address,
+</span></span><span style=display:flex><span>    key: <span style=color:#a6e22e>bitcoin</span>::PublicKey,
+</span></span><span style=display:flex><span>    timeout: <span style=color:#a6e22e>RelTime</span>,
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>impl</span> CheckIfDead {
+</span></span><span style=display:flex><span>    <span style=color:#75715e>#[then]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>is_dead</span>(self, ctx: <span style=color:#a6e22e>Context</span>) {
+</span></span><span style=display:flex><span>        self.<span style=color:#ae81ff>0.</span>is_dead(ctx, self.<span style=color:#ae81ff>0.</span>is_dead_cpfp.clone())
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>This kind of dead man switch is much more reliable than having slowly eroding
+timelocks since it doesn&rsquo;t require regular transaction refreshing, which was the
+source of <a href=https://medium.com/blockstream/patching-the-liquid-timelock-issue-b4b2f5f9a973>a bug in Blockstream&rsquo;s federation
+code</a>.
+It also requires an explicit action to claim a lack of liveness, which also
+gives information about the trustworthiness of your kids (or any exploits of
+their signers).</p><h2 id=not-so-fast>Not so fast</h2><p>What if we want to make sure that little Jimmy and his gambling addiction don&rsquo;t
+blow it all at once&mldr; Maybe if instead of giving Jimmy one big lump sum, we
+could give a little bit every month. Then maybe he&rsquo;d be better off! This is
+basically an Annuity contract.</p><p>Now let&rsquo;s have a look at an annuity contract.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>Annuity</span> {
+</span></span><span style=display:flex><span>    to: <span style=color:#a6e22e>bitcoin</span>::PublicKey,
+</span></span><span style=display:flex><span>    amount: <span style=color:#a6e22e>bitcoin</span>::Amount,
+</span></span><span style=display:flex><span>    period: <span style=color:#a6e22e>AnyRelTime</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>const</span> MIN_PAYOUT: <span style=color:#a6e22e>bitcoin</span>::Amount <span style=color:#f92672>=</span> bitcoin::Amount::from_sat(<span style=color:#ae81ff>10000</span>);
+</span></span><span style=display:flex><span><span style=color:#66d9ef>impl</span> Annuity {
+</span></span><span style=display:flex><span>    <span style=color:#75715e>#[then]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>claim</span>(self, ctx:<span style=color:#a6e22e>Context</span>) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> amt <span style=color:#f92672>=</span> ctx.funds();
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// Basically, while there are funds left this contract recurses to itself,
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#75715e>// until there&#39;s only a little bit left over.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#75715e>// No need for CPFP since we can spend from the `to` output for CPFP.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#66d9ef>if</span> amt <span style=color:#f92672>-</span> self.amount <span style=color:#f92672>&gt;</span> MIN_PAYOUT {
+</span></span><span style=display:flex><span>            ctx.template()
+</span></span><span style=display:flex><span>                .add_output(self.amount, <span style=color:#f92672>&amp;</span>self.to, None)<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>                .add_output(amt <span style=color:#f92672>-</span> self.amount, <span style=color:#f92672>&amp;</span>self, None)<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>                .set_sequence(<span style=color:#f92672>-</span><span style=color:#ae81ff>1</span>, self.period.into())<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>                .into()
+</span></span><span style=display:flex><span>        } <span style=color:#66d9ef>else</span> <span style=color:#66d9ef>if</span> amt <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>0</span> {
+</span></span><span style=display:flex><span>            ctx.template()
+</span></span><span style=display:flex><span>                .add_output(amt, <span style=color:#f92672>&amp;</span>self.to, None)<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>                .set_sequence(<span style=color:#f92672>-</span><span style=color:#ae81ff>1</span>, self.period.into())<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>                .into()
+</span></span><span style=display:flex><span>        } <span style=color:#66d9ef>else</span> {
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// nothing left to claim
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            empty()
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>We could instead &ldquo;transpose&rdquo; an annuity into a non-serialized form. This would
+basically be a big transaction that has N outputs with locktimes on claiming
+each. However this has a few drawbacks:</p><ol><li><p>Claims are non-serialized, which means that relative timelocks can only last
+at most 2 years. Therefore only absolute timelocks may be used.</p></li><li><p>You might want to make it possible for another entity to counterclaim Jimmy&rsquo;s
+funds back, perhaps if he also died (talk about bad luck). In the transposed version, you would need to make N proof-of-life challenges v.s. just one<sup id=fnref:1><a href=#fn:1 class=footnote-ref role=doc-noteref>1</a></sup>.</p></li><li><p>You would have to pay more fees all at once (although less fees overall if feerates increase or stay flat).</p></li><li><p>It&rsquo;s less extensible &ndash; for example, it would be possible to do a lot of cool
+things with serialization of payouts (e.g., allowing oracles to inflation adjust
+payout rate).</p></li></ol><h2 id=splits>Splits</h2><p>Remember our annoying spouse, bad lawyer, etc? Well, instead of giving them a multisig, imagine
+we use the split function as the end output from our CheckIfDead:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>split</span>(ctx: <span style=color:#a6e22e>Context</span>, cpfp: <span style=color:#a6e22e>bitcoin</span>::Address) -&gt; <span style=color:#a6e22e>TxTmplIt</span> {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>let</span> dust <span style=color:#f92672>=</span> Amount::from_sat(<span style=color:#ae81ff>600</span>);
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>let</span> amt <span style=color:#f92672>=</span> ctx.funds() <span style=color:#f92672>-</span> dust;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>let</span> <span style=color:#66d9ef>mut</span> ctx.template()
+</span></span><span style=display:flex><span>       .add_output(dust, <span style=color:#f92672>&amp;</span>Compiled::from_address(cpfp, None), None)<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>       .add_output(amt<span style=color:#f92672>*</span><span style=color:#ae81ff>0.5</span>, <span style=color:#f92672>&amp;</span>from_somewhere::spouse_annuity, None)<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>       .add_output(amt <span style=color:#f92672>*</span> <span style=color:#ae81ff>0.1666</span>, <span style=color:#f92672>&amp;</span>from_somewhere::kids_annuity[<span style=color:#ae81ff>0</span>], None)<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>       .add_output(amt<span style=color:#f92672>*</span><span style=color:#ae81ff>0.1666</span>, <span style=color:#f92672>&amp;</span>from_somewhere::kids_annuity[<span style=color:#ae81ff>1</span>], None)<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>       .add_output(amt<span style=color:#f92672>*</span><span style=color:#ae81ff>0.1666</span>, <span style=color:#f92672>&amp;</span>from_somewhere::kids_annuity[<span style=color:#ae81ff>2</span>], None)<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>       .into()
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>This way we don&rsquo;t rely on any pesky disagreement over what to sign, the funds
+are split exactly how we like.</p><h2 id=oracles-and-lawyers>Oracles and Lawyers</h2><p>Lastly, it is possible to bake into these contracts all sorts of
+conditionallity.</p><p>For example, imagine an Annuity that only makes payouts if a University
+Attendance Validator signs your tuition payment, otherwise you get the coins on
+your 25th Birthday.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>Tuition</span> {
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// keep this key secret from the school
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    to: <span style=color:#a6e22e>bitcoin</span>::PublicKey,
+</span></span><span style=display:flex><span>    enrolled: <span style=color:#a6e22e>bitcoin</span>::PublicKey,
+</span></span><span style=display:flex><span>    school: <span style=color:#a6e22e>bitcoin</span>::PublicKey,
+</span></span><span style=display:flex><span>    amount: <span style=color:#a6e22e>bitcoin</span>::Amount,
+</span></span><span style=display:flex><span>    period: <span style=color:#a6e22e>AnyRelTime</span>,
+</span></span><span style=display:flex><span>    birthday: <span style=color:#a6e22e>AbsTime</span>,
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>const</span> MIN_PAYOUT: <span style=color:#a6e22e>bitcoin</span>::Amount <span style=color:#f92672>=</span> bitcoin::Amount::from_sat(<span style=color:#ae81ff>10000</span>);
+</span></span><span style=display:flex><span><span style=color:#66d9ef>impl</span> Tuition {
+</span></span><span style=display:flex><span>    <span style=color:#75715e>#[guard]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>enrolled</span>(self, ctx: <span style=color:#a6e22e>Context</span>) {
+</span></span><span style=display:flex><span>        Clause::And(vec![Clause::Key(self.enrolled), Clause::Key(self.to)])
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    <span style=color:#75715e>#[then(guarded_by=</span><span style=color:#e6db74>&#34;[Self::enrolled]&#34;</span><span style=color:#75715e>)]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>claim</span>(self, ctx:<span style=color:#a6e22e>Context</span>) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> amt <span style=color:#f92672>=</span> ctx.funds();
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> amt <span style=color:#f92672>-</span> self.amount <span style=color:#f92672>&gt;</span> MIN_PAYOUT {
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// send money to school
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            ctx.template()
+</span></span><span style=display:flex><span>                .add_output(self.amount, <span style=color:#f92672>&amp;</span>self.enrolled, None)<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>                .add_output(amt <span style=color:#f92672>-</span> self.amount, <span style=color:#f92672>&amp;</span>self, None)<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>                .set_sequence(<span style=color:#f92672>-</span><span style=color:#ae81ff>1</span>, self.period.into())<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>                .into()
+</span></span><span style=display:flex><span>        } <span style=color:#66d9ef>else</span> <span style=color:#66d9ef>if</span> amt <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>0</span> {
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// give the change to child
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            ctx.template()
+</span></span><span style=display:flex><span>                .add_output(amt, <span style=color:#f92672>&amp;</span>self.to, None)<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>                .set_sequence(<span style=color:#f92672>-</span><span style=color:#ae81ff>1</span>, self.period.into())<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>                .into()
+</span></span><span style=display:flex><span>        } <span style=color:#66d9ef>else</span> {
+</span></span><span style=display:flex><span>            empty()
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    <span style=color:#75715e>#[guard]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>spend</span>(self, ctx: <span style=color:#a6e22e>Context</span>) {
+</span></span><span style=display:flex><span>        Clause::And(vec![self.birthday.into(), Clause::Key(self.to)])
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>The oracle can&rsquo;t really steal funds here &ndash; they can only sign the already
+agreed on txn and get the tuition payment to the &ldquo;school&rdquo; network. And on the
+specified Birthday, if not used for tuition, the funds go to the child directly.</p><h1 id=where-do-these-live>Where do these live?</h1><p>In theory what you&rsquo;d end up doing is attaching these to every coin in you wallet
+under a dead-man switch.</p><p>Ideally, you&rsquo;d put enough under your main &ldquo;structured&rdquo; splits that you&rsquo;re not
+moving all to often and then you would have the rest go into less structured
+stuff. E.g., the college fund coins you might touch less frequently than the
+coins for general annuity. You can also sequence some things using absolute
+timelocks, for example.</p><p>In an ideal world you would have a wallet agent that is aware of all your UTXOs
+and your will and testament state and makes sure to regenerate the correct
+conditions whenever you spend and then store them durably, but that&rsquo;s a bit
+futuristic for the time being. With CTV the story is a bit better, as for many
+designs you could distribute a WASM bundle for your wallet to your family and
+they could use that to generate all the transactions given an output, without
+needing to have every presigned transaction saved.</p><p>This does demonstrate a relative strength for the account model, it&rsquo;s much
+easier to keep all your funds in once account and write globally correct
+inheritence vault logic around it for all your funds, computed across
+percentages. No matter the UTXO model covenant, that someone might have multiple
+UTXOs poses an inherent challenge in doing this kind of stuff properly.</p><h1 id=what-else>What else?</h1><p>Well, this is just a small sampling of things you could do. Part of the power of
+Sapio is that I hope you&rsquo;re feeling inspired to make your own bespoke
+inhertience scheme in it! No one size fits all, ever, but perhaps with the power
+of Sapio available to the world we&rsquo;ll see a lot more experimentation with what&rsquo;s
+possible.</p><p>Till next time &ndash; Jeremy.</p><div class=footnotes role=doc-endnotes><hr><ol><li id=fn:1><p>Note this is a case where unrolling can be used, but the contract sizes can blow up kinda quick, so careful programming might be needed or you might need to say that it can only be claimed that Jimmy is dead once or twice before he just gets all the money. Recursive covenants would not nescessarily have this issue.&#160;<a href=#fnref:1 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p></li></ol></div></div><div></div></div><hr><div class=main2><div></div><div id=disqus_thread></div><script type=application/javascript>window.disqus_config=function(){},function(){if(["localhost","127.0.0.1"].indexOf(window.location.hostname)!=-1){document.getElementById("disqus_thread").innerHTML="Disqus comments not available by default when the website is previewed locally.";return}var t=document,e=t.createElement("script");e.async=!0,e.src="//judica-org.disqus.com/embed.js",e.setAttribute("data-timestamp",+new Date),(t.head||t.body).appendChild(e)}()</script><noscript>Please enable JavaScript to view the <a href=https://disqus.com/?ref_noscript>comments powered by Disqus.</a></noscript><a href=https://disqus.com class=dsq-brlink>comments powered by <span class=logo-disqus>Disqus</span></a><div></div></div><hr><footer style=text-align:center;bottom:0;padding-bottom:10px;width:100%>&copy; Judica, Inc 2022 | contact@judica.org | <a class=darkmode-switch>dark/light theme</a></footer></body></html>

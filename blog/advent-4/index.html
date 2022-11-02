@@ -1,0 +1,72 @@
+<!doctype html><html><head><meta name=viewport content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@200;500&display=swap" rel=stylesheet><link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600&display=swap" rel=stylesheet><link rel=stylesheet type=text/css href=/css/style.css><script>const storage=window.localStorage,get_darkmode=()=>{const e=storage.getItem("darkmode");return e==null||e==="true"},set_darkmode=()=>{get_darkmode()?(document.body.classList.remove("lightmode"),document.body.classList.add("darkmode")):(document.body.classList.remove("darkmode"),document.body.classList.add("lightmode"))};function applyBackgroundTheme(e){var n="body { background: "+e+"; }",s=document.head||document.getElementsByTagName("head")[0],t=document.createElement("style");return s.appendChild(t),t.type="text/css",t.styleSheet?t.styleSheet.cssText=n:t.appendChild(document.createTextNode(n)),t}const style=applyBackgroundTheme(get_darkmode()?"black":"white");document.addEventListener("DOMContentLoaded",()=>{set_darkmode(),style.parentElement.removeChild(style);const e=document.getElementsByClassName("darkmode-switch")[0];e.onclick=e=>{storage.setItem("darkmode",!get_darkmode()),get_darkmode(),set_darkmode()}})</script><script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-175497336-1","auto"),ga("send","pageview"))</script><script async src=https://www.google-analytics.com/analytics.js></script><meta property="og:title" content="Pillars of Bitcoin: Decentralization"><meta property="og:description" content="This post is syndicated from rubin.io.
+Welcome to day 4 of my Bitcoin Advent Calendar. You can see an index of all the posts here or subscribe at judica.org/join to get new posts in your inbox
+Many may have tried, but few have successfully characterized what &ldquo;being decentralized&rdquo; means in an objective / quantitative sense. Instead, we&rsquo;re left with soft &ldquo;know it when I see it&#34;s.
+Decentralization may be a pillar of Bitcoin with a lotta fanfare, but it&rsquo;s still just a means to an end."><meta property="og:type" content="article"><meta property="og:url" content="https://judica.org/blog/advent-4/"><meta property="og:image" content="https://judica.org/img/og-img.png"><meta property="article:section" content="blog"><meta property="article:published_time" content="2021-12-01T00:00:00+00:00"><meta property="article:modified_time" content="2021-12-01T00:00:00+00:00"><meta property="og:site_name" content="judica.org -- restore the balance"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://judica.org/img/og-img.png"><meta name=twitter:title content="Pillars of Bitcoin: Decentralization"><meta name=twitter:description content="This post is syndicated from rubin.io.
+Welcome to day 4 of my Bitcoin Advent Calendar. You can see an index of all the posts here or subscribe at judica.org/join to get new posts in your inbox
+Many may have tried, but few have successfully characterized what &ldquo;being decentralized&rdquo; means in an objective / quantitative sense. Instead, we&rsquo;re left with soft &ldquo;know it when I see it&#34;s.
+Decentralization may be a pillar of Bitcoin with a lotta fanfare, but it&rsquo;s still just a means to an end."></head><body><header class=nav><ul><li class=float-left><a href=/>judica.</a></li></ul><ul><li><a href=/about/>about.</a></li><li><a href=/software/>software.</a></li><li><a href=/blog/>blog.</a></li><li><a href=/join/>join.</a></li></ul></header><div class=main2><h1>Pillars of Bitcoin: Decentralization</h1><div><h2 class=nobottom>Day 4: Rubin's Bitcoin Advent Calendar</h2></div><small>on December 1, 2021</small><hr></div><div class=main2><div></div><div class=blogtext-inner><p><em>This post is syndicated from <a href=https://rubin.io/advent21>rubin.io</a>.</em></p><p><em>Welcome to day 4 of my Bitcoin Advent Calendar. You can see an index of all
+the posts <a href=/advent21>here</a> or subscribe at
+<a href=https://judica.org/join>judica.org/join</a> to get new posts in your inbox</em></p><p>Many may have tried, but few have successfully characterized what &ldquo;being
+decentralized&rdquo; means in an objective / quantitative sense. Instead, we&rsquo;re left
+with soft &ldquo;know it when I see it"s.</p><p>Decentralization may be a pillar of Bitcoin with a lotta fanfare, but it&rsquo;s still
+just a means to an end. It&rsquo;s about the Pantheon, not the pillars! A system can
+be very decentralized and still kinda suck. Much like pillars with no roof won&rsquo;t
+keep the rain out!</p><h2 id=got-gas>Got Gas?</h2><p>For a more than slightly contrived example, imagine a pre-internet driver
+navigating gas stations prices. Kind of &ldquo;decentralized&rdquo;, right?
+Users/purchasers operate on local information to see pricing and make a decent
+decision, and sellers operate on local information to stay competitive. Over
+time the network should &ldquo;converge&rdquo; a sellers learn who has better prices
+throughout town, but from the perspective of an individual purchaser it&rsquo;s really
+hard for them to determine within their remaining tank range/willingness to
+drive across town for a dollar who has the best prices. So while the market
+works as a decentralized pricing system, it&rsquo;s not highly consistent!</p><h2 id=its-hard-no-cap>It&rsquo;s Hard; No CAP</h2><p>Computer network nerds have three rules for keeping their jobs: consistency,
+availability, and partition tolerance. What do these mean in practice? Thinking
+back to our gas analogy, gas stations are very available (you can always get gas
+at some price), they&rsquo;re strongly partition tolerant (i.e., if you can&rsquo;t see
+other gas station&rsquo;s advertised prices you won&rsquo;t know if it&rsquo;s better, but you can
+still get gas). But the pricing might be all over the map! No consistency!</p><p>It&rsquo;s really hard to achieve all three properties &ndash; there even exist proofs of
+its impossibility. Instead, engineers make tradeoffs to achieve different
+amounts of guarantee across the properties.</p><p>For Bitcoin we care a <em>lot</em> about consistency<sup id=fnref:1><a href=#fn:1 class=footnote-ref role=doc-noteref>1</a></sup>. If I send money to
+Alice, I should not be able to send it to Bob. We also care a lot about
+partition tolerance. If some group of participants should shunt themselves out
+from others, the system should still operate? So do we inherently care less
+about availability? Well, kinda! If the &ldquo;blockchain is closed&rdquo; and you can&rsquo;t
+transact, at least you still have your money. And technologies like Lightning
+Network can help bridge the gaps if the Bitcoin blockchain is unavailable that
+you can still fully confirm transactions as long as it comes back eventually.</p><p>So, interestingly, Availability seems like the property we need to care about
+the least… but it&rsquo;s one of the main reasons we need decentralization! That&rsquo;s
+because even though we might have a design that elevates the other two
+properties, it doesn&rsquo;t mean that availability is unimportant. And availability
+is not one monolithic level, there are many different types of availability
+fault one might experience on a network. For example, you might experience
+reduced or no availability if:</p><ol><li>The network doesn&rsquo;t have blockspace at your price</li><li>The internet is down</li><li>Your usual peers are offline</li><li>Theres a fire at a major data center</li><li>Your battery on your phone dies</li><li>A big solar flare happens</li><li>An evil government changes your DNS records to your mining pool and you don&rsquo;t know the IP address</li><li>An evil government runs the network entirely and doesn&rsquo;t like your transactions so they get censored.</li></ol><p>Some of these problems, decentralization can help us with! Some,
+decentralization can&rsquo;t help with. And some are caused <em>by decentralization</em>. Uh
+oh!</p><p>For example&mldr;</p><p>A fire a major data center can be defrayed by being more decentralized &ndash; a fire
+can only spread so far! The other data centers should be fine, since Bitcoin is
+partition tolerant, the overall network is available.</p><p>If a big solar flare happens, there&rsquo;s not much <em>any</em> of us can do if all the
+internet is down and our devices got fried. Too catastrophic… We can recover
+eventually, your metal seed plates will be fine, but hopefully someone had some
+Faraday cage shielded backups.</p><p>If blockspace is too expensive, decentralization may be the cause!</p><p>In order to keep the network decentralization friendly, Bitcoin uses far less
+bandwidth and storage than a centralized system (like Google) could use. This
+ensures that participants on the network need not be particularly well resourced
+or well connected to be a meaningful, full participant in the Bitcoin Network.</p><p>That&rsquo;s because of another availability issue: censorship. Bitcoin fundamentally
+stands as a fuck-you to the entrenched powers that be. As such, Bitcoin uses
+decentralization to guarantee censorship-resistance against state actors. While
+there&rsquo;s been much ink scaled about the censorship of scalability v.s. the
+censorship of state actors, Bitcoin is hyper focused on providing some form of
+&ldquo;equal protection&rdquo;.</p><p>Everyone hates that you lose availability from high tx prices, and all are
+equally affected<sup id=fnref:2><a href=#fn:2 class=footnote-ref role=doc-noteref>2</a></sup>. Everyone hates solar flares, and all are equally
+affected. But with state actor censorship, enemies of the state, be they Jews,
+Conservative Non-Profits, Black Americans, Gazan Chocolatiers, People who
+believe things posted on *******&rsquo;s Twitter Account etc, can be picked
+apart and subjected to selective abuses. If anyone can run a node (and
+hopefully miner), and most people don&rsquo;t have a political agenda, we can maybe
+protect individuals of any background.</p><p>As such, Bitcoin&rsquo;s decentralization is focused on censorship-resistance, even at
+the expense of on-chain availability.</p><h2 id=the-neverending-story>The Neverending Story</h2><p>The story doesn&rsquo;t end there. Decentralization, as we noted earlier, is very
+tough to quantify. Even if we can&rsquo;t quantify it, we can still reason about
+decentralization efficiency. Given the &ldquo;costs of decentralization&rdquo;, how much
+censorship resistance do we get? Can we decrease the costs and achieve the same
+amount? Can we keep the cost the same and gain more censorship resistance?
+Or&mldr; do we need to increase the costs, because we&rsquo;re not censorship resistant
+enough? Stay tuned for future posts we&rsquo;re we&rsquo;ll see if we can&rsquo;t do something
+about it!</p><div class=footnotes role=doc-endnotes><hr><ol><li id=fn:1><p>If we&rsquo;re being pedantic, technically Bitcoin sacrifices consistency for <em>eventual consistency</em> to preserve the other properties&mldr; but it really depends on what you view the &ldquo;output&rdquo; of the network being as you can detect consistency losses by seeing hashrate decreases, for example. My opinion is we sacrifice availability of high quality confirmations for consistency&mldr;&#160;<a href=#fnref:1 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p></li><li id=fn:2><p>There is a complex interaction between scalability solutions and chain space that can help bridge the fact that rich people are typically in power and poorer people aren&rsquo;t.&#160;<a href=#fnref:2 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p></li></ol></div></div><div></div></div><hr><div class=main2><div></div><div id=disqus_thread></div><script type=application/javascript>window.disqus_config=function(){},function(){if(["localhost","127.0.0.1"].indexOf(window.location.hostname)!=-1){document.getElementById("disqus_thread").innerHTML="Disqus comments not available by default when the website is previewed locally.";return}var t=document,e=t.createElement("script");e.async=!0,e.src="//judica-org.disqus.com/embed.js",e.setAttribute("data-timestamp",+new Date),(t.head||t.body).appendChild(e)}()</script><noscript>Please enable JavaScript to view the <a href=https://disqus.com/?ref_noscript>comments powered by Disqus.</a></noscript><a href=https://disqus.com class=dsq-brlink>comments powered by <span class=logo-disqus>Disqus</span></a><div></div></div><hr><footer style=text-align:center;bottom:0;padding-bottom:10px;width:100%>&copy; Judica, Inc 2022 | contact@judica.org | <a class=darkmode-switch>dark/light theme</a></footer></body></html>

@@ -1,0 +1,75 @@
+<!doctype html><html><head><meta name=viewport content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@200;500&display=swap" rel=stylesheet><link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600&display=swap" rel=stylesheet><link rel=stylesheet type=text/css href=/css/style.css><script>const storage=window.localStorage,get_darkmode=()=>{const e=storage.getItem("darkmode");return e==null||e==="true"},set_darkmode=()=>{get_darkmode()?(document.body.classList.remove("lightmode"),document.body.classList.add("darkmode")):(document.body.classList.remove("darkmode"),document.body.classList.add("lightmode"))};function applyBackgroundTheme(e){var n="body { background: "+e+"; }",s=document.head||document.getElementsByTagName("head")[0],t=document.createElement("style");return s.appendChild(t),t.type="text/css",t.styleSheet?t.styleSheet.cssText=n:t.appendChild(document.createTextNode(n)),t}const style=applyBackgroundTheme(get_darkmode()?"black":"white");document.addEventListener("DOMContentLoaded",()=>{set_darkmode(),style.parentElement.removeChild(style);const e=document.getElementsByClassName("darkmode-switch")[0];e.onclick=e=>{storage.setItem("darkmode",!get_darkmode()),get_darkmode(),set_darkmode()}})</script><script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-175497336-1","auto"),ga("send","pageview"))</script><script async src=https://www.google-analytics.com/analytics.js></script><meta property="og:title" content=" The Urgency of Rearchitecting Bitcoin's Mempool"><meta property="og:description" content="Learn about the challenges facing the mempool and plans to make it better"><meta property="og:type" content="article"><meta property="og:url" content="https://judica.org/blog/mempool/"><meta property="og:image" content="https://judica.org/img/complex-mempool-sm.png"><meta property="article:section" content="blog"><meta property="article:published_time" content="2020-08-01T00:00:00+00:00"><meta property="article:modified_time" content="2020-08-01T00:00:00+00:00"><meta property="og:site_name" content="judica.org -- restore the balance"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://judica.org/img/complex-mempool-sm.png"><meta name=twitter:title content=" The Urgency of Rearchitecting Bitcoin's Mempool"><meta name=twitter:description content="Learn about the challenges facing the mempool and plans to make it better"></head><body><header class=nav><ul><li class=float-left><a href=/>judica.</a></li></ul><ul><li><a href=/about/>about.</a></li><li><a href=/software/>software.</a></li><li><a href=/blog/>blog.</a></li><li><a href=/join/>join.</a></li></ul></header><div class=main2><h1>The Urgency of Rearchitecting Bitcoin's Mempool</h1><h3>by Jeremy Rubin</h3><small>on August 1, 2020</small><hr></div><div class=main2><div></div><div class=blogtext-inner><h3 id=if-this-post-excites-you-lets-work-togetherjoin-or-if-you-see-the-value-of-this-work-and-are-able-to-dedicate-financial-resources-please-reach-outjoin-to-support-more-developers-working-on-this-project><em>If this post excites you let&rsquo;s <a href=/join/>work together</a>. Or, if you see the value of this work and are able to dedicate financial resources, <a href=/join/>please reach out</a> to support more developers working on this project.</em></h3><hr><p>Bitcoin is a complicated software artifact which requires active investment in discovering its flaws
+to harden and strengthen its implementations against fatal attacks and insidious bugs. Over the last
+year I&rsquo;ve been investing significant efforts to put Bitcoin&rsquo;s Mempool under the microscope to
+categorise potential bugs and vulnerabilities and come up with plans and patches to fix them.</p><p>The fruits of this labor so far have been promising in their ability to address substantial
+stability issues in Bitcoin, but there is still much work to be done to fully implement the
+necessary changes and tackle some of the harder architectural challenges. The Mempool serves as the
+main gatekeeper for submitting transactions to the network for inclusion in a block, which makes it
+one of the main ways all types of users interact with Bitcoin, and drives the urgency of completing
+this security critical work in a manner that respects the myriad of currently supported uses.</p><p>Judica exists in part to build a team to tackle the hard problems facing Bitcoin. In the last two
+months, <a href=/blog/100x-grant/>100x/BitMEX</a> and <a href=/blog/acinq-grant>ACINQ</a> have issued grants to
+support Judica&rsquo;s work improving Bitcoin&rsquo;s Mempool over the next year. To grow our team, I plan to
+use these grants to sponsor other developers (either in a full or part time capacity) to contribute
+to the Mempool efforts. One of the chief bottlenecks in Bitcoin development is tight review and
+feedback loops on ambitious projects like this, so having more developers engaged under contract to
+complete this project as a team will help us deliver results for the Bitcoin community.</p><p>Judica is not the only organization working on improving the Mempool, Bitcoin developers have paid
+serious attention to it over the years and have made vast improvements and contributions. Other
+contributors are focused on issues like package relay and rebroadcasting. However, with this new
+effort I&rsquo;m hoping to assemble the resources to make sustained progress on the goals described below and
+increase the number of developers who understand the Mempool functionality fully enough to provide
+high-quality review.</p><p>In the remainder of this blog post, I&rsquo;m going to explain the tensions between implementing an
+idealized functionality of the Mempool and making it secure against resource exhaustion attacks.</p><h2 id=the-mempool-bitcoins-mvp>The Mempool: Bitcoin&rsquo;s MVP</h2><p>The Mempool is one of the most critical subsystems in the Bitcoin network, yet its function is
+poorly understood by many businesses and projects. What role does the Mempool play?</p><p>Before transactions are mined in a block, they are typically submitted to the network to be relayed
+and stored until block inclusion. A Bitcoin miner uses the Mempool to select which transactions they
+wish to include into a block. A perfectly rational node would accept and store all transactions it
+had ever seen and pick the best transactions (i.e., those paying the highest fees) for mining.</p><p>Incidentally, this is why the Mempool is such an important data structure in Bitcoin. With a less
+rational Mempool, miners would produce less valuable blocks, and there would be less incentive to
+mine. All of Bitcoin would suffer for having worse security.</p><p>It&rsquo;s not practical to store, process, and consider all transactions, so instead nodes make decisions
+on what to accept based on a number of heuristics. The Mempool is used for more than just mining,
+network nodes use the Mempool to figure out what is likely to be included in a block in the future
+to decrease block propagation latency and to relay other profitable transactions across the network,
+improving privacy (not all transactions from a node are yours) and improving the user experience of
+transaction broadcast.</p><p>The Mempool has a number of artificial constraints on what types of transactions it will accept by
+default. These limitations include static checks (e.g., the size of the transaction in bytes or
+&ldquo;weight units&rdquo;) and contextual checks (e.g., is this transaction mineable immediately, does it pay
+more fee than other transactions, or does it have more unconfirmed parent or grandparent
+transactions than permitted or cause another transaction to have more children transactions than
+permitted).</p><p>These rules are artificial in the sense that they are locally decided policies that are not
+generally enforced. In other words, when you mine a block, these Mempool restrictions are not
+considered. Why does the Mempool need to have stricter rules than a block?</p><h3 id=its-complicated>It&rsquo;s Complicated!</h3><p>Many of the Mempool algorithms are &ldquo;superlinearly algorithmically complex&rdquo;. This means that as the
+Mempool grows, if these restrictions were not enforced, the amount of work to select transactions
+for a block to mine could grow as well, which can lead to resource exhaustion, denial-of-service,
+and cost miners money with a loss of uptime. Imagine it taking more time for a miner to decide what
+should go into a block than it takes to mine the block itself! Therefore we need stricter rules in
+the mempool to prevent these blowouts.</p><figure><img src=/img/less-complex-mempool.png alt="Visualization of Mempool with 800 transactions. See this PR for more details." width=100%><figcaption><p>Visualization of Mempool with 800 transactions. See <a href=https://github.com/bitcoin/bitcoin/pull/17292#issuecomment-547592769>this PR</a> for more details.</p></figcaption></figure><p>Unfortunately, a number of algorithms in the Mempool are suboptimal, meaning where a small amount
+of operations might be sufficient, a much larger amount is done. Suboptimal often also means that
+while the overall work is similar in terms of the number of operations, the algorithm&rsquo;s operations
+are inefficient to run (maybe allocating too much memory or just doing something slowly).<figure><img src=/img/complex-mempool.png alt="Visualization of Mempool with 10,000 transactions. See this PR for more details. This makes it easy to see how the work becomes harder as more entries are added." width=100%><figcaption><p>Visualization of Mempool with 10,000 transactions. See <a href=https://github.com/bitcoin/bitcoin/pull/17292#issuecomment-547592769>this PR</a> for more details. This makes it easy to see how the work becomes harder as more entries are added.</p></figcaption></figure></p><p>These algorithms performance mean that we have to determine safe limitations for what we will accept
+into the Mempool that fits within our computational budgets, and if the performance is suboptimal,
+we end up with stricter limitations than necessary, or even end up requiring a limitation where it
+would be fine not to have any. Developers often determine safe limits experimentally (as opposed to
+by a rigorous proof), which means we have to include an additional safety margin in case we haven&rsquo;t
+found the true worst case behavior.</p><h3 id=whats-the-worst-that-can-happen>What&rsquo;s the worst that can happen?</h3><p>Because we make a best effort, and not a perfect one, Mempool implementations have to make some
+tough decisions about which transactions to process and which to ignore in order to prevent resource
+exhaustion or other denial-of-service vulnerabilities. Even with the guards we have in place, it&rsquo;s
+possible that a series of carefully crafted but otherwise normal input could cause all nodes on the
+network to crash or cease to be functional.</p><p>Fully understanding the gap between perfectly rational Mempool behavior and computationally limited
+Mempool behavior can be quite hard and full of surprising edge cases, which is the bane of many
+protocol developers and infrastructure operators.</p><p>As an example, there&rsquo;s a generic issue called &ldquo;mempool pinning&rdquo; which impacts protocols like the
+Lightning Network or when exchanges payout via batches. The issue comes up when a transaction in the
+Mempool has two outputs owned by two different parties, one good, one evil. The evil party attaches
+a bunch of low-fee transactions to their output. Now, because of the Mempool&rsquo;s limitations on how
+many child spends an unconfirmed transaction may have, the good party is unable to spend from their
+unconfirmed output. This seems like a minor problem, but the issue can be more severe in contexts
+that rely on Child Pays for Parent (CPFP) for paying for fees and have time lock conditions.</p><h3 id=so-whatre-we-gonna-do-about-that>So what&rsquo;re we gonna do about that?!</h3><p>Don&rsquo;t fret. Judica is working to improve the Mempool. The Mempool Project is an effort that has multiple
+components aimed at improving Mempool performance with the goal of reducing the maximum memory the
+Mempool requires to operate and improving performance. This work may ultimately lead to being able
+to remove some restrictions previously required or loosen them up. This makes application developers
+happy, improves mining revenue, and hopefully helps protocols be more robust against attacks.</p><p>To complete this work, multiple components must be developed simultaneously:</p><ol><li><p>Epoch Mempool &ndash; a base level algorithmic improvement across the Mempool with minimal
+architectural changes that has already shown major performance benefits (2-3x faster on difficult
+benchmarks) but requires more review and testing.</p></li><li><p>Mempool Stress Tests &ndash; identifying and assembling a catalogue of worst-case exploitable
+behaviors (with and without current limitations enforced and other non standard node flags). This
+makes us more confident in the changes we&rsquo;re making and can also discover and prevent regressions
+introducing new Denial-of-Service issues.</p></li><li><p>Major architectural re-design &ndash; reconsideration of the general design of the Mempool to improve
+how transactions are selected for mining, relay, and eviction to fully address issues like pinning
+and improve rationality.</p></li></ol></div><div></div></div><hr><div class=main2><div></div><div id=disqus_thread></div><script type=application/javascript>window.disqus_config=function(){},function(){if(["localhost","127.0.0.1"].indexOf(window.location.hostname)!=-1){document.getElementById("disqus_thread").innerHTML="Disqus comments not available by default when the website is previewed locally.";return}var t=document,e=t.createElement("script");e.async=!0,e.src="//judica-org.disqus.com/embed.js",e.setAttribute("data-timestamp",+new Date),(t.head||t.body).appendChild(e)}()</script><noscript>Please enable JavaScript to view the <a href=https://disqus.com/?ref_noscript>comments powered by Disqus.</a></noscript><a href=https://disqus.com class=dsq-brlink>comments powered by <span class=logo-disqus>Disqus</span></a><div></div></div><hr><footer style=text-align:center;bottom:0;padding-bottom:10px;width:100%>&copy; Judica, Inc 2022 | contact@judica.org | <a class=darkmode-switch>dark/light theme</a></footer></body></html>

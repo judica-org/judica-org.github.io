@@ -1,0 +1,46 @@
+<!doctype html><html><head><meta name=viewport content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@200;500&display=swap" rel=stylesheet><link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600&display=swap" rel=stylesheet><link rel=stylesheet type=text/css href=/css/style.css><script>const storage=window.localStorage,get_darkmode=()=>{const e=storage.getItem("darkmode");return e==null||e==="true"},set_darkmode=()=>{get_darkmode()?(document.body.classList.remove("lightmode"),document.body.classList.add("darkmode")):(document.body.classList.remove("darkmode"),document.body.classList.add("lightmode"))};function applyBackgroundTheme(e){var n="body { background: "+e+"; }",s=document.head||document.getElementsByTagName("head")[0],t=document.createElement("style");return s.appendChild(t),t.type="text/css",t.styleSheet?t.styleSheet.cssText=n:t.appendChild(document.createTextNode(n)),t}const style=applyBackgroundTheme(get_darkmode()?"black":"white");document.addEventListener("DOMContentLoaded",()=>{set_darkmode(),style.parentElement.removeChild(style);const e=document.getElementsByClassName("darkmode-switch")[0];e.onclick=e=>{storage.setItem("darkmode",!get_darkmode()),get_darkmode(),set_darkmode()}})</script><script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-175497336-1","auto"),ga("send","pageview"))</script><script async src=https://www.google-analytics.com/analytics.js></script><meta property="og:title" content="Sapio Primer"><meta property="og:description" content="This post is syndicated from rubin.io.
+Welcome to day 9 of my Bitcoin Advent Calendar. You can see an index of all the posts here or subscribe at judica.org/join to get new posts in your inbox
+We&rsquo;re through the basics sections of the Advent calendar ow! Time for some more… specific content on the bleeding edge!
+This post is your introduction to the world of Sapio. Sapio is the programming framework I&rsquo;ve been developing for Bitcoin Smart Contracts."><meta property="og:type" content="article"><meta property="og:url" content="https://judica.org/blog/advent-9/"><meta property="og:image" content="https://judica.org/img/og-img.png"><meta property="article:section" content="blog"><meta property="article:published_time" content="2021-12-06T00:00:00+00:00"><meta property="article:modified_time" content="2021-12-06T00:00:00+00:00"><meta property="og:site_name" content="judica.org -- restore the balance"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://judica.org/img/og-img.png"><meta name=twitter:title content="Sapio Primer"><meta name=twitter:description content="This post is syndicated from rubin.io.
+Welcome to day 9 of my Bitcoin Advent Calendar. You can see an index of all the posts here or subscribe at judica.org/join to get new posts in your inbox
+We&rsquo;re through the basics sections of the Advent calendar ow! Time for some more… specific content on the bleeding edge!
+This post is your introduction to the world of Sapio. Sapio is the programming framework I&rsquo;ve been developing for Bitcoin Smart Contracts."></head><body><header class=nav><ul><li class=float-left><a href=/>judica.</a></li></ul><ul><li><a href=/about/>about.</a></li><li><a href=/software/>software.</a></li><li><a href=/blog/>blog.</a></li><li><a href=/join/>join.</a></li></ul></header><div class=main2><h1>Sapio Primer</h1><div><h2 class=nobottom>Day 9: Rubin's Bitcoin Advent Calendar</h2></div><small>on December 6, 2021</small><hr></div><div class=main2><div></div><div class=blogtext-inner><p><em>This post is syndicated from <a href=https://rubin.io/advent21>rubin.io</a>.</em></p><p><em>Welcome to day 9 of my Bitcoin Advent Calendar. You can see an index of all
+the posts <a href=/advent21>here</a> or subscribe at
+<a href=https://judica.org/join>judica.org/join</a> to get new posts in your inbox</em></p><p>We&rsquo;re through the basics sections of the Advent calendar ow! Time for some more…
+specific content on the bleeding edge!</p><p>This post is your introduction to the world of
+<a href=https://learn.sapio-lang.org>Sapio</a>. Sapio is the programming framework I&rsquo;ve
+been developing for Bitcoin Smart Contracts. There&rsquo;s a <em>ton</em> of material on <a href=https://learn.sapio-lang.org>the
+website</a>, so this post is going to be a bit
+high-level and then you should jump into the docs after to learn more.</p><h2 id=what-the-heck-is-sapio>What the heck is Sapio?</h2><p>Sapio is a tool that helps you design and use Bitcoin smart contracts based on
+covenants (like CTV) as well as manage potentially recursive state transitions
+at terminal states.</p><p>That&rsquo;s a mouthful and a half… let&rsquo;s break it down with a very basic vault
+deposit example.</p><p>Suppose I have 10 bitcoin sitting in my normal wallet. I want to deposit it to
+an exchange. I go to my exchange and request an address to deposit to. The
+exchange wants their coins to be in a special cold storage whereby any move from
+cold storage has to &ldquo;mature&rdquo; for 10 days since it was claimed before it&rsquo;s
+spendable as a hot-spend, otherwise it stays in cold. The hot wallet has logic
+such that any unused funds after it transacts, goes back into the cold-storage
+contract. We saw a contract like this in the <a href=/bitcoin/2021/12/04/advent-7/>day
+7</a> post.</p><p>The exchange can use Sapio to generate an address that expects 10 coins and
+encodes this cold-to-hot logic without requiring the cold keys be online! Better
+than that, I don&rsquo;t even have to contact the exchange for the address. The
+exchange can distribute a codesigned Sapio WASM applet that runs on my own
+machine locally. I download the applet into my Sapio Studio GUI and that
+generates the exchange deposit UX form for the contract that I (or my wallet)
+automatically fills out and then generates a proper address/spending
+transaction.</p><p>Upon receipt of the deposit information, (which can in certain circumstances be
+completely on-chain in the txn, so no need for a separate communication
+channel), the exchange can us the WASM to generate an identical deposit program
+to verify the user isn&rsquo;t cheating somehow. <strong>Bada-bing-bada-boom!</strong></p><p>We&rsquo;ll see in close detail examples like this coming in the following posts, but
+to sum up, Sapio helped us with the following:</p><ol><li>Authoring a Smart Contract Application for a cold storage deposit solution</li><li>Distributing it as a deterministic executable with a GUI User using it to make a
+deposit</li><li>Receiving funds as a depositee directly into a smart contract</li><li>Generating withdrawal transactions out of the vault</li><li>Putting the remaining funds back into the cold storage</li></ol><p>This is not a hypothetical, all of these components exist and are usable today!
+Where there is an asterisk is that BIP-119 CTV does not yet exist, and so for
+apps like this the exchange would have to run some kind of <a href=https://learn.sapio-lang.org/ch05-01-ctv-emulator.html>signing
+server</a> you connect to.
+This works, but is a worse trust model. For some applications, you don&rsquo;t need
+CTV if you can get all of a contract&rsquo;s parties to run their own oracles.
+Therefore you can still accomplish a lot without a worse trust model with what&rsquo;s
+there today!</p><p>Over the remaining posts we&rsquo;ll go into great detail on different applications
+built in Sapio, but for now you can <a href=https://learn.sapio-lang.org>skim through
+learn.sapio-lang.org</a> to get started playing
+around with your own designs.</p></div><div></div></div><hr><div class=main2><div></div><div id=disqus_thread></div><script type=application/javascript>window.disqus_config=function(){},function(){if(["localhost","127.0.0.1"].indexOf(window.location.hostname)!=-1){document.getElementById("disqus_thread").innerHTML="Disqus comments not available by default when the website is previewed locally.";return}var t=document,e=t.createElement("script");e.async=!0,e.src="//judica-org.disqus.com/embed.js",e.setAttribute("data-timestamp",+new Date),(t.head||t.body).appendChild(e)}()</script><noscript>Please enable JavaScript to view the <a href=https://disqus.com/?ref_noscript>comments powered by Disqus.</a></noscript><a href=https://disqus.com class=dsq-brlink>comments powered by <span class=logo-disqus>Disqus</span></a><div></div></div><hr><footer style=text-align:center;bottom:0;padding-bottom:10px;width:100%>&copy; Judica, Inc 2022 | contact@judica.org | <a class=darkmode-switch>dark/light theme</a></footer></body></html>

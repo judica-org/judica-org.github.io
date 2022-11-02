@@ -1,0 +1,130 @@
+<!doctype html><html><head><meta name=viewport content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@200;500&display=swap" rel=stylesheet><link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600&display=swap" rel=stylesheet><link rel=stylesheet type=text/css href=/css/style.css><script>const storage=window.localStorage,get_darkmode=()=>{const e=storage.getItem("darkmode");return e==null||e==="true"},set_darkmode=()=>{get_darkmode()?(document.body.classList.remove("lightmode"),document.body.classList.add("darkmode")):(document.body.classList.remove("darkmode"),document.body.classList.add("lightmode"))};function applyBackgroundTheme(e){var n="body { background: "+e+"; }",s=document.head||document.getElementsByTagName("head")[0],t=document.createElement("style");return s.appendChild(t),t.type="text/css",t.styleSheet?t.styleSheet.cssText=n:t.appendChild(document.createTextNode(n)),t}const style=applyBackgroundTheme(get_darkmode()?"black":"white");document.addEventListener("DOMContentLoaded",()=>{set_darkmode(),style.parentElement.removeChild(style);const e=document.getElementsByClassName("darkmode-switch")[0];e.onclick=e=>{storage.setItem("darkmode",!get_darkmode()),get_darkmode(),set_darkmode()}})</script><script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-175497336-1","auto"),ga("send","pageview"))</script><script async src=https://www.google-analytics.com/analytics.js></script><meta property="og:title" content="Review of Smart Contract Concepts for Bitcoin"><meta property="og:description" content="This post is syndicated from rubin.io.
+Welcome to day 7 of my Bitcoin Advent Calendar. You can see an index of all the posts here or subscribe at judica.org/join to get new posts in your inbox
+In this post we&rsquo;ll review a concepts for thinking about different types of smart contract capabilities and the implications of their availability.
+Recursive v.s. Non Recursive Recursive is pretty much just a fancy way of saying &ldquo;loops&rdquo;."><meta property="og:type" content="article"><meta property="og:url" content="https://judica.org/blog/advent-7/"><meta property="og:image" content="https://judica.org/img/og-img.png"><meta property="article:section" content="blog"><meta property="article:published_time" content="2021-12-04T00:00:00+00:00"><meta property="article:modified_time" content="2021-12-04T00:00:00+00:00"><meta property="og:site_name" content="judica.org -- restore the balance"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://judica.org/img/og-img.png"><meta name=twitter:title content="Review of Smart Contract Concepts for Bitcoin"><meta name=twitter:description content="This post is syndicated from rubin.io.
+Welcome to day 7 of my Bitcoin Advent Calendar. You can see an index of all the posts here or subscribe at judica.org/join to get new posts in your inbox
+In this post we&rsquo;ll review a concepts for thinking about different types of smart contract capabilities and the implications of their availability.
+Recursive v.s. Non Recursive Recursive is pretty much just a fancy way of saying &ldquo;loops&rdquo;."></head><body><header class=nav><ul><li class=float-left><a href=/>judica.</a></li></ul><ul><li><a href=/about/>about.</a></li><li><a href=/software/>software.</a></li><li><a href=/blog/>blog.</a></li><li><a href=/join/>join.</a></li></ul></header><div class=main2><h1>Review of Smart Contract Concepts for Bitcoin</h1><div><h2 class=nobottom>Day 7: Rubin's Bitcoin Advent Calendar</h2></div><small>on December 4, 2021</small><hr></div><div class=main2><div></div><div class=blogtext-inner><p><em>This post is syndicated from <a href=https://rubin.io/advent21>rubin.io</a>.</em></p><p><em>Welcome to day 7 of my Bitcoin Advent Calendar. You can see an index of all
+the posts <a href=/advent21>here</a> or subscribe at
+<a href=https://judica.org/join>judica.org/join</a> to get new posts in your inbox</em></p><p>In this post we&rsquo;ll review a concepts for thinking about different types of smart
+contract capabilities and the implications of their availability.</p><h2 id=recursive-vs-non-recursive>Recursive v.s. Non Recursive</h2><p>Recursive is pretty much just a fancy way of saying &ldquo;loops&rdquo;. This is sometimes
+also called &ldquo;Turing Complete&rdquo;. That&rsquo;s an even fancier way of saying loops. For
+example, imagine a bitcoin contract with the following logic:</p><p>When Alice requests moving 1 coin to Bob by broadcasting a transaction with the
+request, Alice has 24 hours to completely cancel the transfer by broadcasting
+another transaction.</p><p>This is a looping contract because after cancelling Alice can immediately
+re-request the transfer. An example of non-looping but similar logic would be:</p><p>When Alice requests moving 1 coin to Bob, Alice has 24 hours to cancel the
+transfer by sending the coins to Alice&rsquo;s backup key.</p><p>Here, the contract terminates after one canceled request by moving the coin
+elsewhere. It&rsquo;s possible to emulate recursive behavior a limited amount by
+&ldquo;unrolling&rdquo; a loop. For example:</p><p>When Alice requests moving 1 coin to Bob, Alice has 24 hours to cancel the
+transfer by sending the coins to (when Alice requests moving 1 coin to Bob,
+Alice has 24 hours to cancel the transfer by sending the coins to Alice&rsquo;s backup
+key).</p><p>Here we substituted the backup key with a copy of the original logic. Now Alice
+can make 2 cancellable requests before sending the money to the backup. This
+looks recursive, and it can be expressed by a recursive meta-program. Meta
+program is just a fancy term for a program that makes programs. But when we put
+the contract into writing (e.g., an address on the chain), it has to be unrolled
+for the specific number of iterations we want possible.</p><p>Unrolling is a very useful technique, and can be used in a broad variety of
+circumstances. For example, imagine we unroll a contract a million times and
+specify that transactions can only happen every 10 blocks. That covers like 200
+years of contract execution. However, unrolling has it&rsquo;s limits. When choices
+(action A or B) are introduced, unrolling can be less effective since you have
+and exponential blowup (that means unrolling even like 32 steps might be too
+many). However, there are some tricks that can be employed by a clever and
+careful programmer to reduce this complexity through, for example, memoization.</p><h2 id=fully-enumerated-vs-open-ended>Fully Enumerated v.s. Open Ended</h2><p>Suppose I have a contract which is supposed to strike an American option<sup id=fnref:1><a href=#fn:1 class=footnote-ref role=doc-noteref>1</a></sup> and
+transfer a token. It might look like this:</p><p>If Alice is paid 1 BTC by December 25th, 2021 Midnight, then transfer 100 tokens
+to Bob&rsquo;s Control.</p><p>A fully enumerated contract would be expressed as:</p><p>If Alice is paid 1 BTC by December 25th, 2021 Midnight, then transfer 100 tokens
+to Bob&rsquo;s Address B.</p><p>Whereas an Open Ended contract would be expressed as:</p><p>If Alice is paid 1 BTC by December 25th, 2021 Midnight, then transfer 100 tokens
+to the address Bob requested with the payment.</p><p>The key difference being that in the fully enumerated case we must know the
+exact specifics of the contract and how it will execute, and in the open ended
+contract case there are bits and pieces we can dynamically specify.</p><p>There are ways that a fully enumerated contract can emulate dynamic choice. For
+example:</p><p>If Alice is paid 1 BTC by December 25th, 2021 Midnight, then transfer 100 tokens
+to one of Bob&rsquo;s Address B1, B2, or B3 at Bob&rsquo;s discretion.</p><p>Now Bob can pick from one of three destinations in the future. However, these
+options must have been known in advance (a priori). With an open ended contract,
+the address could be generated after the fact (post hoc).</p><p>This is a separate concept from recursive or non recursive. A contract that
+loops could loop through a set of fully enumerated states until reaching some
+terminal predetermined &ldquo;exit&rdquo; state (e.g., a plain address). The option contract
+described above is non-recursive, but can be open ended.</p><h2 id=client-vs-consensus-validation>Client v.s. Consensus Validation</h2><p>When you have a Bitcoin in an output, anyone who has run, say, Bitcoin Core can
+tell that it is valid by seeing it in the UTXO set. But what happens if you want
+to issue a token on top of Bitcoin with some set of unique rules? Bitcoin does
+not know anything about these tokens, and so it would be possible to make an
+invalid transaction (e.g., spending more value than you have). In order to
+ensure the token is valid and not corrupt, one must trace every prior
+transaction back to some &ldquo;axiomatic&rdquo; genesis transaction(s) minting the token.
+These traces can be cached, but by default Bitcoin software will not enforce
+that only valid transfers be made. We say that the token is Client validated
+while the Bitcoin is Consensus validated.</p><p>Is one worse than the other? Not necessarily. While permitting invalid
+transactions in the chain seems bad, as long as the invalid transactions can be
+uniformly excluded by all who care about the token it is not much worse than the
+work you do to run a Bitcoin full node anyways. There does seem to be some value
+in the Bitcoin network preventing you from making invalid transactions, but the
+network doesn&rsquo;t stop you from making bad transactions (e.g., you could send
+money to the wrong place).</p><p>Client side validation can check all sorts of properties, not just tokens. For
+example, you could write a contract for an on-chain governed company and check
+transactions for valid state transitions amending the rules.</p><p>The main drawback to client side validation comes when you want your contract to
+interoperate with Bitcoin values. While client side validation can burn tokens
+that are transferred invalidly, imagine an exchange contract that swaps Bitcoin
+for Token. If the exchange contract sends more Bitcoin than it should, the
+clients can tell that it was an invalid transaction but the Bitcoin is still
+gone. Thus Client validated contracts are best left to things that don&rsquo;t hold
+Bitcoin. The exception to this rule is if the Client validated contracts admit a
+custodian, a special monitor or set of monitors that handle the contracts
+Bitcoin balances in e.g. a multisig. The monitors can client-side validate the
+contracts and sign off on any balance transfers. The drawback to this approach
+is trust, but in certain applications that we&rsquo;ll see later the monitor could be
+all of the participants themselves, which makes the application of the rules
+trustless.</p><h2 id=validation-vs-computation>Validation v.s. Computation</h2><p>Validation and Computation are two sides of the same coin. A simple example to
+demonstrate:</p><table><thead><tr><th>Type</th><th>Task</th><th>Input</th><th>Output</th></tr></thead><tbody><tr><td>Computation</td><td>Sort the numbers [4,5,1]</td><td>None</td><td>[1,4,5]</td></tr><tr><td>Validation</td><td>Check that [4,5,1] is sorted by indexes A</td><td>A = [2,0,1]</td><td>True</td></tr></tbody></table><p>Validation <em>is</em> a computation, but hopefully it&rsquo;s easier to perform the
+validation computation than the computation itself.</p><p>In a Bitcoin transaction we are always validating that the transaction was
+approved. A transaction in Bitcoin makes a clear precondition (the coins spent)
+and postcondition (the coins sent). Even in cases where we have to do a lot of
+computation to check the authorization, we still know the proposed outcome.</p><p>Compare to an Ethereum transaction: We pass some input to a function, and the
+EVM verifies that our input was authorized (e.g., send 1 Eth to contract X with
+message &ldquo;hello&rdquo;). Then, the side effects of that action are computed dynamically
+by the EVM. For certain contracts, we might be able to predict what the side
+effect will be (e.g., a 1:1 token exchange like Eth to Wrapped Eth), but for
+other contracts (e.g., a floating exchange rate for Eth to Wrapped BTC) we will
+get an outcome that can&rsquo;t be fully predicted. It is possible for contracts to
+choose to engineer themselves in a way to create more predictability, however in
+Ethereum this does not result in an Invalid transaction, it results in a valid
+transaction (that e.g. still costs gas) that has a result which is not taken.
+For example, a transaction which says &ldquo;Buy 1 WBTC for 15 ETH&rdquo; might fail to
+acquire WBTC since the price is now 16ETH, but the transaction would be valid
+that you tried to make the trade and failed. This is because Ethereum&rsquo;s base
+layer is computational in nature with little validation: validation must be
+built on top.</p><h3 id=sidenote-malleability>Sidenote: Malleability</h3><p>For certain Bitcoin &ldquo;covenant&rdquo; transactions the validation/computation line can
+be thin. Transactions must always be transactions in a block, but it&rsquo;s possible
+that in the future miners could receive &ldquo;details&rdquo; of a transaction and be
+responsible for generating the appropriate transaction themselves. For example,
+Blockstream released details on a <a href=https://medium.com/blockstream/simplicity-taproot-and-universal-sighashes-18be8647b3bd>noninteractive
+feebumping</a>
+transaction, whereby a miner can dynamically compute a transaction that pays
+them more fees the longer it takes to confirm.</p><p>In the case of malleability like this, it&rsquo;s not as simple as saying &ldquo;don&rsquo;t do
+it&rdquo;, because miners have an incentive to extract the value if it is available.</p><h2 id=dynamic-state>Dynamic State</h2><p>Contracts can have different types of state. State is just a fancy term for
+information available to execution.</p><p>Global state is information that is observable from anywhere. An example of this
+in Bitcoin is the UTXO Set: any transaction could spend any coin, and can &ldquo;pull
+it into scope&rdquo; by naming it&rsquo;s Outpoint (whether or not the transaction is valid
+is another question). Another example of global state is the current block
+height, used for validating things like lock times. In Ethereum, there is a much
+expanded concept of Global state whereby contracts persist and allow read/write
+access from other contracts, and unlike Bitcoin&rsquo;s UTXO set, observing a piece of
+information doesn&rsquo;t destroy it like spending a coin does.</p><p>Local State is information observable only within your own context. For example,
+a contract might hold balances for 3 different people, but the current values of
+those split balances is not something queryable by outside parties. This also
+includes implicit state, such as &ldquo;the contract is currently pending an Action
+from Alice&rdquo; that are not explicitly coded.</p><p>Lastly, certain things are not State. An example of this is an authorizing
+signature, which is ephemeral data that is used in the transaction execution but
+does not have relevance for the continued execution of the contract and is not
+particularly observable (which signature we use shouldn&rsquo;t matter).</p><h2 id=general-vs-specific>General v.s. Specific</h2><p>A General contract primitive is something that can be used across many different
+types of contract. A Specific contract implements well defined logic. In Bitcoin
+and Ethereum, the focus is on General contract primitives that can be used many
+ways. In some other ecosystems (e.g. NXT, Stellar), contract primitives have
+much more specific functionality.</p><p>General/Specific ends up being more of a spectrum than a binary. Certain
+contract primitives might be very specific but find general use, similarly some
+general primitives might be more general than others.</p><p>For example, the Lightning Network on Bitcoin has pursued a path of using
+general purpose extensions to Bitcoin so as not to &ldquo;special case&rdquo; payment
+channels. But is that worth it? Might Payment Channels be cheaper, easier to
+use, etc if we just designed built-in channels from the get-go? Perhaps yes, but
+then it might be harder to embed other things or incorporate new innovations
+into Lightning if it had to fit a single mold.</p><p>This isn&rsquo;t an exhaustive list of topics by any means, but it should be a good
+primer for thinking about upgrade proposals that people discuss in Bitcoin.
+You&rsquo;ll find out more about that in&mldr; tomorrow&rsquo;s post!.</p><div class=footnotes role=doc-endnotes><hr><ol><li id=fn:1><p>An American option is the right to either purchase or compell a counterparty to buy an asset until a deadline.&#160;<a href=#fnref:1 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p></li></ol></div></div><div></div></div><hr><div class=main2><div></div><div id=disqus_thread></div><script type=application/javascript>window.disqus_config=function(){},function(){if(["localhost","127.0.0.1"].indexOf(window.location.hostname)!=-1){document.getElementById("disqus_thread").innerHTML="Disqus comments not available by default when the website is previewed locally.";return}var t=document,e=t.createElement("script");e.async=!0,e.src="//judica-org.disqus.com/embed.js",e.setAttribute("data-timestamp",+new Date),(t.head||t.body).appendChild(e)}()</script><noscript>Please enable JavaScript to view the <a href=https://disqus.com/?ref_noscript>comments powered by Disqus.</a></noscript><a href=https://disqus.com class=dsq-brlink>comments powered by <span class=logo-disqus>Disqus</span></a><div></div></div><hr><footer style=text-align:center;bottom:0;padding-bottom:10px;width:100%>&copy; Judica, Inc 2022 | contact@judica.org | <a class=darkmode-switch>dark/light theme</a></footer></body></html>

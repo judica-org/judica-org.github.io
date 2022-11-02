@@ -1,0 +1,329 @@
+<!doctype html><html><head><meta name=viewport content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@200;500&display=swap" rel=stylesheet><link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600&display=swap" rel=stylesheet><link rel=stylesheet type=text/css href=/css/style.css><script>const storage=window.localStorage,get_darkmode=()=>{const e=storage.getItem("darkmode");return e==null||e==="true"},set_darkmode=()=>{get_darkmode()?(document.body.classList.remove("lightmode"),document.body.classList.add("darkmode")):(document.body.classList.remove("darkmode"),document.body.classList.add("lightmode"))};function applyBackgroundTheme(e){var n="body { background: "+e+"; }",s=document.head||document.getElementsByTagName("head")[0],t=document.createElement("style");return s.appendChild(t),t.type="text/css",t.styleSheet?t.styleSheet.cssText=n:t.appendChild(document.createTextNode(n)),t}const style=applyBackgroundTheme(get_darkmode()?"black":"white");document.addEventListener("DOMContentLoaded",()=>{set_darkmode(),style.parentElement.removeChild(style);const e=document.getElementsByClassName("darkmode-switch")[0];e.onclick=e=>{storage.setItem("darkmode",!get_darkmode()),get_darkmode(),set_darkmode()}})</script><script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-175497336-1","auto"),ga("send","pageview"))</script><script async src=https://www.google-analytics.com/analytics.js></script><meta property="og:title" content="NFTs Part Two: Auctions, Royalties, Mints, Generative, Game Items"><meta property="og:description" content="This post is syndicated from rubin.io.
+Welcome to day 22 of my Bitcoin Advent Calendar. You can see an index of all the posts here or subscribe at judica.org/join to get new posts in your inbox
+I promised you a few things a few days ago:
+We&rsquo;d see how to do royalties in a sale We&rsquo;d see how to do a Dutch auction We&rsquo;d see how to do batch mints We&rsquo;d see how to make generative art and one thing I didn&rsquo;t"><meta property="og:type" content="article"><meta property="og:url" content="https://judica.org/blog/advent-22/"><meta property="og:image" content="https://judica.org/img/og-img.png"><meta property="article:section" content="blog"><meta property="article:published_time" content="2021-12-19T00:00:00+00:00"><meta property="article:modified_time" content="2021-12-19T00:00:00+00:00"><meta property="og:site_name" content="judica.org -- restore the balance"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://judica.org/img/og-img.png"><meta name=twitter:title content="NFTs Part Two: Auctions, Royalties, Mints, Generative, Game Items"><meta name=twitter:description content="This post is syndicated from rubin.io.
+Welcome to day 22 of my Bitcoin Advent Calendar. You can see an index of all the posts here or subscribe at judica.org/join to get new posts in your inbox
+I promised you a few things a few days ago:
+We&rsquo;d see how to do royalties in a sale We&rsquo;d see how to do a Dutch auction We&rsquo;d see how to do batch mints We&rsquo;d see how to make generative art and one thing I didn&rsquo;t"></head><body><header class=nav><ul><li class=float-left><a href=/>judica.</a></li></ul><ul><li><a href=/about/>about.</a></li><li><a href=/software/>software.</a></li><li><a href=/blog/>blog.</a></li><li><a href=/join/>join.</a></li></ul></header><div class=main2><h1>NFTs Part Two: Auctions, Royalties, Mints, Generative, Game Items</h1><div><h2 class=nobottom>Day 22: Rubin's Bitcoin Advent Calendar</h2></div><small>on December 19, 2021</small><hr></div><div class=main2><div></div><div class=blogtext-inner><p><em>This post is syndicated from <a href=https://rubin.io/advent21>rubin.io</a>.</em></p><p><em>Welcome to day 22 of my Bitcoin Advent Calendar. You can see an index of all
+the posts <a href=/advent21>here</a> or subscribe at
+<a href=https://judica.org/join>judica.org/join</a> to get new posts in your inbox</em></p><p>I promised you a few things a few days ago:</p><ol><li>We&rsquo;d see how to do royalties in a sale</li><li>We&rsquo;d see how to do a Dutch auction</li><li>We&rsquo;d see how to do batch mints</li><li>We&rsquo;d see how to make generative art</li></ol><p>and one thing I didn&rsquo;t</p><ol start=5><li>In game items</li></ol><p>Let&rsquo;d get it done, son.</p><h2 id=royalties-and-dutch-auction>Royalties and Dutch Auction:</h2><p>A Dutch Auction is a theoretically beautiful form on an auction that is great for sellers.</p><p>The way it works is that if you want to sell a piece, you start selling it at
+price that you think no one could buy it for, and then slowly lower the price.</p><p>For example, suppose I have a car that the blue book value is $10,000 for. I
+start by offerring it at $15,000k, and then drop it by $10 per second until
+someone buys it. After about 10 minutes, the price will be $9,000, so a pretty
+good deal. But before that, the price will be all prices between $9k and $15k.
+So if a buyer thinks the car is actually a pretty good deal at $11k, and a great
+deal at $10.5k, they would want to bid (assuming lots of bidders) at $11k lest
+someone else buy it first.</p><p>Thus Dutch Auctions are very favorable to sellers, so natually, sellers like them.</p><p>Let&rsquo;s patch our <a href=/bitcoin/2021/12/16/advent-19/>earlier NFT System</a> to support
+Dutch Auctions! While we&rsquo;re at it let&rsquo;s toss in royalties too!</p><p>First, we need to clean up a couple things about our NFT Definitions. These are
+sorta trivial changes &ndash; really if I had planned better I&rsquo;d have included them
+from the get-go.</p><p>To our Minting trait we&rsquo;re going to add a few fields:</p><ol><li>A key for the creator</li><li>A &lsquo;royalty&rsquo; percent (0 to disable)</li></ol><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#e6db74>/// # Trait for a Mintable NFT
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#75715e>#[derive(Serialize, JsonSchema, Deserialize, Clone)]</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>pub</span> <span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>Mint_NFT_Trait_Version_0_1_0</span> {
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # Creator Key
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#66d9ef>pub</span> creator: <span style=color:#a6e22e>bitcoin</span>::PublicKey,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # Initial Owner
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// The key that will own this NFT
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#66d9ef>pub</span> owner: <span style=color:#a6e22e>bitcoin</span>::PublicKey,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # Locator
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// A piece of information that will instruct us where the NFT can be
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// downloaded -- e.g. an IPFs Hash
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#66d9ef>pub</span> locator: String,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # Minting Module
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// If a specific sub-module is to be used / known -- when in doubt, should
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// be None.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#66d9ef>pub</span> minting_module: Option<span style=color:#f92672>&lt;</span>SapioHostAPI<span style=color:#f92672>&lt;</span>Mint_NFT_Trait_Version_0_1_0<span style=color:#f92672>&gt;&gt;</span>,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// how much royalty, should be paid, as a percent
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#66d9ef>pub</span> royalty: <span style=color:#66d9ef>f64</span>,
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Next, we&rsquo;re going to add to our Sale trait a start time (e.g. blockheight).</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#e6db74>/// # NFT Sale Trait
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>/// A trait for coordinating a sale of an NFT
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#75715e>#[derive(Serialize, JsonSchema, Deserialize, Clone)]</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>pub</span> <span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>NFT_Sale_Trait_Version_0_1_0</span> {
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # Owner
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// The key that will own this NFT
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#66d9ef>pub</span> sell_to: <span style=color:#a6e22e>bitcoin</span>::PublicKey,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # Price
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// The price in Sats
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#66d9ef>pub</span> price: <span style=color:#a6e22e>AmountU64</span>,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # NFT
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// The NFT&#39;s Current Info
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#66d9ef>pub</span> data: <span style=color:#a6e22e>Mint_NFT_Trait_Version_0_1_0</span>,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # Sale Time
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// When the sale should be possible after
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#66d9ef>pub</span> sale_time: <span style=color:#a6e22e>AbsHeight</span>,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # Extra Information
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// Extra information required by this contract, if any.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// Must be Optional for consumer or typechecking will fail.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// Usually None unless you know better!
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#66d9ef>pub</span> extra: Option<span style=color:#f92672>&lt;</span>Value<span style=color:#f92672>&gt;</span>,
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>These fields could have gone into the extra data, but since it was probably a
+mistake to not have them from the get-go we&rsquo;ll allow it this time without increasing
+our version numbers (nothings been released yet!).</p><p>Next, we&rsquo;ll go ahead and create a new plugin module for our Dutch auction.</p><p>First we define some data that we have to have for a Dutch auction:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#e6db74>/// # Dutch Auction Data
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>/// Additional information required to initiate a dutch auction
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#75715e>#[derive(JsonSchema, Serialize, Deserialize)]</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>DutchAuctionData</span> {
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// How often should we decreate the price, in blocks
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    period: <span style=color:#66d9ef>u16</span>,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// what price should we start at?
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    start_price: <span style=color:#a6e22e>AmountU64</span>,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// what price should we stop at?
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    min_price: <span style=color:#a6e22e>AmountU64</span>,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// how many price decreases should we do?
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    updates: <span style=color:#66d9ef>u64</span>,
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Then we define how to translate that into a schedule of sale prices:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#66d9ef>impl</span> DutchAuctionData {
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # Create a Schedule for Sale
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// computes, based on a start time, the list of heights and prices
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>create_schedule</span>(
+</span></span><span style=display:flex><span>        <span style=color:#f92672>&amp;</span>self,
+</span></span><span style=display:flex><span>        start_height: <span style=color:#a6e22e>AbsHeight</span>,
+</span></span><span style=display:flex><span>    ) -&gt; Result<span style=color:#f92672>&lt;</span>Vec<span style=color:#f92672>&lt;</span>(AbsHeight, AmountU64)<span style=color:#f92672>&gt;</span>, CompilationError<span style=color:#f92672>&gt;</span> {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> <span style=color:#66d9ef>mut</span> start: <span style=color:#a6e22e>Amount</span> <span style=color:#f92672>=</span> self.start_price.into();
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> stop: <span style=color:#a6e22e>Amount</span> <span style=color:#f92672>=</span> self.min_price.into();
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> inc <span style=color:#f92672>=</span> (start <span style=color:#f92672>-</span> stop) <span style=color:#f92672>/</span> self.updates;
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> <span style=color:#66d9ef>mut</span> h: <span style=color:#66d9ef>u32</span> <span style=color:#f92672>=</span> start_height.get();
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> <span style=color:#66d9ef>mut</span> sched <span style=color:#f92672>=</span> vec![(start_height, self.start_price)];
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>for</span> _ <span style=color:#66d9ef>in</span> <span style=color:#ae81ff>1</span><span style=color:#f92672>..</span>self.updates {
+</span></span><span style=display:flex><span>            h <span style=color:#f92672>+=</span> self.period <span style=color:#66d9ef>as</span> <span style=color:#66d9ef>u32</span>;
+</span></span><span style=display:flex><span>            start <span style=color:#f92672>-=</span> inc;
+</span></span><span style=display:flex><span>            sched.push((AbsHeight::try_from(h)<span style=color:#f92672>?</span>, start.into()));
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>        Ok(sched)
+</span></span><span style=display:flex><span>    }
+</span></span></code></pre></div><p>Finally, we want to be able to derive this data with some default choices
+in case a user wants to not select specific parameters. Hope you liked what we pick!</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span>    <span style=color:#e6db74>/// derives a default auction where the price drops every 6
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// blocks (1 time per hour), from 10x to 1x the sale price specified,
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// spanning a month of blocks.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>derive_default</span>(main: <span style=color:#66d9ef>&amp;</span><span style=color:#a6e22e>NFT_Sale_Trait_Version_0_1_0</span>) -&gt; <span style=color:#a6e22e>Self</span> {
+</span></span><span style=display:flex><span>        DutchAuctionData {
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// every 6 blocks
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            period: <span style=color:#ae81ff>6</span>,
+</span></span><span style=display:flex><span>            start_price: (Amount::from(main.price) <span style=color:#f92672>*</span> <span style=color:#ae81ff>10</span><span style=color:#66d9ef>u64</span>).into(),
+</span></span><span style=display:flex><span>            min_price: <span style=color:#a6e22e>main</span>.price,
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// 144 blocks/day
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            updates: <span style=color:#ae81ff>144</span> <span style=color:#f92672>*</span> <span style=color:#ae81ff>30</span> <span style=color:#f92672>/</span> <span style=color:#ae81ff>6</span>,
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>With the parameters for a Dutch Auction out of the way, now we can implement the
+contract logic. First, the boring stuff:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#75715e>#[derive(JsonSchema, Serialize, Deserialize)]</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>pub</span> <span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>NFTDutchAuction</span> {
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// This data can be specified directly, or default derived from main
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    extra: <span style=color:#a6e22e>DutchAuctionData</span>,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// The main trait data
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    main: <span style=color:#a6e22e>NFT_Sale_Trait_Version_0_1_0</span>,
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#e6db74>/// # Versions Trait Wrapper
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#75715e>#[derive(Serialize, Deserialize, JsonSchema)]</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>enum</span> <span style=color:#a6e22e>Versions</span> {
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// Use the Actual Trait API
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    NFT_Sale_Trait_Version_0_1_0(NFT_Sale_Trait_Version_0_1_0),
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// Directly Specify the Data
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    Exact(DutchAuctionData, NFT_Sale_Trait_Version_0_1_0),
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span><span style=color:#66d9ef>impl</span> Contract <span style=color:#66d9ef>for</span> NFTDutchAuction {
+</span></span><span style=display:flex><span>    declare<span style=color:#f92672>!</span> {updatable<span style=color:#f92672>&lt;</span>()<span style=color:#f92672>&gt;</span>, Self::transfer}
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span><span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>default_coerce</span><span style=color:#f92672>&lt;</span>T<span style=color:#f92672>&gt;</span>(_: <span style=color:#a6e22e>T</span>) -&gt; Result<span style=color:#f92672>&lt;</span>(), CompilationError<span style=color:#f92672>&gt;</span> {
+</span></span><span style=display:flex><span>    Ok(())
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>impl</span> TryFrom<span style=color:#f92672>&lt;</span>Versions<span style=color:#f92672>&gt;</span> <span style=color:#66d9ef>for</span> NFTDutchAuction {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>type</span> <span style=color:#a6e22e>Error</span> <span style=color:#f92672>=</span> CompilationError;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>try_from</span>(v: <span style=color:#a6e22e>Versions</span>) -&gt; Result<span style=color:#f92672>&lt;</span>NFTDutchAuction, Self::Error<span style=color:#f92672>&gt;</span> {
+</span></span><span style=display:flex><span>        Ok(<span style=color:#66d9ef>match</span> v {
+</span></span><span style=display:flex><span>            Versions::NFT_Sale_Trait_Version_0_1_0(main) <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>                <span style=color:#75715e>// attempt to get the data from the JSON:
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>                <span style=color:#75715e>// - if extra data, must deserialize
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>                <span style=color:#75715e>//   - return any errors?
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>                <span style=color:#75715e>// - if no extra data, derive.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>                <span style=color:#66d9ef>let</span> extra <span style=color:#f92672>=</span> main
+</span></span><span style=display:flex><span>                    .extra
+</span></span><span style=display:flex><span>                    .clone()
+</span></span><span style=display:flex><span>                    .map(serde_json::from_value)
+</span></span><span style=display:flex><span>                    .transpose()
+</span></span><span style=display:flex><span>                    .map_err(<span style=color:#f92672>|</span>_<span style=color:#f92672>|</span> CompilationError::TerminateCompilation)<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>                    .unwrap_or_else(<span style=color:#f92672>||</span> DutchAuctionData::derive_default(<span style=color:#f92672>&amp;</span>main));
+</span></span><span style=display:flex><span>                NFTDutchAuction { main, extra }
+</span></span><span style=display:flex><span>            }
+</span></span><span style=display:flex><span>            Versions::Exact(extra, main) <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>                <span style=color:#66d9ef>if</span> extra.start_price <span style=color:#f92672>&lt;</span> extra.min_price <span style=color:#f92672>||</span> extra.period <span style=color:#f92672>==</span> <span style=color:#ae81ff>0</span> <span style=color:#f92672>||</span> extra.updates <span style=color:#f92672>==</span> <span style=color:#ae81ff>0</span>{
+</span></span><span style=display:flex><span>                    <span style=color:#75715e>// Nonsense
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>                    <span style=color:#66d9ef>return</span> Err(CompilationError::TerminateCompilation);
+</span></span><span style=display:flex><span>                }
+</span></span><span style=display:flex><span>                NFTDutchAuction { main, extra },
+</span></span><span style=display:flex><span>            }
+</span></span><span style=display:flex><span>        })
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>REGISTER<span style=color:#f92672>!</span>[[NFTDutchAuction, Versions], <span style=color:#e6db74>&#34;logo.png&#34;</span>];
+</span></span></code></pre></div><p>Now, the fun part! Implementing it. This is basically the same as our NFTs from
+the other day, but we just do sales along the schedule we generated:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#66d9ef>impl</span> NFTDutchAuction {
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # signed
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// sales must be signed by the current owner
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#75715e>#[guard]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>signed</span>(self, ctx: <span style=color:#a6e22e>Context</span>) {
+</span></span><span style=display:flex><span>        Clause::Key(self.main.data.owner.clone())
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # transfer
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// transfer exchanges the NFT for cold hard Bitcoinz
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#75715e>#[continuation(guarded_by = </span><span style=color:#e6db74>&#34;[Self::signed]&#34;</span><span style=color:#75715e>, web_api, coerce_args = </span><span style=color:#e6db74>&#34;default_coerce&#34;</span><span style=color:#75715e>)]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>transfer</span>(self, base_ctx: <span style=color:#a6e22e>Context</span>, u: ()) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> <span style=color:#66d9ef>mut</span> ret <span style=color:#f92672>=</span> vec![];
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> schedule <span style=color:#f92672>=</span> self.extra.create_schedule(self.main.sale_time)<span style=color:#f92672>?</span>;
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> <span style=color:#66d9ef>mut</span> base_ctx <span style=color:#f92672>=</span> base_ctx;
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// the main difference is we iterate over the schedule here
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#66d9ef>for</span> (nth, sched) <span style=color:#66d9ef>in</span> schedule.iter().enumerate() {
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>let</span> ctx <span style=color:#f92672>=</span> base_ctx.derive_num(nth <span style=color:#66d9ef>as</span> <span style=color:#66d9ef>u64</span>)<span style=color:#f92672>?</span>;
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>let</span> amt <span style=color:#f92672>=</span> ctx.funds();
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// first, let&#39;s get the module that should be used to &#39;re-mint&#39; this NFT
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#75715e>// to the new owner
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#66d9ef>let</span> key <span style=color:#f92672>=</span> self
+</span></span><span style=display:flex><span>                .main
+</span></span><span style=display:flex><span>                .data
+</span></span><span style=display:flex><span>                .minting_module
+</span></span><span style=display:flex><span>                .clone()
+</span></span><span style=display:flex><span>                .ok_or(CompilationError::TerminateCompilation)<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>                .key;
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// let&#39;s make a copy of the old nft metadata..
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#66d9ef>let</span> <span style=color:#66d9ef>mut</span> mint_data <span style=color:#f92672>=</span> self.main.data.clone();
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// and change the owner to the buyer
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            mint_data.owner <span style=color:#f92672>=</span> self.main.sell_to;
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// let&#39;s now compile a new &#39;mint&#39; of the NFT
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#66d9ef>let</span> new_nft_contract <span style=color:#f92672>=</span> Ok(CreateArgs {
+</span></span><span style=display:flex><span>                context: <span style=color:#a6e22e>ContextualArguments</span> {
+</span></span><span style=display:flex><span>                    amount: <span style=color:#a6e22e>ctx</span>.funds(),
+</span></span><span style=display:flex><span>                    network: <span style=color:#a6e22e>ctx</span>.network,
+</span></span><span style=display:flex><span>                    effects: <span style=color:#a6e22e>unsafe</span> { ctx.get_effects_internal() }.as_ref().clone(),
+</span></span><span style=display:flex><span>                },
+</span></span><span style=display:flex><span>                arguments: <span style=color:#a6e22e>mint_impl</span>::Versions::Mint_NFT_Trait_Version_0_1_0(mint_data),
+</span></span><span style=display:flex><span>            })
+</span></span><span style=display:flex><span>            .and_then(serde_json::to_value)
+</span></span><span style=display:flex><span>            .map(<span style=color:#f92672>|</span>args<span style=color:#f92672>|</span> create_contract_by_key(<span style=color:#f92672>&amp;</span>key, args, Amount::from_sat(<span style=color:#ae81ff>0</span>)))
+</span></span><span style=display:flex><span>            .map_err(<span style=color:#f92672>|</span>_<span style=color:#f92672>|</span> CompilationError::TerminateCompilation)<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>            .ok_or(CompilationError::TerminateCompilation)<span style=color:#f92672>?</span>;
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// Now for the magic:
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#75715e>// This is a transaction that creates at output 0 the new nft for the
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#75715e>// person, and must add another input that pays sufficiently to pay the
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#75715e>// prior owner an amount.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// todo: we also could use cut-through here once implemented
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#75715e>// todo: change seem problematic here? with a bit of work, we could handle it
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#75715e>// cleanly if the buyer identifys an output they are spending before requesting
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#75715e>// a purchase.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#66d9ef>let</span> price: <span style=color:#a6e22e>Amount</span> <span style=color:#f92672>=</span> sched.<span style=color:#ae81ff>1.</span>into();
+</span></span><span style=display:flex><span>            ret.push(Ok(ctx
+</span></span><span style=display:flex><span>                .template()
+</span></span><span style=display:flex><span>                .add_output(amt, <span style=color:#f92672>&amp;</span>new_nft_contract, None)<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>                .add_amount(price)
+</span></span><span style=display:flex><span>                .add_sequence()
+</span></span><span style=display:flex><span>                <span style=color:#75715e>// Pay Sale to Seller
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>                .add_output(
+</span></span><span style=display:flex><span>                    Amount::from_btc(price.as_btc() <span style=color:#f92672>*</span> (<span style=color:#ae81ff>1.0</span> <span style=color:#f92672>-</span> self.main.data.royalty))<span style=color:#f92672>?</span>,
+</span></span><span style=display:flex><span>                    <span style=color:#f92672>&amp;</span>self.main.data.owner,
+</span></span><span style=display:flex><span>                    None,
+</span></span><span style=display:flex><span>                )<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>                <span style=color:#75715e>// Pay Royalty to Creator
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>                .add_output(
+</span></span><span style=display:flex><span>                    Amount::from_btc(price.as_btc() <span style=color:#66d9ef>as</span> <span style=color:#66d9ef>f64</span> <span style=color:#f92672>*</span> self.main.data.royalty)<span style=color:#f92672>?</span>,
+</span></span><span style=display:flex><span>                    <span style=color:#f92672>&amp;</span>self.main.data.creator,
+</span></span><span style=display:flex><span>                    None,
+</span></span><span style=display:flex><span>                )<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>                <span style=color:#75715e>// only active at the set time
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>                .set_lock_time(sched.<span style=color:#ae81ff>0.</span>into())<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>                .into()))
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>        Ok(Box::new(ret.into_iter()))
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>What&rsquo;s interesting is that this contract is technically just a helper on-top of
+our earlier Sale definition. Granted, we really ought to have had the royalty
+and timelock before, but we could emulate a dutch auction by just calling the
+regular Sale contract n times with different locktimes and prices. So we didn&rsquo;t
+really have to implement a standalone system for this. However, for more
+advanced or bespoke things (like sales that also mint an NFT comemorating the
+Sale itself) we&rsquo;d want a bespoke module. Plus, the module makes it simple to
+ensure that the type of auction and rate of change in price is well understood.</p><p>If desired, the <code>DutchAuctionData</code> could also have different sorts of logic for
+different price curves (e.g. Geometric, Linear, S-Curve, Custom).</p><p>Fun!</p><h3 id=abstract-client-verifier-auction>Abstract Client Verifier Auction</h3><p>After an auction closes, in order for them to be able to prove to a future party
+it was made correctly, they would need to run the identical Sapio code and
+generate all possible execution price transactions.</p><p>This is not just computationally annoying, it&rsquo;s also not very &ldquo;lightweight&rdquo;.
+And it can lead to bugs like some bozo writing a contract which does not
+do what it says it does (and pays no royalties).</p><p>An Abstract Client Verifier Auction could be set up as a postcondition on the
+transactions generated by a Sale that they all be able to be re-generated by a
+specialized template builder that just checks basic properties like &ldquo;was a
+royalty paid&rdquo;.</p><p>We won&rsquo;t go into detail on this here, but you could imagine patching <code>Sell</code> as follows:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#e6db74>/// # Sell Instructions
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#75715e>#[derive(Serialize, Deserialize, JsonSchema)]</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>pub</span> <span style=color:#66d9ef>enum</span> <span style=color:#a6e22e>Sell</span> {
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # Hold
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// Don&#39;t transfer this NFT
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    Hold,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # MakeSale
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// Transfer this NFT
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    MakeSale {
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>/// # Which Sale Contract to use?
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>        <span style=color:#e6db74>/// Specify a hash/name for a contract to generate the sale with.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>        which_sale: <span style=color:#a6e22e>SapioHostAPI</span><span style=color:#f92672>&lt;</span>NFT_Sale_Trait_Version_0_1_0<span style=color:#f92672>&gt;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>/// # The information needed to create the sale
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>        sale_info: <span style=color:#a6e22e>NFT_Sale_Trait_Version_0_1_0</span>,
+</span></span><span style=display:flex><span>    },
+</span></span><span style=display:flex><span>    VerifySale {
+</span></span><span style=display:flex><span>        txn: <span style=color:#a6e22e>Bitcoin</span>::Transaction 
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>and the NFT can verify that the Sale transaction was valid according to it&rsquo;s
+choice of rule (or maybe even an artist selected Verifier module).</p><p>This might not be a huge deal / worth doing given that the Cross-Module-Call
+results for client-side validation are cacheable.</p><h2 id=batch-mints>Batch Mints</h2><p>Batch mints are important because they allow an artist to fairly and easily
+distribute their art. It&rsquo;s really important for batch mints that the artist be
+able to disseminate a single Output + Contract info and sign it per collection.
+Even if the artist/their server has to be online to sell the work, users
+should be able to unambiguously see who got which art.</p><p>Conceptually speaking &ndash; no code for now &ndash; Batch Mints can be done several
+ways. It really depends what the artist wants:</p><h3 id=single-transaction>Single Transaction</h3><p>Do a single transaction whereby every minted NFT has an output.</p><ul><li>Simple!</li><li>Big all at once cost bourne by artist</li><li>No enforced &ldquo;minting order&rdquo;</li></ul><h3 id=annuity-of-nfts>Annuity of NFTs</h3><p>Embed the mint contract into an Annuity where the successful auction of the ith NFT starts
+the auction of the ith+1.</p><ul><li>Cheaper for the artist</li><li>Requires the server be online</li><li>Serial issuance piece i+1 can&rsquo;t be bought till i is (buyers may clear i to get to i+1)</li></ul><h3 id=congestion-control-tree-of-nfts>Congestion Control Tree of NFTs</h3><ul><li>Cheaper for the artist</li><li>Auctions can proceed independently for every piece</li><li>Server is required.</li></ul><h2 id=generative-art>Generative Art:</h2><p>This concept is actually&mldr; pretty simple!</p><p>If you want to automatic generative art, essentially all you need to do is give
+your NFT Contract (or your NFT Minting contract) some piece of state and a
+function to convert the metadata description of the NFT + a pointer to the
+transaction&rsquo;s location and then you can generate a random seed for generating
+that piece via your generate_art function.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>MyNFT</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>impl</span> MyNFT {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>generate_art</span>(<span style=color:#f92672>&amp;</span>self, b: <span style=color:#a6e22e>BlockHash</span>, offset: <span style=color:#66d9ef>u64</span>) -&gt; String {
+</span></span><span style=display:flex><span>        <span style=color:#75715e>/*
+</span></span></span><span style=display:flex><span><span style=color:#75715e>            Make your artz here
+</span></span></span><span style=display:flex><span><span style=color:#75715e>        */</span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>This can be fun for things like creating the entropy for input to e.g. a machine
+learning model.</p><h2 id=bonus-updatable-nfts>Bonus: Updatable NFTs</h2><p>Imagine you have a rare sword NFT for a videogame.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>Sword</span> {
+</span></span><span style=display:flex><span>    sharpness: <span style=color:#66d9ef>u64</span>,
+</span></span><span style=display:flex><span>    kills: <span style=color:#66d9ef>u64</span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Every 10 kills you -1 sharpness, and every time you sharpen it you get +100 sharpness.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#66d9ef>impl</span> Sword {
+</span></span><span style=display:flex><span>    <span style=color:#75715e>#[continuation = </span><span style=color:#e6db74>&#34;[Self::signed]&#34;</span><span style=color:#75715e>]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>sharpen</span>(self, ctx: <span style=color:#a6e22e>Context</span>, times: <span style=color:#66d9ef>u64</span>) {
+</span></span><span style=display:flex><span>        <span style=color:#75715e>/*
+</span></span></span><span style=display:flex><span><span style=color:#75715e>            Pay 1000 sats to the game dev  per time sharpened
+</span></span></span><span style=display:flex><span><span style=color:#75715e>        */</span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    <span style=color:#75715e>#[continuation = </span><span style=color:#e6db74>&#34;[Self::signed]&#34;</span><span style=color:#75715e>]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>register_kills</span>(self, ctx: <span style=color:#a6e22e>Context</span>, headcount: <span style=color:#66d9ef>u64</span>) {
+</span></span><span style=display:flex><span>        <span style=color:#75715e>/*
+</span></span></span><span style=display:flex><span><span style=color:#75715e>            update the metadata with a commitment to v
+</span></span></span><span style=display:flex><span><span style=color:#75715e>        */</span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>These state transitions would be verified by anyone playing the game with you, using Bitcoin as the Database.</p><h4 id=bbbbbuttt-on-chain-load>bbbbbuttt on-chain load</h4><p>Not to sweat &ndash; simply build in to the continuation logic the ability to load in
+an attestation chain (<a href=/bitcoin/2021/12/17/advent-20/>remember those?</a>) of
+lightning invoices of you paying the game developer over LN.</p><p>The attestation chain means that cheating would be duly punishable by loss of
+bonds. You can also log things like &lsquo;kills&rsquo; by publishing your game record through
+the attestation chain with a signature from the other player you killed.</p><p>Any time you move or sell your NFT you can checkpoint into the metadata a copy
+of the attestation chain &ldquo;sealing&rdquo; those actions. One tweak we can make to the
+attestation chains is to require a regular &ldquo;heartbeat&rdquo; attestation from players
+as well as a freeze attestation. This helps ensure that players buying an NFT
+that they have all the latest state of the item loaded and other players can
+check that there&rsquo;s nothing missing.</p><p><em>galaxy brain: what if you bake into your NFT an attestation chain spec and the
+thing you lose for lying is the item itself? And then you can do a special
+HTLC-like contract whereby you have to prove you didn&rsquo;t cheat for 2 weeks before
+getting the payment from your counterparty, else they get a refund.</em></p><p>Overall I hope this post has opened your mind up wildly about the possibilities with Bitcoin NFTs&mldr;</p><p>I apologize I didn&rsquo;t have more code ready and the post is late, but writing these posts is hard and
+I&rsquo;ve been focusing on the end of the series too :)</p></div><div></div></div><hr><div class=main2><div></div><div id=disqus_thread></div><script type=application/javascript>window.disqus_config=function(){},function(){if(["localhost","127.0.0.1"].indexOf(window.location.hostname)!=-1){document.getElementById("disqus_thread").innerHTML="Disqus comments not available by default when the website is previewed locally.";return}var t=document,e=t.createElement("script");e.async=!0,e.src="//judica-org.disqus.com/embed.js",e.setAttribute("data-timestamp",+new Date),(t.head||t.body).appendChild(e)}()</script><noscript>Please enable JavaScript to view the <a href=https://disqus.com/?ref_noscript>comments powered by Disqus.</a></noscript><a href=https://disqus.com class=dsq-brlink>comments powered by <span class=logo-disqus>Disqus</span></a><div></div></div><hr><footer style=text-align:center;bottom:0;padding-bottom:10px;width:100%>&copy; Judica, Inc 2022 | contact@judica.org | <a class=darkmode-switch>dark/light theme</a></footer></body></html>

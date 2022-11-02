@@ -1,0 +1,496 @@
+<!doctype html><html><head><meta name=viewport content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@200;500&display=swap" rel=stylesheet><link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600&display=swap" rel=stylesheet><link rel=stylesheet type=text/css href=/css/style.css><script>const storage=window.localStorage,get_darkmode=()=>{const e=storage.getItem("darkmode");return e==null||e==="true"},set_darkmode=()=>{get_darkmode()?(document.body.classList.remove("lightmode"),document.body.classList.add("darkmode")):(document.body.classList.remove("darkmode"),document.body.classList.add("lightmode"))};function applyBackgroundTheme(e){var n="body { background: "+e+"; }",s=document.head||document.getElementsByTagName("head")[0],t=document.createElement("style");return s.appendChild(t),t.type="text/css",t.styleSheet?t.styleSheet.cssText=n:t.appendChild(document.createTextNode(n)),t}const style=applyBackgroundTheme(get_darkmode()?"black":"white");document.addEventListener("DOMContentLoaded",()=>{set_darkmode(),style.parentElement.removeChild(style);const e=document.getElementsByClassName("darkmode-switch")[0];e.onclick=e=>{storage.setItem("darkmode",!get_darkmode()),get_darkmode(),set_darkmode()}})</script><script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-175497336-1","auto"),ga("send","pageview"))</script><script async src=https://www.google-analytics.com/analytics.js></script><meta property="og:title" content="Derivatives and Options For Bitcoin"><meta property="og:description" content="This post is syndicated from rubin.io.
+Welcome to day 23 of my Bitcoin Advent Calendar. You can see an index of all the posts here or subscribe at judica.org/join to get new posts in your inbox
+In today&rsquo;s post we&rsquo;re going to talk about derivatives and options. Hoooo Boy!
+Let&rsquo;s define an Option: An option is a contract that gives the holder the right to take an action to the detriment of a counterparty."><meta property="og:type" content="article"><meta property="og:url" content="https://judica.org/blog/advent-23/"><meta property="og:image" content="https://judica.org/img/og-img.png"><meta property="article:section" content="blog"><meta property="article:published_time" content="2021-12-20T00:00:00+00:00"><meta property="article:modified_time" content="2021-12-20T00:00:00+00:00"><meta property="og:site_name" content="judica.org -- restore the balance"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://judica.org/img/og-img.png"><meta name=twitter:title content="Derivatives and Options For Bitcoin"><meta name=twitter:description content="This post is syndicated from rubin.io.
+Welcome to day 23 of my Bitcoin Advent Calendar. You can see an index of all the posts here or subscribe at judica.org/join to get new posts in your inbox
+In today&rsquo;s post we&rsquo;re going to talk about derivatives and options. Hoooo Boy!
+Let&rsquo;s define an Option: An option is a contract that gives the holder the right to take an action to the detriment of a counterparty."></head><body><header class=nav><ul><li class=float-left><a href=/>judica.</a></li></ul><ul><li><a href=/about/>about.</a></li><li><a href=/software/>software.</a></li><li><a href=/blog/>blog.</a></li><li><a href=/join/>join.</a></li></ul></header><div class=main2><h1>Derivatives and Options For Bitcoin</h1><div><h2 class=nobottom>Day 23: Rubin's Bitcoin Advent Calendar</h2></div><small>on December 20, 2021</small><hr></div><div class=main2><div></div><div class=blogtext-inner><p><em>This post is syndicated from <a href=https://rubin.io/advent21>rubin.io</a>.</em></p><p><em>Welcome to day 23 of my Bitcoin Advent Calendar. You can see an index of all
+the posts <a href=/advent21>here</a> or subscribe at
+<a href=https://judica.org/join>judica.org/join</a> to get new posts in your inbox</em></p><p>In today&rsquo;s post we&rsquo;re going to talk about derivatives and options. Hoooo Boy!</p><h1 id=lets-define-an-option>Let&rsquo;s define an Option:</h1><p>An option is a contract that gives the holder the right to take an action to the
+detriment of a counterparty. Options can be created for payment.</p><p>For example, I might say to you, &ldquo;hey! I heard you&rsquo;re pretty good at coming up
+with memes. I&rsquo;d like to pay you $10 for the option to buy the next meme you make
+supporting OP_CTV for $100.&rdquo;<sup id=fnref:1><a href=#fn:1 class=footnote-ref role=doc-noteref>1</a></sup> You might say &ldquo;OK&rdquo;, and then make a meme.
+I think it&rsquo;s awful and I tell you to go away. I&rsquo;m out the $10, but not $110! I
+can&rsquo;t post the meme though or my friends will think I&rsquo;m lame for sharing Right
+Clicked Content. Or, if I think it&rsquo;s great, I can pay you the $100 and then
+I&rsquo;m off to the races.</p><p>There are a few different types of Option contract to think about:</p><h3 id=call-vs-put>Call v.s. Put.</h3><p>A Call option we get the right to buy something later for a fixed price (like a preorder).</p><p>A Put option we get the right to sell something later for a fixed price (like insurance).</p><p>Here&rsquo;s how to remember it:</p><p>Think about a nice puppy. You Call the puppy to you, and give him a cookie, head
+pat, and a &ldquo;good boy&rdquo;.</p><p>Think about a naughty puppy. You take away your chewed up sneaker, and Put her
+in her crate. &ldquo;Bad girl&rdquo;.</p><h3 id=american-v-european>American v. European</h3><p>American options you can settle at any time before it &ldquo;expires&rdquo;.</p><p>European options you must settle during a specific window after it expires, and
+before the window expires.</p><p>Think of European options like a restaurant reservation. You can no-show if you want,
+but you can show up between 7:00 and 7:15 and be seated.</p><p>American options are like a hold on jacket you think is beautiful at Saks Fifth
+Ave. You could come and buy it later today, tomorrow even! But wait a week and
+someone else will buy it because they put it back on the rack.</p><h3 id=collateralized-v-non-collateralized>Collateralized v. Non Collateralized</h3><p>A collateralized option means that the asset is actually there.</p><p>For example, think of Jerry Seinfeld renting a car. He reserved the car (buying
+a call option), but they didn&rsquo;t have a car when he showed up. They knew how to
+take the reservation, but not keep it.</p><p><img src=/public/img/bitcoin/advent/seinfeld.gif alt></p><p>This is an example of a &rsquo;naked short sale&rsquo; of the car rental, because it wasn&rsquo;t
+backed by an actual car to rent.</p><p>I don&rsquo;t have a proof, but we can&rsquo;t really build that kind of thing in Bitcoin.</p><p>However, imagine if Jery had to, in order to make his reservation, make a
+deposit for the entire value of the reservation. Sure, he could get a refund,
+but then he would have an opportunity cost of which options. Imagine you&rsquo;re
+taking your partner out for a suprise dinner that&rsquo;s going to cost $1000, but you
+don&rsquo;t know which one is going to be better so you reserve two restaurants and
+cancel one you decide not to go to for a 1% penalty. If you had to deposit, it would
+cost you $10 for the no-show, but you&rsquo;d have to put up $2000 to hold the reservations!
+If instead, you paid both restaurants $10 up front, then you would only need to lock
+up $20 instead. Much more efficient!</p><p>These, we will build.</p><h2 id=the-optimal-strategy-for-pricing-options>The Optimal Strategy for Pricing Options</h2><p>Just kidding. I have no idea. It&rsquo;s a complex subject, but some people are OK at
+it. This post is just plumbing.</p><h1 id=whats-derivative>What&rsquo;s Derivative?</h1><p>Your humor&mldr;. burnnnn. Just kidding.</p><p>A derivative is uhhh&mldr; well. It&rsquo;s anything that isn&rsquo;t the thing?</p><p>A derivative is a way of taking a real thing (e.g. a ton of corn, an NFT, an
+Apple Stock) and then either wrapping it or observing it in some other financial
+product.</p><p>In fact, Options themselves are Derivatives! Wacky, right? It&rsquo;s a thing (e.g. a
+car) and then the right to buy that car has a price and a value that is a
+function of what the car is, but a lot of other factors too. So the option isn&rsquo;t
+the car, but it&rsquo;s connected.</p><p>An option is a &ldquo;Real Derivative&rdquo; because it is actually connected to the car
+that is bought or sold. But we can also make &ldquo;Synthetic Derivatives&rdquo; that just
+measure some external quantity (somehow) and then give you some amount of value
+in return. For example, I could make a synthetic option that mints an NFT of a
+car instead of the actual car. Or I could make a synthetic derivative that
+measures the price of the car over the last month and gives me that value in
+Bitcoin at the end of the month.</p><p>For synthetics, they have to be over collateralized to cover all outcomes. E.g.,
+if we expect the car to be $50,000, but it might go to $100,000, we have to lock
+up $100,000. And if the price is $200,000, well our max profit is $100k then.</p><p>The Options we saw earlier were very binary in outcome. Synthetic derivatives
+like these can emulate <em>any</em> function, discontinuous or continuous. So you could
+have a contract, for example, that pays out on a sinusoidal wave based on the
+car price. Trippy.</p><h2 id=wheres-the-info-come-from>Wheres the info come from?</h2><p>Well, multiple places. We could get it from a third party (maybe using an
+attestation chain of some sort?), or there are certain ways it could be
+self-referential (like for <a href=https://powswap.com>powswap</a>).</p><h1 id=lets-see-some-code>Let&rsquo;s See Some Code</h1><h2 id=synthetic-derivatives>Synthetic Derivatives</h2><p>I love the children equally, so let&rsquo;s start with Derivatives now.</p><p>First let&rsquo;s define an Oracle Interface who provides us data. All the Oracle does
+is, given a Symbol (some request), gives us a Clause they will help us satisfy
+if the Symbol is true, and something else if it is false. Imagine a symbol that
+you can query an oracle for questions such as &ldquo;is a Bitcoin worth more than
+$50k&rdquo;.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#e6db74>/// Placeholder type for a standard way of looking up a stock symbol; can be defined more
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>/// concretely but should have a human readable string representation.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#66d9ef>pub</span> <span style=color:#66d9ef>type</span> <span style=color:#a6e22e>Symbol</span> <span style=color:#f92672>=</span> String;
+</span></span><span style=display:flex><span><span style=color:#e6db74>/// Oracle is a generic wrapper for any logic to get a pair of binary clauses.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>/// It can be based on hash preimage, federated signers, or key revealing.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>/// The Trait Object can be responsible for network requests/caching.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#66d9ef>pub</span> <span style=color:#66d9ef>trait</span> Oracle {
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// returns keys (price lo, price hi) for the given query
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>get_key_lt_gte</span>(<span style=color:#f92672>&amp;</span>self, t: <span style=color:#66d9ef>&amp;</span><span style=color:#a6e22e>Symbol</span>, price: <span style=color:#66d9ef>i64</span>) -&gt; (Clause, Clause);
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Now let&rsquo;s define a threshold oracle &ndash; we wouldn&rsquo;t want to trust just one
+lousy oracle, so let&rsquo;s trust M out of N of them!</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#e6db74>/// An Oracle can also be &#34;composed&#34; into a threshold scheme with other
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>/// oracles quite easily as below...
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>///
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>/// Under *certain* circumstances, composition could be optimized (e.g., schnorr keys)
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#66d9ef>pub</span> <span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>ThresholdOracle</span> {
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// the list of price oracles to consult
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#66d9ef>pub</span> oracles: Vec<span style=color:#f92672>&lt;</span>Box<span style=color:#f92672>&lt;</span><span style=color:#66d9ef>dyn</span> Oracle<span style=color:#f92672>&gt;&gt;</span>,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// how many oracles must agree
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#66d9ef>pub</span> thresh: <span style=color:#66d9ef>usize</span>,
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>impl</span> Oracle <span style=color:#66d9ef>for</span> ThresholdOracle {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>get_key_lt_gte</span>(<span style=color:#f92672>&amp;</span>self, t: <span style=color:#66d9ef>&amp;</span><span style=color:#a6e22e>Symbol</span>, price: <span style=color:#66d9ef>i64</span>) -&gt; (Clause, Clause) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> (l, r) <span style=color:#f92672>=</span> self
+</span></span><span style=display:flex><span>            .oracles
+</span></span><span style=display:flex><span>            .iter()
+</span></span><span style=display:flex><span>            .map(<span style=color:#f92672>|</span>o<span style=color:#f92672>|</span> o.get_key_lt_gte(t, price))
+</span></span><span style=display:flex><span>            .unzip();
+</span></span><span style=display:flex><span>        (
+</span></span><span style=display:flex><span>            Clause::Threshold(self.thresh, l),
+</span></span><span style=display:flex><span>            Clause::Threshold(self.thresh, r),
+</span></span><span style=display:flex><span>        )
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>The underlying clauses could really be anything&mldr; we can even (with some tweaks
+to Sapio I&rsquo;d LOVE to get working, but need to engineer) make this represent
+Discrete Log Oracles with 2 counterparties and an external Oracle. If that means
+something to you, good, otherwise you can ignore that remark.</p><p>Now, let&rsquo;s define a Generic framework for any outcome. The key insight we need
+to have is that we can ask the oracle a bunch of greater-than-or-less-than
+questions and build up a binary tree of transactions to settle at the right price.</p><p>To start, let&rsquo;s define some basic stuff for a &lsquo;GenericBet&rsquo;.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#e6db74>/// A GenericBet takes a sorted list of outcomes and a cached table of
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>/// oracle lookups and assembles a binary contract tree for the GenericBet
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#66d9ef>pub</span> <span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>GenericBet</span> {
+</span></span><span style=display:flex><span>    amount: <span style=color:#a6e22e>Amount</span>,
+</span></span><span style=display:flex><span>    outcomes: Vec<span style=color:#f92672>&lt;</span>(<span style=color:#66d9ef>i64</span>, Template)<span style=color:#f92672>&gt;</span>,
+</span></span><span style=display:flex><span>    oracle: <span style=color:#a6e22e>Rc</span><span style=color:#f92672>&lt;</span>HashMap<span style=color:#f92672>&lt;</span><span style=color:#66d9ef>i64</span>, (Clause, Clause)<span style=color:#f92672>&gt;&gt;</span>,
+</span></span><span style=display:flex><span>    cooperate: <span style=color:#a6e22e>Clause</span>,
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span><span style=color:#66d9ef>impl</span> Contract <span style=color:#66d9ef>for</span> GenericBet {
+</span></span><span style=display:flex><span>    declare<span style=color:#f92672>!</span>(then, Self::pay_gte, Self::pay_lt, Self::oracle_no_show);
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>But where do we get the list of price to outcome and price to oracle clause from?</p><p>We need an external data source, right?</p><p>We&rsquo;ll define some arguments and then a way of turning those arguments into a precise GenericBet.</p><p>We do it this way so that we can have GenericBetArguments accept
+a non-deterministic oracle server type, and then GenericBet itself could live in WASM and be fully deterministic.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#e6db74>/// To setup a GenericBet select an amount, a list of outcomes, and an oracle.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>/// The outcomes do not need to be sorted but must be unique.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#66d9ef>pub</span> <span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>GenericBetArguments</span><span style=color:#f92672>&lt;&#39;</span><span style=color:#a6e22e>a</span><span style=color:#f92672>&gt;</span> {
+</span></span><span style=display:flex><span>    amount: <span style=color:#a6e22e>Amount</span>,
+</span></span><span style=display:flex><span>    outcomes: Vec<span style=color:#f92672>&lt;</span>(<span style=color:#66d9ef>i64</span>, Template)<span style=color:#f92672>&gt;</span>,
+</span></span><span style=display:flex><span>    oracle: <span style=color:#66d9ef>&amp;</span><span style=color:#f92672>&#39;</span><span style=color:#a6e22e>a</span> <span style=color:#a6e22e>dyn</span> Oracle,
+</span></span><span style=display:flex><span>    cooperate: <span style=color:#a6e22e>Clause</span>,
+</span></span><span style=display:flex><span>    symbol: <span style=color:#a6e22e>Symbol</span>,
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span><span style=color:#e6db74>/// We can then convert the arguments into a specific contract instance
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#66d9ef>impl</span><span style=color:#f92672>&lt;&#39;</span><span style=color:#a6e22e>a</span><span style=color:#f92672>&gt;</span> From<span style=color:#f92672>&lt;</span>GenericBetArguments<span style=color:#f92672>&lt;&#39;</span><span style=color:#a6e22e>a</span><span style=color:#f92672>&gt;&gt;</span> <span style=color:#66d9ef>for</span> GenericBet {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>from</span>(<span style=color:#66d9ef>mut</span> v: <span style=color:#a6e22e>GenericBetArguments</span><span style=color:#f92672>&lt;&#39;</span><span style=color:#a6e22e>a</span><span style=color:#f92672>&gt;</span>) -&gt; <span style=color:#a6e22e>GenericBet</span> {
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// Make sure the outcomes are sorted for the binary tree
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        v.outcomes.sort_by_key(<span style=color:#f92672>|</span>(i, _)<span style=color:#f92672>|</span> <span style=color:#f92672>*</span>i);
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// Cache locally all calls to the oracle
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#66d9ef>let</span> <span style=color:#66d9ef>mut</span> h <span style=color:#f92672>=</span> HashMap::new();
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>for</span> (k, _) <span style=color:#66d9ef>in</span> v.outcomes.iter() {
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>let</span> r <span style=color:#f92672>=</span> v.oracle.get_key_lt_gte(<span style=color:#f92672>&amp;</span>v.symbol, <span style=color:#f92672>*</span>k);
+</span></span><span style=display:flex><span>            h.insert(<span style=color:#f92672>*</span>k, r);
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>        GenericBet {
+</span></span><span style=display:flex><span>            amount: <span style=color:#a6e22e>v</span>.amount,
+</span></span><span style=display:flex><span>            outcomes: <span style=color:#a6e22e>v</span>.outcomes,
+</span></span><span style=display:flex><span>            oracle: <span style=color:#a6e22e>Rc</span>::new(h),
+</span></span><span style=display:flex><span>            cooperate: <span style=color:#a6e22e>v</span>.cooperate,
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Now, we&rsquo;ll implement the logic behind a generic bet:</p><p>Basically, we do a binary search over all the outcomes to find the middle, and
+if the price is greater, we send to that one. Otherwise, the other one.
+By winnowing through all of these outcomes recrusively, we are able
+to resolve a single price:action pair and settle the contract.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#66d9ef>impl</span> GenericBet {
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// The oracle price kyes for this part of the tree is in the middle of the range.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>price</span>(<span style=color:#f92672>&amp;</span>self, b: <span style=color:#66d9ef>bool</span>) -&gt; <span style=color:#a6e22e>Clause</span> {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> v <span style=color:#f92672>=</span> <span style=color:#f92672>&amp;</span>self.oracle[<span style=color:#f92672>&amp;</span>self.outcomes[self.outcomes.len() <span style=color:#f92672>/</span> <span style=color:#ae81ff>2</span>].<span style=color:#ae81ff>0</span>];
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> b {
+</span></span><span style=display:flex><span>            v.<span style=color:#ae81ff>1.</span>clone()
+</span></span><span style=display:flex><span>        } <span style=color:#66d9ef>else</span> {
+</span></span><span style=display:flex><span>            v.<span style=color:#ae81ff>0.</span>clone()
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>recurse_over</span>(
+</span></span><span style=display:flex><span>        <span style=color:#f92672>&amp;</span>self,
+</span></span><span style=display:flex><span>        range: <span style=color:#a6e22e>std</span>::ops::Range<span style=color:#f92672>&lt;</span><span style=color:#66d9ef>usize</span><span style=color:#f92672>&gt;</span>,
+</span></span><span style=display:flex><span>        ctx: <span style=color:#a6e22e>sapio</span>::contract::Context,
+</span></span><span style=display:flex><span>    ) -&gt; Result<span style=color:#f92672>&lt;</span>Option<span style=color:#f92672>&lt;</span>Template<span style=color:#f92672>&gt;</span>, CompilationError<span style=color:#f92672>&gt;</span> {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>match</span> <span style=color:#f92672>&amp;</span>self.outcomes[range] {
+</span></span><span style=display:flex><span>            [] <span style=color:#f92672>=&gt;</span> <span style=color:#66d9ef>return</span> Ok(None),
+</span></span><span style=display:flex><span>            [(_, a)] <span style=color:#f92672>=&gt;</span> Ok(Some(a.clone())),
+</span></span><span style=display:flex><span>            sl <span style=color:#f92672>=&gt;</span> Ok(Some(
+</span></span><span style=display:flex><span>                ctx.template()
+</span></span><span style=display:flex><span>                    .add_output(
+</span></span><span style=display:flex><span>                        self.amount.into(),
+</span></span><span style=display:flex><span>                        <span style=color:#f92672>&amp;</span>GenericBet {
+</span></span><span style=display:flex><span>                            amount: <span style=color:#a6e22e>self</span>.amount,
+</span></span><span style=display:flex><span>                            outcomes: <span style=color:#a6e22e>sl</span>.into(),
+</span></span><span style=display:flex><span>                            oracle: <span style=color:#a6e22e>self</span>.oracle.clone(),
+</span></span><span style=display:flex><span>                            cooperate: <span style=color:#a6e22e>self</span>.cooperate.clone(),
+</span></span><span style=display:flex><span>                        },
+</span></span><span style=display:flex><span>                        None,
+</span></span><span style=display:flex><span>                    )<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>                    .into(),
+</span></span><span style=display:flex><span>            )),
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// Action when the price is greater than or equal to the price in the middle
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#75715e>#[guard]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>gte</span>(self, _ctx: <span style=color:#a6e22e>Context</span>) {
+</span></span><span style=display:flex><span>        self.price(<span style=color:#66d9ef>true</span>)
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    <span style=color:#75715e>#[then(guarded_by = </span><span style=color:#e6db74>&#34;[Self::gte]&#34;</span><span style=color:#75715e>)]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>pay_gte</span>(self, ctx: <span style=color:#a6e22e>sapio</span>::Context) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> <span style=color:#66d9ef>let</span> Some(tmpl) <span style=color:#f92672>=</span> self.recurse_over(self.outcomes.len() <span style=color:#f92672>/</span> <span style=color:#ae81ff>2</span><span style=color:#f92672>..</span>self.outcomes.len(), ctx)<span style=color:#f92672>?</span> {
+</span></span><span style=display:flex><span>            Ok(Box::new(std::iter::once(Ok(tmpl))))
+</span></span><span style=display:flex><span>        } <span style=color:#66d9ef>else</span> {
+</span></span><span style=display:flex><span>            Ok(Box::new(std::iter::empty()))
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// Action when the price is less than or equal to the price in the middle
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#75715e>#[guard]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>lt</span>(self, _ctx: <span style=color:#a6e22e>Context</span>) {
+</span></span><span style=display:flex><span>        self.price(<span style=color:#66d9ef>false</span>)
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    <span style=color:#75715e>#[then(guarded_by = </span><span style=color:#e6db74>&#34;[Self::lt]&#34;</span><span style=color:#75715e>)]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>pay_lt</span>(self, ctx: <span style=color:#a6e22e>sapio</span>::Context) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> <span style=color:#66d9ef>let</span> Some(tmpl) <span style=color:#f92672>=</span> self.recurse_over(<span style=color:#ae81ff>0</span><span style=color:#f92672>..</span>self.outcomes.len() <span style=color:#f92672>/</span> <span style=color:#ae81ff>2</span>, ctx)<span style=color:#f92672>?</span> {
+</span></span><span style=display:flex><span>            Ok(Box::new(std::iter::once(Ok(tmpl))))
+</span></span><span style=display:flex><span>        } <span style=color:#66d9ef>else</span> {
+</span></span><span style=display:flex><span>            Ok(Box::new(std::iter::empty()))
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// Allow for both parties to cooperative close
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#75715e>#[guard]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>cooperate</span>(self, _ctx: <span style=color:#a6e22e>Context</span>) {
+</span></span><span style=display:flex><span>        self.cooperate.clone()
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>#[then]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>oracle_no_show</span>(self, _ctx: <span style=color:#a6e22e>Context</span>) {
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// elided for simplicity: unilateral close initiation after certain
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#75715e>// relative delay if oracle doesn&#39;t reveal data
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>This is, by itself, useless. But now that we have it we can implement now any
+payoff curve we want to. I&rsquo;ll just show one example and leave it as &ldquo;homework&rdquo;
+for you to build others. We&rsquo;ll start with the humble risk-reversal, which can be
+used to stablize a Bitcoin against the dollar. You can think of it as a Bitcoin
+&ldquo;low pass&rdquo; filter: you&rsquo;ll still see big price swings, but not little ones. See below:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-text data-lang=text><span style=display:flex><span> Value of BTC in Asset
+</span></span><span style=display:flex><span>    |            
+</span></span><span style=display:flex><span>    |                                 /
+</span></span><span style=display:flex><span>    |             a                  /
+</span></span><span style=display:flex><span>    |        &lt;------         b      /
+</span></span><span style=display:flex><span>    |               -------------&gt; /
+</span></span><span style=display:flex><span>    |        ----------------------
+</span></span><span style=display:flex><span>    |       /       ^
+</span></span><span style=display:flex><span>    |      /        |
+</span></span><span style=display:flex><span>    |     /        current price
+</span></span><span style=display:flex><span>    |    /
+</span></span><span style=display:flex><span>    --------------------------------------------------- price of BTC in Asset
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-text data-lang=text><span style=display:flex><span> Amount of BTC
+</span></span><span style=display:flex><span>    |            
+</span></span><span style=display:flex><span>    |-------
+</span></span><span style=display:flex><span>    |       \
+</span></span><span style=display:flex><span>    |        \  ^
+</span></span><span style=display:flex><span>    |         \  \
+</span></span><span style=display:flex><span>    |          \  \
+</span></span><span style=display:flex><span>    |           \  \
+</span></span><span style=display:flex><span>    |            \  \  a
+</span></span><span style=display:flex><span>    |             \  \
+</span></span><span style=display:flex><span>    |              \  \
+</span></span><span style=display:flex><span>    |               \  \
+</span></span><span style=display:flex><span>    |                \  \
+</span></span><span style=display:flex><span>    |                 \ &lt;- current price
+</span></span><span style=display:flex><span>    |                  \  \
+</span></span><span style=display:flex><span>    |                   \  \
+</span></span><span style=display:flex><span>    |                    \  \
+</span></span><span style=display:flex><span>    |                     \  \ b
+</span></span><span style=display:flex><span>    |                      \  \
+</span></span><span style=display:flex><span>    |                       \  \
+</span></span><span style=display:flex><span>    |                        \  \
+</span></span><span style=display:flex><span>    |                         \  \
+</span></span><span style=display:flex><span>    |                          \  \
+</span></span><span style=display:flex><span>    |                           \  \
+</span></span><span style=display:flex><span>    |                            \  \
+</span></span><span style=display:flex><span>    |                             \  v
+</span></span><span style=display:flex><span>    |                              \
+</span></span><span style=display:flex><span>    |                               --------------
+</span></span><span style=display:flex><span>    |    
+</span></span><span style=display:flex><span>    --------------------------------------------------- price of BTC in Asset
+</span></span></code></pre></div><p>In this case, Operator would be providing enough Bitcoin (Y) for a user&rsquo;s funds (X) such that:</p><p>$$ (current - a)*(X+Y) = current * X$$
+or
+$$ Y * current = a * (X + Y)$$</p><p>and would be seeing a potential bitcoin gain (Z) of</p><p>$$(current + b) * (X - Z) = current * X$$
+or
+$$Z = b * X / (b + current)$$</p><p>or \(Z (current + b)\) dollars.</p><p>Operator can profit on the contract by:</p><ol><li>selecting carefully parameters a and b</li><li>charging a premium</li><li>charging a fee (& rehypothecating the position)</li></ol><p>Similar to our GenericBetArguments we&rsquo;ll compile this to a GenericBet to hide all the Network-y stuff.</p><p>First, let us define a couple APIs we need for the maker and taker of a contract (e.g., the person offering dollar stabilization and the person needing it).</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#e6db74>/// An API for the Operator Service:
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#66d9ef>pub</span> <span style=color:#66d9ef>trait</span> OperatorApi {
+</span></span><span style=display:flex><span>   <span style=color:#e6db74>/// Return Operator&#39;s Oracle
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>   <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>get_oracle</span>(<span style=color:#f92672>&amp;</span>self) -&gt; <span style=color:#66d9ef>&amp;</span><span style=color:#a6e22e>dyn</span> Oracle;
+</span></span><span style=display:flex><span>   <span style=color:#e6db74>/// Get a fresh key clause for Operator signing (could be a multisig etc)
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>   <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>get_key</span>(<span style=color:#f92672>&amp;</span>self) -&gt; <span style=color:#a6e22e>Clause</span>;
+</span></span><span style=display:flex><span>   <span style=color:#e6db74>/// Get a contract for a receivable amount. Allows Operator to direct funds to e.g.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>   <span style=color:#e6db74>/// cold storage contracts
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>   <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>receive_payment</span>(<span style=color:#f92672>&amp;</span>self, amount: <span style=color:#a6e22e>Amount</span>) -&gt; <span style=color:#a6e22e>Compiled</span>;
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#e6db74>/// An API for the Counterparty
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#66d9ef>pub</span> <span style=color:#66d9ef>trait</span> UserApi {
+</span></span><span style=display:flex><span>   <span style=color:#e6db74>/// Get a fresh key clause for user signing (could be a multisig etc)
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>   <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>get_key</span>(<span style=color:#f92672>&amp;</span>self) -&gt; <span style=color:#a6e22e>Clause</span>;
+</span></span><span style=display:flex><span>   <span style=color:#e6db74>/// Get a contract for a receivable amount. Allows Userto direct funds to e.g.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>   <span style=color:#e6db74>/// cold storage contracts
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>   <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>receive_payment</span>(<span style=color:#f92672>&amp;</span>self, amount: <span style=color:#a6e22e>Amount</span>) -&gt; <span style=color:#a6e22e>Compiled</span>;
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Now, let us define the Arguments to a Risk Reversal:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#e6db74>//! RiskReversal represents a specific contract where we specify a set of price ranges that we
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>//! want to keep purchasing power flat within.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#66d9ef>pub</span> <span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>RiskReversal</span><span style=color:#f92672>&lt;&#39;</span><span style=color:#a6e22e>a</span><span style=color:#f92672>&gt;</span> {
+</span></span><span style=display:flex><span>    amount: <span style=color:#a6e22e>Amount</span>,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// the current price in dollars with one_unit precision
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    current_price_x_one_unit: <span style=color:#66d9ef>u64</span>,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// price multipliers rationals (lo, hi) and (a,b) = a/b
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// e.g. ((7, 91), (1, 10)) computes from price - price*7/91 to price + price*1/10
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    range: ((<span style=color:#66d9ef>u64</span>, <span style=color:#66d9ef>u64</span>), (<span style=color:#66d9ef>u64</span>, <span style=color:#66d9ef>u64</span>)),
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// ignore the
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    operator_api: <span style=color:#66d9ef>&amp;</span><span style=color:#f92672>&#39;</span><span style=color:#a6e22e>a</span> <span style=color:#a6e22e>dyn</span> apis::OperatorApi,
+</span></span><span style=display:flex><span>    user_api: <span style=color:#66d9ef>&amp;</span><span style=color:#f92672>&#39;</span><span style=color:#a6e22e>a</span> <span style=color:#a6e22e>dyn</span> apis::UserApi,
+</span></span><span style=display:flex><span>    symbol: <span style=color:#a6e22e>Symbol</span>,
+</span></span><span style=display:flex><span>    ctx: <span style=color:#a6e22e>Context</span>,
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Lastly, a bunch of complicated logic to turn those arguments
+into a price curve for a GenericBetArguments that then gets turned
+into a GenericBet:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#66d9ef>const</span> ONE_UNIT: <span style=color:#66d9ef>u64</span> <span style=color:#f92672>=</span> <span style=color:#ae81ff>10_000</span>;
+</span></span><span style=display:flex><span><span style=color:#66d9ef>impl</span><span style=color:#f92672>&lt;&#39;</span><span style=color:#a6e22e>a</span><span style=color:#f92672>&gt;</span> TryFrom<span style=color:#f92672>&lt;</span>RiskReversal<span style=color:#f92672>&lt;&#39;</span><span style=color:#a6e22e>a</span><span style=color:#f92672>&gt;&gt;</span> <span style=color:#66d9ef>for</span> GenericBetArguments<span style=color:#f92672>&lt;&#39;</span><span style=color:#a6e22e>a</span><span style=color:#f92672>&gt;</span> {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>type</span> <span style=color:#a6e22e>Error</span> <span style=color:#f92672>=</span> CompilationError;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>try_from</span>(<span style=color:#66d9ef>mut</span> v: <span style=color:#a6e22e>RiskReversal</span><span style=color:#f92672>&lt;&#39;</span><span style=color:#a6e22e>a</span><span style=color:#f92672>&gt;</span>) -&gt; Result<span style=color:#f92672>&lt;</span>Self, Self::Error<span style=color:#f92672>&gt;</span> {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> key <span style=color:#f92672>=</span> v.operator_api.get_key();
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> user <span style=color:#f92672>=</span> v.user_api.get_key();
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> <span style=color:#66d9ef>mut</span> outcomes <span style=color:#f92672>=</span> vec![];
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> current_price <span style=color:#f92672>=</span> v.current_price_x_one_unit;
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// TODO: Can Customize this logic to for arbitrary curves or grids
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#75715e>// bottom and top are floor/ceil for where our contract operates
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#66d9ef>let</span> bottom <span style=color:#f92672>=</span>
+</span></span><span style=display:flex><span>            ((current_price <span style=color:#f92672>-</span> (current_price <span style=color:#f92672>*</span> v.range.<span style=color:#ae81ff>0</span> .<span style=color:#ae81ff>0</span>) <span style=color:#f92672>/</span> v.range.<span style=color:#ae81ff>0</span> .<span style=color:#ae81ff>1</span>) <span style=color:#f92672>/</span> ONE_UNIT) <span style=color:#f92672>*</span> ONE_UNIT;
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> top <span style=color:#f92672>=</span> (((current_price <span style=color:#f92672>+</span> (current_price <span style=color:#f92672>*</span> v.range.<span style=color:#ae81ff>1</span> .<span style=color:#ae81ff>0</span>) <span style=color:#f92672>/</span> v.range.<span style=color:#ae81ff>1</span> .<span style=color:#ae81ff>1</span>) <span style=color:#f92672>+</span> ONE_UNIT
+</span></span><span style=display:flex><span>            <span style=color:#f92672>-</span> <span style=color:#ae81ff>1</span>)
+</span></span><span style=display:flex><span>            <span style=color:#f92672>/</span> ONE_UNIT)
+</span></span><span style=display:flex><span>            <span style=color:#f92672>*</span> ONE_UNIT;
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// The max amount of BTC the contract needs to meet obligations
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#66d9ef>let</span> max_amount_bitcoin <span style=color:#f92672>=</span> (v.amount <span style=color:#f92672>*</span> current_price) <span style=color:#f92672>/</span> bottom;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// represents an overflow
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#66d9ef>if</span> bottom <span style=color:#f92672>&gt;</span> current_price <span style=color:#f92672>||</span> top <span style=color:#f92672>&lt;</span> current_price {
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>return</span> Err(CompilationError::TerminateCompilation);
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> <span style=color:#66d9ef>mut</span> strike_ctx <span style=color:#f92672>=</span> v.ctx.derive_str(Arc::new(<span style=color:#e6db74>&#34;strike&#34;</span>.into()))<span style=color:#f92672>?</span>;
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// Increment 1 dollar per step
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#66d9ef>for</span> strike <span style=color:#66d9ef>in</span> (bottom<span style=color:#f92672>..=</span>top).step_by(ONE_UNIT <span style=color:#66d9ef>as</span> <span style=color:#66d9ef>usize</span>) {
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// Value Conservation Property:
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#75715e>// strike * (amount + delta)  == amount * current price
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#75715e>// strike * (pay to user)  == amount * current price
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#75715e>// pay to user  == amount * current price / strike
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#66d9ef>let</span> profit <span style=color:#f92672>=</span> (v.amount <span style=color:#f92672>*</span> current_price) <span style=color:#f92672>/</span> strike;
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>let</span> refund <span style=color:#f92672>=</span> max_amount_bitcoin <span style=color:#f92672>-</span> profit;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>            outcomes.push((
+</span></span><span style=display:flex><span>                strike <span style=color:#66d9ef>as</span> <span style=color:#66d9ef>i64</span>,
+</span></span><span style=display:flex><span>                strike_ctx
+</span></span><span style=display:flex><span>                    .derive_num(strike <span style=color:#66d9ef>as</span> <span style=color:#66d9ef>u64</span>)<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>                    .template()
+</span></span><span style=display:flex><span>                    .add_output(profit, <span style=color:#f92672>&amp;</span>v.user_api.receive_payment(profit), None)<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>                    .add_output(refund, <span style=color:#f92672>&amp;</span>v.operator_api.receive_payment(refund), None)<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>                    .into(),
+</span></span><span style=display:flex><span>            ));
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// Now that the schedule is constructed, build a contract
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        Ok(GenericBetArguments {
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// must send max amount for the contract to be valid!
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            amount: <span style=color:#a6e22e>max_amount_bitcoin</span>,
+</span></span><span style=display:flex><span>            outcomes,
+</span></span><span style=display:flex><span>            oracle: <span style=color:#a6e22e>v</span>.operator_api.get_oracle(),
+</span></span><span style=display:flex><span>            cooperate: <span style=color:#a6e22e>Clause</span>::And(vec![key, user]),
+</span></span><span style=display:flex><span>            symbol: <span style=color:#a6e22e>v</span>.symbol,
+</span></span><span style=display:flex><span>        })
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>impl</span><span style=color:#f92672>&lt;&#39;</span><span style=color:#a6e22e>a</span><span style=color:#f92672>&gt;</span> TryFrom<span style=color:#f92672>&lt;</span>RiskReversal<span style=color:#f92672>&lt;&#39;</span><span style=color:#a6e22e>a</span><span style=color:#f92672>&gt;&gt;</span> <span style=color:#66d9ef>for</span> GenericBet {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>type</span> <span style=color:#a6e22e>Error</span> <span style=color:#f92672>=</span> CompilationError;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>try_from</span>(v: <span style=color:#a6e22e>RiskReversal</span><span style=color:#f92672>&lt;&#39;</span><span style=color:#a6e22e>a</span><span style=color:#f92672>&gt;</span>) -&gt; Result<span style=color:#f92672>&lt;</span>Self, Self::Error<span style=color:#f92672>&gt;</span> {
+</span></span><span style=display:flex><span>        Ok(GenericBetArguments::try_from(v)<span style=color:#f92672>?</span>.into())
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Woooooop! Our Risk has been Reversed!</p><h2 id=options>Options</h2><p>First let&rsquo;s play with Options.</p><p>We need a generic trait interface for all options. The basics
+are something to happen when it expires, and something to happen
+when it is paid for (<code>strikes</code>).</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#e6db74>/// Generic functionality required for Expiring contracts
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#66d9ef>pub</span> <span style=color:#66d9ef>trait</span> Expires: <span style=color:#f92672>&#39;</span>static <span style=color:#f92672>+</span> Sized {
+</span></span><span style=display:flex><span>    decl_then<span style=color:#f92672>!</span> {
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>/// What to do when the timeout expires
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>        expires
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    decl_then<span style=color:#f92672>!</span> {
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>/// what to do when the holder wishes to strike
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>        strikes
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>First we&rsquo;ll define an <code>ExpiringOption</code> whereby two parties deposit
+all the funds required for the contract (full collateral).</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#e6db74>/// Wraps a generic option opt with functionality to refund both parties on timeout.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#66d9ef>pub</span> <span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>ExpiringOption</span><span style=color:#f92672>&lt;</span>T: <span style=color:#f92672>&#39;</span>static<span style=color:#f92672>&gt;</span> {
+</span></span><span style=display:flex><span>    party_one: <span style=color:#a6e22e>Amount</span>,
+</span></span><span style=display:flex><span>    party_two: <span style=color:#a6e22e>Amount</span>,
+</span></span><span style=display:flex><span>    key_p1: <span style=color:#a6e22e>bitcoin</span>::Address,
+</span></span><span style=display:flex><span>    key_p2: <span style=color:#a6e22e>bitcoin</span>::Address,
+</span></span><span style=display:flex><span>    key_p2_pk: <span style=color:#a6e22e>Clause</span>,
+</span></span><span style=display:flex><span>    opt: <span style=color:#a6e22e>T</span>,
+</span></span><span style=display:flex><span>    timeout: <span style=color:#a6e22e>AnyAbsTimeLock</span>,
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span><span style=color:#66d9ef>impl</span><span style=color:#f92672>&lt;</span>T<span style=color:#f92672>&gt;</span> Contract <span style=color:#66d9ef>for</span> ExpiringOption<span style=color:#f92672>&lt;</span>T<span style=color:#f92672>&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>where</span>
+</span></span><span style=display:flex><span>    GenericBet: <span style=color:#a6e22e>TryFrom</span><span style=color:#f92672>&lt;</span>T, Error <span style=color:#f92672>=</span> CompilationError<span style=color:#f92672>&gt;</span>,
+</span></span><span style=display:flex><span>    T: Clone <span style=color:#f92672>+</span> <span style=color:#f92672>&#39;</span>static,
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    declare<span style=color:#f92672>!</span>(then, Self::expires, Self::strikes);
+</span></span><span style=display:flex><span>    declare<span style=color:#f92672>!</span>(non updatable);
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>impl</span><span style=color:#f92672>&lt;</span>T<span style=color:#f92672>&gt;</span> ExpiringOption<span style=color:#f92672>&lt;</span>T<span style=color:#f92672>&gt;</span> {
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// Party Two is the option holder
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#75715e>#[guard]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>signed</span>(self, _ctx: <span style=color:#a6e22e>Context</span>) {
+</span></span><span style=display:flex><span>        self.key_p2_pk.clone()
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Then we&rsquo;ll implement the functions:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#66d9ef>impl</span><span style=color:#f92672>&lt;</span>T<span style=color:#f92672>&gt;</span> Expires <span style=color:#66d9ef>for</span> ExpiringOption<span style=color:#f92672>&lt;</span>T<span style=color:#f92672>&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>where</span>
+</span></span><span style=display:flex><span>    GenericBet: <span style=color:#a6e22e>TryFrom</span><span style=color:#f92672>&lt;</span>T, Error <span style=color:#f92672>=</span> CompilationError<span style=color:#f92672>&gt;</span>,
+</span></span><span style=display:flex><span>    T: Clone,
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#75715e>#[then]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>expires</span>(self, ctx: <span style=color:#a6e22e>sapio</span>::Context) {
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// return the money to each party
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        ctx.template()
+</span></span><span style=display:flex><span>            .add_output(
+</span></span><span style=display:flex><span>                self.party_one.into(),
+</span></span><span style=display:flex><span>                <span style=color:#f92672>&amp;</span>Compiled::from_address(self.key_p1.clone(), None),
+</span></span><span style=display:flex><span>                None,
+</span></span><span style=display:flex><span>            )<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>            .add_output(
+</span></span><span style=display:flex><span>                self.party_two.into(),
+</span></span><span style=display:flex><span>                <span style=color:#f92672>&amp;</span>Compiled::from_address(self.key_p2.clone(), None),
+</span></span><span style=display:flex><span>                None,
+</span></span><span style=display:flex><span>            )<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>            .set_lock_time(self.timeout)<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>            .into()
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// Only party 2 can strike!
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#75715e>#[then(guarded_by = </span><span style=color:#e6db74>&#34;[Self::signed]&#34;</span><span style=color:#75715e>)]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>strikes</span>(self, ctx: <span style=color:#a6e22e>sapio</span>::Context) {
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// Send the money to a generic bet...
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        ctx.template()
+</span></span><span style=display:flex><span>            .add_output(
+</span></span><span style=display:flex><span>                (self.party_one <span style=color:#f92672>+</span> self.party_two).into(),
+</span></span><span style=display:flex><span>                <span style=color:#f92672>&amp;</span>GenericBet::try_from(self.opt.clone())<span style=color:#f92672>?</span>,
+</span></span><span style=display:flex><span>                None,
+</span></span><span style=display:flex><span>            )<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>            .into()
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Now we&rsquo;ll implement similar logic, but where the amount from <code>party_two</code>
+is not paid until the strike is called:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#e6db74>/// Similar to `ExpiringOption` except that the option requires an additional
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>/// value amount to be paid in in order to execute, hence being &#34;under funded&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#66d9ef>pub</span> <span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>UnderFundedExpiringOption</span><span style=color:#f92672>&lt;</span>T: <span style=color:#f92672>&#39;</span>static<span style=color:#f92672>&gt;</span> {
+</span></span><span style=display:flex><span>    party_one: <span style=color:#a6e22e>Amount</span>,
+</span></span><span style=display:flex><span>    party_two: <span style=color:#a6e22e>Amount</span>,
+</span></span><span style=display:flex><span>    key_p1: <span style=color:#a6e22e>bitcoin</span>::Address,
+</span></span><span style=display:flex><span>    opt: <span style=color:#a6e22e>T</span>,
+</span></span><span style=display:flex><span>    timeout: <span style=color:#a6e22e>AnyAbsTimeLock</span>,
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span><span style=color:#66d9ef>impl</span><span style=color:#f92672>&lt;</span>T<span style=color:#f92672>&gt;</span> Contract <span style=color:#66d9ef>for</span> UnderFundedExpiringOption<span style=color:#f92672>&lt;</span>T<span style=color:#f92672>&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>where</span>
+</span></span><span style=display:flex><span>    GenericBet: <span style=color:#a6e22e>TryFrom</span><span style=color:#f92672>&lt;</span>T, Error <span style=color:#f92672>=</span> CompilationError<span style=color:#f92672>&gt;</span>,
+</span></span><span style=display:flex><span>    T: Clone <span style=color:#f92672>+</span> <span style=color:#f92672>&#39;</span>static,
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    declare<span style=color:#f92672>!</span>(then, Self::expires, Self::strikes);
+</span></span><span style=display:flex><span>    declare<span style=color:#f92672>!</span>(non updatable);
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>impl</span><span style=color:#f92672>&lt;</span>T<span style=color:#f92672>&gt;</span> Expires <span style=color:#66d9ef>for</span> UnderFundedExpiringOption<span style=color:#f92672>&lt;</span>T<span style=color:#f92672>&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>where</span>
+</span></span><span style=display:flex><span>    GenericBet: <span style=color:#a6e22e>TryFrom</span><span style=color:#f92672>&lt;</span>T, Error <span style=color:#f92672>=</span> CompilationError<span style=color:#f92672>&gt;</span>,
+</span></span><span style=display:flex><span>    T: Clone,
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#75715e>#[then]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>expires</span>(self, ctx: <span style=color:#a6e22e>sapio</span>::Context) {
+</span></span><span style=display:flex><span>        ctx.template()
+</span></span><span style=display:flex><span>            .add_output(
+</span></span><span style=display:flex><span>                self.party_one.into(),
+</span></span><span style=display:flex><span>                <span style=color:#f92672>&amp;</span>Compiled::from_address(self.key_p1.clone(), None),
+</span></span><span style=display:flex><span>                None,
+</span></span><span style=display:flex><span>            )<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>            .set_lock_time(self.timeout)<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>            .into()
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>#[then]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>strikes</span>(self, ctx: <span style=color:#a6e22e>sapio</span>::Context) {
+</span></span><span style=display:flex><span>        ctx.template()
+</span></span><span style=display:flex><span>            .add_amount(self.party_two)
+</span></span><span style=display:flex><span>            .add_sequence()
+</span></span><span style=display:flex><span>            .add_output(
+</span></span><span style=display:flex><span>                (self.party_one <span style=color:#f92672>+</span> self.party_two).into(),
+</span></span><span style=display:flex><span>                <span style=color:#f92672>&amp;</span>GenericBet::try_from(self.opt.clone())<span style=color:#f92672>?</span>,
+</span></span><span style=display:flex><span>                None,
+</span></span><span style=display:flex><span>            )<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>            .into()
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h3 id=nft-exercises-for-the-reader>NFT Exercises for the reader:</h3><ul><li>Question: Why isn&rsquo;t a normal NFT Sale contract an Option?</li><li>Answer: Because it doesn&rsquo;t guarantee the uniqueness of the right to purchase</li><li>Question: How can we implement NFT Options?</li><li>Answer: The NFT Option has to be the <em>only</em> owner of the NFT. Without writing any new contracts&mldr; generate the code to transfer the NFT to a 2-2 multisig between option holder and seller, and pre-sign a timelocked transfer back to the original owner plus a non-timelocked sale to the purchaser for a price. With new contracts? Do the same thing, but without having to stitch it together.</li><li>Question: Can you do call options? What about put options?</li><li>Answer: Sure! For a call option have the contract have the NFT in it. For a
+put option, require that the NFT be put in and the funds present, and pre-sign
+the transfer. The tricky thing is that if you wish to &lsquo;move&rsquo; your NFT while you
+have a put option open, you must get your counterparty to agree to the new UTXO
+representing the NFT. But they can validate this client side and sign automatically.</li></ul><h1 id=does-this-need-ctv>Does this NEED CTV?</h1><p>No, not in particular. Most of this stuff could be done with online signer server federation between you and counterparty. CTV makes some stuff nicer though, and opens up new possibilities for opening these contracts unilaterally.</p><h1 id=representing-positions-as-nfts>Representing Positions as NFTs</h1><p>Offers to open up a contract could be represented as NFTs! You don&rsquo;t even need
+to create the NFT, just bind the NFT interface with an option open as a generic
+minting parameter, and then you can do price discovery of Option contracts through a dutch auction you thought was just for selling cat pics.</p><h1 id=wen-ln>Wen LN?</h1><p>Well, if you note that we can coop close options and derivatives, and that I
+claimed we don&rsquo;t need CTV, these two facts imply that you can put these kinds of
+contracts inside of the LN no problem :).</p><h1 id=what-about-powswap>What About PowSwap?</h1><p>I mentioned <a href=https://powswap.com>powswap.com</a> earlier. But you&rsquo;ll have to wait
+to read about it, that&rsquo;s all for today!</p><div class=footnotes role=doc-endnotes><hr><ol><li id=fn:1><p>I don&rsquo;t actually have any paid shills, contrary to some people&rsquo;s beliefs.&#160;<a href=#fnref:1 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p></li></ol></div></div><div></div></div><hr><div class=main2><div></div><div id=disqus_thread></div><script type=application/javascript>window.disqus_config=function(){},function(){if(["localhost","127.0.0.1"].indexOf(window.location.hostname)!=-1){document.getElementById("disqus_thread").innerHTML="Disqus comments not available by default when the website is previewed locally.";return}var t=document,e=t.createElement("script");e.async=!0,e.src="//judica-org.disqus.com/embed.js",e.setAttribute("data-timestamp",+new Date),(t.head||t.body).appendChild(e)}()</script><noscript>Please enable JavaScript to view the <a href=https://disqus.com/?ref_noscript>comments powered by Disqus.</a></noscript><a href=https://disqus.com class=dsq-brlink>comments powered by <span class=logo-disqus>Disqus</span></a><div></div></div><hr><footer style=text-align:center;bottom:0;padding-bottom:10px;width:100%>&copy; Judica, Inc 2022 | contact@judica.org | <a class=darkmode-switch>dark/light theme</a></footer></body></html>

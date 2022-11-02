@@ -1,0 +1,236 @@
+<!doctype html><html><head><meta name=viewport content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@200;500&display=swap" rel=stylesheet><link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600&display=swap" rel=stylesheet><link rel=stylesheet type=text/css href=/css/style.css><script>const storage=window.localStorage,get_darkmode=()=>{const e=storage.getItem("darkmode");return e==null||e==="true"},set_darkmode=()=>{get_darkmode()?(document.body.classList.remove("lightmode"),document.body.classList.add("darkmode")):(document.body.classList.remove("darkmode"),document.body.classList.add("lightmode"))};function applyBackgroundTheme(e){var n="body { background: "+e+"; }",s=document.head||document.getElementsByTagName("head")[0],t=document.createElement("style");return s.appendChild(t),t.type="text/css",t.styleSheet?t.styleSheet.cssText=n:t.appendChild(document.createTextNode(n)),t}const style=applyBackgroundTheme(get_darkmode()?"black":"white");document.addEventListener("DOMContentLoaded",()=>{set_darkmode(),style.parentElement.removeChild(style);const e=document.getElementsByClassName("darkmode-switch")[0];e.onclick=e=>{storage.setItem("darkmode",!get_darkmode()),get_darkmode(),set_darkmode()}})</script><script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-175497336-1","auto"),ga("send","pageview"))</script><script async src=https://www.google-analytics.com/analytics.js></script><meta property="og:title" content="Oracles, Bonds, and Attestation Chains"><meta property="og:description" content="This post is syndicated from rubin.io.
+Welcome to day 20 of my Bitcoin Advent Calendar. You can see an index of all the posts here or subscribe at judica.org/join to get new posts in your inbox
+Today&rsquo;s post is going to be a bit lighter weight than yesterday&rsquo;s. We&rsquo;ll cover some high level concepts around oracles and then look at some Sapio.
+The genesis of this line of inquiry was a conversation with Robin Linus that led to a pretty cool whitepaper, so definitely read that if you find this post compelling."><meta property="og:type" content="article"><meta property="og:url" content="https://judica.org/blog/advent-20/"><meta property="og:image" content="https://judica.org/img/og-img.png"><meta property="article:section" content="blog"><meta property="article:published_time" content="2021-12-17T00:00:00+00:00"><meta property="article:modified_time" content="2021-12-17T00:00:00+00:00"><meta property="og:site_name" content="judica.org -- restore the balance"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://judica.org/img/og-img.png"><meta name=twitter:title content="Oracles, Bonds, and Attestation Chains"><meta name=twitter:description content="This post is syndicated from rubin.io.
+Welcome to day 20 of my Bitcoin Advent Calendar. You can see an index of all the posts here or subscribe at judica.org/join to get new posts in your inbox
+Today&rsquo;s post is going to be a bit lighter weight than yesterday&rsquo;s. We&rsquo;ll cover some high level concepts around oracles and then look at some Sapio.
+The genesis of this line of inquiry was a conversation with Robin Linus that led to a pretty cool whitepaper, so definitely read that if you find this post compelling."></head><body><header class=nav><ul><li class=float-left><a href=/>judica.</a></li></ul><ul><li><a href=/about/>about.</a></li><li><a href=/software/>software.</a></li><li><a href=/blog/>blog.</a></li><li><a href=/join/>join.</a></li></ul></header><div class=main2><h1>Oracles, Bonds, and Attestation Chains</h1><div><h2 class=nobottom>Day 20: Rubin's Bitcoin Advent Calendar</h2></div><small>on December 17, 2021</small><hr></div><div class=main2><div></div><div class=blogtext-inner><p><em>This post is syndicated from <a href=https://rubin.io/advent21>rubin.io</a>.</em></p><p><em>Welcome to day 20 of my Bitcoin Advent Calendar. You can see an index of all
+the posts <a href=/advent21>here</a> or subscribe at
+<a href=https://judica.org/join>judica.org/join</a> to get new posts in your inbox</em></p><p>Today&rsquo;s post is going to be a bit lighter weight than yesterday&rsquo;s. We&rsquo;ll cover
+some high level concepts around oracles and then look at some Sapio.</p><p>The genesis of this line of inquiry was a conversation with Robin Linus that led to
+a pretty cool <a href=https://coins.github.io/stakechains.pdf>whitepaper</a>, so definitely
+read that if you find this post compelling.</p><h1 id=oracles>Oracles</h1><p>Oracles are cool! The most basic form of an useful bitcoin oracle is just a
+signing key that signs transactions or reveals information that it &ldquo;should&rdquo;
+according to some rule.</p><p>Protocols for oracles like discrete log contract oracles produce more generic
+&ldquo;key material reveals&rdquo;, that are more similar to releasing information that
+allows counterparties to decrypt the relevant signature.</p><p>One of the problems with oracles is that they can equivocate, that is, sign
+multiple conflicting statements. It would be nice if we could esnure that they
+would be consistent, no?</p><h1 id=bonded-oracles>Bonded Oracles</h1><p>In order to make the oracles consistent, what we can do is set up our oracles
+such that if the oracle ever signs two statements they reveal their private key
+to the world. The common way that this is done is via <em>nonce reuse</em>, which is
+essentially a way that you can extract a private key from a signature on
+messages m1 and m2 using the same nonce r1.</p><p>While revealing a key might be punishment enough, we can do one better. We can
+require that if a nonce is leaked, meaning some statement was equivocated, then
+a some bitcoin protected by that key can be &lsquo;stolen&rsquo; by anyone.</p><p>But this form is a little problematic, for a few reasons. Reason one is that the
+oracle could cancel their bond and take it back while there are still contracts
+settling with their data that they then equivocate on.</p><p>The other issue is that the funds in the punishment could be claimed by anyone,
+including a miner or the oracle themselves, and especially if oracles are also miners!</p><p>To fix the first issue, we need to lock up the fund for e.g. 2 weeks and only
+use the oracle for the first week to permit 1 week gap in closing. This creates a
+new issue that bonds are always expiring, but maybe that&rsquo;s OK.</p><p>To fix the second issue, we need a way of restricting where the funds go to definitely
+be out of reach of any bad guys, e.g. burned.</p><h2 id=ctv-fixes-this>CTV Fixes This.</h2><p>If you had checktemplateverify, you could stipulate that a
+bonded oracle must initiate a bond redemption on chain, at which point anyone
+can challenge it if they know the key and they are guaranteed sufficient time
+to post a challenge.</p><p>The second fix is that CTV can stipulate that the funds <em>must</em> be burned by
+sending to an OP_RETURN, not released to miners (which would be problematic if a
+miner was also an oracle).</p><p>Now our oracle is ready to sign all sorts of stuff, and we can make sure that
+for a given Nonce we never sign two conflicting statements.</p><h1 id=dlcs>DLCs?</h1><p>We can now use this type of oracle for a DLC protocol. We just create the contract
+and then we sign+reveal using our staking key whatever messages are required. Any cheating,
+and anyone who detects it can burn our money.</p><h1 id=attestation-chains>Attestation Chains</h1><p>One of the other cools things we can do with our Bonded oracle is to sign a chain of
+attestations.</p><p>For example, we could sign message 1, and then sign message 2, and then sign message 3.</p><p>We can turn this into a &ldquo;blockchain&rdquo; of sorts if when we sign m2 we include a
+hash of m1, and when we sign m3 we include a hash of m3.</p><p>But we can go a step further. If we&rsquo;re careful, we can set it up so that
+&lsquo;branching&rsquo; on any message in the chain (by equivocating/producing a conflicting
+statement) leaks the key of the bonded oracle with a trick I (think?) I came up
+with. Here&rsquo;s roughly how it works:</p><pre tabindex=0><code>message 1: INIT with PK K, nonce R1 for m2, 1 BTC at risk in output X
+message 2: SIGN with K, R1 H(m1), nonce R2 for m3
+message 3: SIGN with K, R2 H(m1), nonce R3 for m4
+</code></pre><p>If the oracle were to ever branch, it would look like this:</p><pre tabindex=0><code>message 1: INIT with PK K, nonce R1, 1 BTC at risk in output X
+message 2: SIGN with K, R1 H(m1), nonce R2
+message 3: SIGN with K, R2 H(m2), nonce R3
+message 3&#39;: SIGN with K, R2 H(m3), nonce R3&#39;
+</code></pre><p>The leak would be able to extract K&rsquo;s secret key via the reuse of R2.</p><p>While it might seem that you could &lsquo;get away with it&rsquo;, because we verify at each
+step that the last used nonce was from the prior step it cannot be forged. The
+commitment to <code>H(mi)</code> also makes it more difficult for an invalid signature to
+float around since from just the top you can know what all the other states
+should be.</p><h2 id=proof-of-stake>Proof of Stake?</h2><p>Essentially we&rsquo;ve built a system for proof-of-stake on Bitcoin. Imagine you have
+100BTC locked up in these contracts across 127 instances, and you want to run
+some system based on it.</p><p>You can just download the message signed at state Mn and see what the majority
+of signers voted for that slot.</p><p>Any signer who cheats gets their funds burned, and you&rsquo;d learn to exclude them
+from consensus.</p><p>If you do need to have a &lsquo;rollback&rsquo;, you can do it by engineering your protocol
+to allow new updates to the chain of signatures to produce a rollback.</p><h3 id=partial-slashing>Partial Slashing</h3><p>You can even implement partial slashing. Suppose you have 10 coins in a contract under
+key K1. If a cheat is detected, it authorizes a txn which burns 2 and puts the
+remaining 8 into key K2. The next round of slashing could put 6.4 under K3.</p><h1 id=alternatives-to-burning>Alternatives to Burning</h1><p>Burning sats is sad. What if instead of a burn, coins went into an annuity that
+would be claimable 100 years from now? That way, no economic agents around today
+can plan to cheat and capture the value of it, but the burned coins can serve a
+real function. While this is slightly less secure than a full burn, it&rsquo;s also
+more secure since it creates an incentive to continue to build the chain.</p><p>Or donate to a well known chairty address/developer fund :p</p><p>To begin, we&rsquo;ll define some &rsquo;type tags&rsquo;. This is a technique in rust where we
+define empty structs that let us build a little state machine in the type
+system. You can read more on the technique
+<a href=https://learn.sapio-lang.org/ch08-01-state-machines.html>here</a>.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#e6db74>/// # Operational State
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>/// State where stakes should be recognized for voting
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#75715e>#[derive(JsonSchema, Deserialize)]</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>pub</span> <span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>Operational</span>;
+</span></span><span style=display:flex><span><span style=color:#e6db74>/// # Closing State
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>/// State where stakes are closing and waiting evidence of misbehavior
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#75715e>#[derive(JsonSchema, Deserialize)]</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>Closing</span>;
+</span></span><span style=display:flex><span><span style=color:#e6db74>/// # Staking States (Operational, Closing)
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>/// enum trait for states
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#66d9ef>pub</span> <span style=color:#66d9ef>trait</span> StakingState {}
+</span></span><span style=display:flex><span><span style=color:#66d9ef>impl</span> StakingState <span style=color:#66d9ef>for</span> Operational {}
+</span></span><span style=display:flex><span><span style=color:#66d9ef>impl</span> StakingState <span style=color:#66d9ef>for</span> Closing {}
+</span></span></code></pre></div><p>Next, we&rsquo;ll define an interface that an implementation of a Staked Signer should
+implement:</p><p>By default something that is declared is given a default not-present implementation.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#e6db74>/// Functional Interface for Staking Contracts
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#66d9ef>pub</span> <span style=color:#66d9ef>trait</span> StakerInterface
+</span></span><span style=display:flex><span><span style=color:#66d9ef>where</span>
+</span></span><span style=display:flex><span>    Self: Sized,
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    decl_guard<span style=color:#f92672>!</span>(
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>/// The key used to sign messages
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>        staking_key
+</span></span><span style=display:flex><span>    );
+</span></span><span style=display:flex><span>    decl_guard<span style=color:#f92672>!</span>(
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>/// the clause to begin a close process
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>        begin_redeem_key
+</span></span><span style=display:flex><span>    );
+</span></span><span style=display:flex><span>    decl_guard<span style=color:#f92672>!</span>(
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>/// the clause to finish a close process
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>        finish_redeem_key
+</span></span><span style=display:flex><span>    );
+</span></span><span style=display:flex><span>    decl_then<span style=color:#f92672>!</span>(
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>/// The transition from Operational to Closing
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>        begin_redeem
+</span></span><span style=display:flex><span>    );
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// Why would anyone ever cheat!!
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#75715e>#[then(guarded_by = </span><span style=color:#e6db74>&#34;[Self::staking_key]&#34;</span><span style=color:#75715e>)]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>cheated</span>(self, ctx: <span style=color:#a6e22e>sapio</span>::Context) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> f <span style=color:#f92672>=</span> ctx.funds();
+</span></span><span style=display:flex><span>        ctx.template()
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// commit to metadata here for convenience, but really could be anywhere!
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#75715e>// exercise for reader: what if we plugged in another instance of StakerInterface
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#75715e>// that:
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#75715e>// 1. switches to a new, unburned key
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#75715e>// 2. pays 80% to the new StakerInterface
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#75715e>// 3. pays 20% to an annuity that pays miners over e.g. 1000 blocks
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#75715e>//    at some point in the far future.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            .add_output(f, <span style=color:#f92672>&amp;</span>Compiled::from_op_return(<span style=color:#f92672>&amp;</span>self.data.as_inner()[<span style=color:#f92672>..</span>])<span style=color:#f92672>?</span>, None)<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>            .into()
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#e6db74>/// We can delcare the Contract impl for all valid Staker&lt;T&gt;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#66d9ef>impl</span><span style=color:#f92672>&lt;</span>T: <span style=color:#f92672>&#39;</span>static <span style=color:#f92672>+</span> StakingState<span style=color:#f92672>&gt;</span> Contract <span style=color:#66d9ef>for</span> Staker<span style=color:#f92672>&lt;</span>T<span style=color:#f92672>&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>where</span>
+</span></span><span style=display:flex><span>    Staker<span style=color:#f92672>&lt;</span>T<span style=color:#f92672>&gt;</span>: <span style=color:#a6e22e>StakerInterface</span>,
+</span></span><span style=display:flex><span>    T: <span style=color:#a6e22e>StakingState</span>,
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    declare<span style=color:#f92672>!</span> {then, Self::begin_redeem, Self::cheated}
+</span></span><span style=display:flex><span>    declare<span style=color:#f92672>!</span> {finish, Self::finish_redeem_key}
+</span></span><span style=display:flex><span>    declare<span style=color:#f92672>!</span> {non updatable}
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Next, we&rsquo;ll define the data required for our staker:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#e6db74>/// # Staker: A Bonded Signing Contract
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>/// Staker is a contract that proceeds from Operational -&gt; Closing
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>/// During it&#39;s lifetime, many things can be signed with signing_key,
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>/// but should the key ever leak (e.g., via nonce reuse) the bonded
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>/// funds can be burned.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>///
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>/// Burning is important v.s. miner fee because otherwise the staker
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>/// can bribe (or be a miner themselves) to cheat.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span><span style=color:#75715e>#[derive(JsonSchema, Deserialize)]</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>pub</span> <span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>Staker</span><span style=color:#f92672>&lt;</span>T: <span style=color:#a6e22e>StakingState</span><span style=color:#f92672>&gt;</span> {
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # Timeout
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// How long to wait for evidence after closing
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    timeout: <span style=color:#a6e22e>AnyRelTimeLock</span>,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # Signing Key
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// The key that if leaked can burn funds
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    signing_key: <span style=color:#a6e22e>PublicKey</span>,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # Redemption Key
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// The key that will be used to control &amp; return the redeemed funds
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    redeeming_key: <span style=color:#a6e22e>PublicKey</span>,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # Data
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// Arbitrary hash of metadata that is needed to start the attestation chain
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    data: <span style=color:#a6e22e>sha256</span>::Hash,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// current contract state.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#75715e>#[serde(skip, default)]</span>
+</span></span><span style=display:flex><span>    state: <span style=color:#a6e22e>PhantomData</span><span style=color:#f92672>&lt;</span>T<span style=color:#f92672>&gt;</span>,
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Next, we&rsquo;ll define the StakerInterface when our channel is operational. At this phase,
+funds can either be burnt or the redeeming key can start the process of withdrawing.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#66d9ef>impl</span> StakerInterface <span style=color:#66d9ef>for</span> Staker<span style=color:#f92672>&lt;</span>Operational<span style=color:#f92672>&gt;</span> {
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// redeeming key
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#75715e>#[guard]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>begin_redeem_key</span>(self, _ctx: <span style=color:#a6e22e>Context</span>) {
+</span></span><span style=display:flex><span>        Clause::Key(self.redeeming_key)
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// begin redemption process
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#75715e>#[then(guarded_by = </span><span style=color:#e6db74>&#34;[Self::begin_redeem_key]&#34;</span><span style=color:#75715e>)]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>begin_redeem</span>(self, ctx: <span style=color:#a6e22e>sapio</span>::Context) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> f <span style=color:#f92672>=</span> ctx.funds();
+</span></span><span style=display:flex><span>        ctx.template()
+</span></span><span style=display:flex><span>            .add_output(
+</span></span><span style=display:flex><span>                f,
+</span></span><span style=display:flex><span>                <span style=color:#f92672>&amp;</span>Staker::<span style=color:#f92672>&lt;</span>Closing<span style=color:#f92672>&gt;</span> {
+</span></span><span style=display:flex><span>                    state: Default::default(),
+</span></span><span style=display:flex><span>                    timeout: <span style=color:#a6e22e>self</span>.timeout,
+</span></span><span style=display:flex><span>                    signing_key: <span style=color:#a6e22e>self</span>.signing_key,
+</span></span><span style=display:flex><span>                    redeeming_key: <span style=color:#a6e22e>self</span>.redeeming_key,
+</span></span><span style=display:flex><span>                },
+</span></span><span style=display:flex><span>                None,
+</span></span><span style=display:flex><span>            )<span style=color:#f92672>?</span>
+</span></span><span style=display:flex><span>            .into()
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// staking key
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#75715e>#[guard]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>staking_key</span>(self, _ctx: <span style=color:#a6e22e>Context</span>) {
+</span></span><span style=display:flex><span>        Clause::Key(self.signing_key)
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Lastly, for closing we should not be able to &ldquo;loop&rdquo; back into Closing or
+Operational, so we do not implement the <code>begin_redeem</code> logic.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#66d9ef>impl</span> StakerInterface <span style=color:#66d9ef>for</span> Staker<span style=color:#f92672>&lt;</span>Closing<span style=color:#f92672>&gt;</span> {
+</span></span><span style=display:flex><span>    <span style=color:#75715e>#[guard]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>finish_redeem_key</span>(self, _ctx: <span style=color:#a6e22e>Context</span>) {
+</span></span><span style=display:flex><span>        Clause::And(vec![Clause::Key(self.redeeming_key), self.timeout.into()])
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    <span style=color:#75715e>#[guard]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>staking_key</span>(self, _ctx: <span style=color:#a6e22e>Context</span>) {
+</span></span><span style=display:flex><span>        Clause::Key(self.signing_key)
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=attestation-chain>Attestation Chain</h2><p>In order to start the attestation chain, the <code>data</code> field should be the hash of something like:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>AttestationStart</span> {
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # Nonce
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// a nonce element
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    first_nonce: [<span style=color:#ae81ff>0</span><span style=color:#66d9ef>u8</span>; <span style=color:#ae81ff>32</span>],
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # Key
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// the key to sign with (for convenience, should match the StakedSigner&#39;s
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// staking key)
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    key: <span style=color:#a6e22e>PublicKey</span>,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # Purpose
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// useful to have some sort of description (machine readable) of what this attestor
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// is signing for
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    purpose: Vec<span style=color:#f92672>&lt;</span><span style=color:#66d9ef>u8</span><span style=color:#f92672>&gt;</span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>To start using the attestation chain, we build a linked list of <code>Attest</code>
+signatures as described below:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#66d9ef>enum</span> <span style=color:#a6e22e>Either</span><span style=color:#f92672>&lt;</span>T, U<span style=color:#f92672>&gt;</span> {
+</span></span><span style=display:flex><span>    Left(T),
+</span></span><span style=display:flex><span>    Right(U)
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span><span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>Attest</span> {
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # Signature
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// the signature over the below data fields
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    sig: <span style=color:#a6e22e>Signature</span>,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # Message
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// whatever info the protocol expects to be signed
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    message: Vec<span style=color:#f92672>&lt;</span><span style=color:#66d9ef>u8</span><span style=color:#f92672>&gt;</span>,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # Nonce
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// a nonce element
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    next_nonce: [<span style=color:#ae81ff>0</span><span style=color:#66d9ef>u8</span>; <span style=color:#ae81ff>32</span>],
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # Height
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// what # signature is this
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    height: <span style=color:#66d9ef>u64</span>,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/// # Previous Attestation
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    <span style=color:#e6db74>/// the last attestation. we either keep a hash or the actual value
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>    prev: <span style=color:#a6e22e>Either</span><span style=color:#f92672>&lt;</span>Hash, Either<span style=color:#f92672>&lt;</span>Box<span style=color:#f92672>&lt;</span>Attest<span style=color:#f92672>&gt;</span>, AttestationStart<span style=color:#f92672>&gt;&gt;</span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>It would be possible &ndash; but perhaps overkill &ndash; to instead encode this structure
+as a Sapio contract with <code>continuation</code> branches. I&rsquo;ll leave that as an exercise
+for the reader for now!</p><h1 id=galaxy-brain-time>Galaxy Brain Time</h1><p>What if we used this staked signer to coordinate a decentralized mining pool
+where the stakers sign off on work shares they have seen&mldr;</p><h1 id=thats-all-folks>That&rsquo;s All Folks!</h1></div><div></div></div><hr><div class=main2><div></div><div id=disqus_thread></div><script type=application/javascript>window.disqus_config=function(){},function(){if(["localhost","127.0.0.1"].indexOf(window.location.hostname)!=-1){document.getElementById("disqus_thread").innerHTML="Disqus comments not available by default when the website is previewed locally.";return}var t=document,e=t.createElement("script");e.async=!0,e.src="//judica-org.disqus.com/embed.js",e.setAttribute("data-timestamp",+new Date),(t.head||t.body).appendChild(e)}()</script><noscript>Please enable JavaScript to view the <a href=https://disqus.com/?ref_noscript>comments powered by Disqus.</a></noscript><a href=https://disqus.com class=dsq-brlink>comments powered by <span class=logo-disqus>Disqus</span></a><div></div></div><hr><footer style=text-align:center;bottom:0;padding-bottom:10px;width:100%>&copy; Judica, Inc 2022 | contact@judica.org | <a class=darkmode-switch>dark/light theme</a></footer></body></html>
