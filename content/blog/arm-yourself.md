@@ -1,14 +1,13 @@
 +++
-title="Arm Yourself"
+title="Arm Yourself With Info On DAOs + Legal Entities"
 date='2022-11-04'
 author="Cara Ponzini"
-front_pic=''
-summary="""An update on the intersection of DAOs and legal entities that is absolutely not legal advice"""
-images=['']
+front_pic='/img/future-lawyers.png'
+summary="""An update on the current intersection of DAOs and legal entities that is absolutely not legal advice"""
+images=['/img/future-lawyers.png']
 description="Learn why a DAO might consider creating an associated business entity and explore pending cases that examine wither a DAO is a legal entity (whether it wants to be or not)."
 +++
 
-------------
 
 This week at Judica, we’ve been meeting with you all to learn more about what features are most important to you in Decentralized Autonomous Organization (DAO) software. 
 We’re excited about what you want to build on the Judica VM, and want you to be as informed as possible while forming your communities. 
@@ -74,7 +73,7 @@ Finally, if there’s one thing I learned as a practicing attorney, besides how 
 
 Cheers!
 
--------
+
 [^1]: In California, loss sharing is also an element in determining whether a general partnership exists. Cislaw v. Southland Corp., 4 Cal. App. 4th 1284, 1297-98 (Ct. App. 1992).
 
 [^2]: Memorandum of Points and Authorities in Support of Motion to Dismiss or, in the Alternative, to Strike Plaintiffs’ Class Allegations, Christian Sarcuni, et al. vs. bZx DAO et al. (2022, S.D. Cal, 22-CV-00618-LAB-DEB),1.
